@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows 跨平台 C++ 开发环境搭建指南</title>
+<style>
+:root{--bg:#0d1117;--sf:#161b22;--sf2:#1c2333;--bd:#30363d;--tx:#e6edf3;--txm:#8b949e;--ac:#58a6ff;--ac2:#3fb950;--ac3:#d2a8ff;--ac4:#ff7b72;--ac5:#ffa657;--tip:#12261e;--tipb:#3fb950;--warn:#2a1f0e;--warnb:#ffa657;--danger:#2d1214;--dangerb:#ff7b72;--info:#0d1f3c;--infob:#58a6ff;--story:#1a1530;--storyb:#d2a8ff}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tx);line-height:1.75;font-size:16px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:270px;min-width:270px;background:var(--sf);border-right:1px solid var(--bd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;padding:20px 0;z-index:100;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.sidebar-title{padding:0 18px 16px;font-size:17px;font-weight:700;color:var(--ac);border-bottom:1px solid var(--bd);margin-bottom:10px}
+.sidebar-title small{display:block;font-size:11px;color:var(--txm);font-weight:400;margin-top:3px}
+.ng{margin-bottom:6px}
+.ngt{padding:7px 18px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--txm)}
+.nl{display:block;padding:4px 18px 4px 26px;color:var(--txm);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+.nl:hover{color:var(--tx);background:rgba(255,255,255,.03);border-left-color:var(--ac)}
+.nl.active{color:var(--ac);border-left-color:var(--ac);background:rgba(88,166,255,.06)}
+.main{flex:1;margin-left:270px;padding:36px 56px 80px;max-width:940px}
+h1{font-size:34px;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,var(--ac),var(--ac3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:17px;color:var(--txm);margin-bottom:36px}
+h2{font-size:26px;font-weight:700;margin:52px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--bd);scroll-margin-top:20px}
+h3{font-size:20px;font-weight:600;margin:32px 0 12px;scroll-margin-top:20px}
+h4{font-size:16px;font-weight:600;margin:22px 0 8px;color:var(--ac5);scroll-margin-top:20px}
+p{margin-bottom:14px}strong{color:var(--ac);font-weight:600}em{color:var(--ac3)}
+a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--sf2);padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:.87em;color:var(--ac5)}
+.cb{position:relative;margin:14px 0 22px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);font-size:12px;color:var(--txm)}
+.ch .tag{font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ch .tag.sh{color:var(--ac2)}.ch .tag.cfg{color:var(--ac3)}.ch .tag.ps{color:#9b4f96}.ch .tag.json{color:var(--ac5)}
+pre{background:var(--bg);padding:14px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:13.5px;line-height:1.6;scrollbar-width:thin}
+pre code{background:none;padding:0;color:var(--tx);font-size:inherit}
+.kw{color:#ff7b72}.tp{color:#79c0ff}.fn{color:#d2a8ff}.st{color:#a5d6ff}.cm{color:#8b949e;font-style:italic}.nu{color:#ffa657}.pp{color:#7ee787}
+.callout{padding:14px 18px;border-radius:8px;margin:18px 0;border-left:4px solid;font-size:14.5px}
+.ct{font-weight:700;margin-bottom:5px;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.callout.tip{background:var(--tip);border-color:var(--tipb)}.callout.tip .ct{color:var(--ac2)}
+.callout.warning{background:var(--warn);border-color:var(--warnb)}.callout.warning .ct{color:var(--ac5)}
+.callout.danger{background:var(--danger);border-color:var(--dangerb)}.callout.danger .ct{color:var(--ac4)}
+.callout.info{background:var(--info);border-color:var(--infob)}.callout.info .ct{color:var(--ac)}
+.callout.story{background:var(--story);border-color:var(--storyb)}
+.callout.story .ct{color:var(--ac3)}
+.callout.story{font-size:14px;line-height:1.8}
+.tbl{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px;border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.tbl th{background:var(--sf2);padding:10px 14px;text-align:left;font-weight:700;border-bottom:2px solid var(--bd)}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--bd);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl td:first-child{font-weight:600;color:var(--ac3);white-space:nowrap}.tbl td code{font-size:12px}
+ol,ul{margin:10px 0 18px 22px}li{margin-bottom:7px}li::marker{color:var(--ac)}
+.check-box{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(63,185,80,.1);border:1px solid var(--tipb);border-radius:6px;font-size:14px;margin:4px 4px 4px 0;color:var(--ac2)}
+.check-box::before{content:'✓';font-weight:700;font-size:16px}
+.step{display:flex;gap:14px;margin:14px 0;padding:14px 18px;background:var(--sf);border:1px solid var(--bd);border-radius:8px}
+.step-num{min-width:32px;height:32px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+.step-body{flex:1}.step-body p{margin-bottom:6px}
+.arch-box{margin:20px 0;padding:20px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;text-align:center;font-family:'Cascadia Code',Consolas,monospace;font-size:13px;line-height:2;color:var(--ac)}
+.arch-box .layer{display:inline-block;padding:4px 14px;margin:3px;border-radius:6px;border:1px solid var(--bd)}
+.arch-box .l1{background:rgba(88,166,255,.15);border-color:var(--ac)}
+.arch-box .l2{background:rgba(210,168,255,.15);border-color:var(--ac3)}
+.arch-box .l3{background:rgba(63,185,80,.15);border-color:var(--ac2)}
+.arch-box .l4{background:rgba(255,166,87,.15);border-color:var(--ac5)}
+.arch-box .arrow{color:var(--txm);font-size:18px;display:block;margin:4px 0}
+.scroll-top{position:fixed;bottom:28px;right:28px;width:42px;height:42px;background:var(--ac);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:18px;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:200}
+.progress-bar{position:fixed;top:0;left:270px;right:0;height:3px;z-index:150}
+.pbf{height:100%;width:0%;background:linear-gradient(90deg,var(--ac),var(--ac3));transition:width .1s}
+.divider{margin:56px 0 36px;text-align:center;position:relative}
+.divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--bd)}
+.divider span{background:var(--bg);padding:0 18px;position:relative;color:var(--txm);font-size:12px;text-transform:uppercase;letter-spacing:2px}
+.mob-tog{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--sf);border:1px solid var(--bd);color:var(--tx);padding:7px 11px;border-radius:6px;cursor:pointer;font-size:17px}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:transform .3s}.sidebar.open{transform:translateX(0)}.mob-tog{display:block}.main{margin-left:0;padding:36px 18px 80px}.progress-bar{left:0}}
+@media print{.sidebar,.mob-tog,.scroll-top,.progress-bar{display:none!important}.main{margin-left:0;max-width:100%}body{background:#fff;color:#000}h1{-webkit-text-fill-color:#00599c}pre{background:#f6f8fa}pre code{color:#24292f}.callout{border-left-width:3px}}
+</style>
+</head>
+<body>
+<button class="mob-tog" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+<div class="progress-bar"><div class="pbf" id="pbf"></div></div>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+<div class="sidebar-title">C++ 开发环境搭建<small>Windows 跨平台指南</small></div>
+<div class="ng"><div class="ngt">总览</div>
+<a href="#overview" class="nl">整体架构概览</a>
+<a href="#checklist" class="nl">安装清单速查</a></div>
+<div class="ng"><div class="ngt">编译器</div>
+<a href="#msvc" class="nl">MSVC 编译器</a>
+<a href="#gcc" class="nl">GCC (MinGW-w64)</a>
+<a href="#clang" class="nl">Clang / LLVM</a></div>
+<div class="ng"><div class="ngt">构建系统</div>
+<a href="#cmake" class="nl">CMake</a>
+<a href="#ninja" class="nl">Ninja</a></div>
+<div class="ng"><div class="ngt">IDE / 编辑器</div>
+<a href="#vs" class="nl">Visual Studio 2022</a>
+<a href="#vscode" class="nl">VS Code</a>
+<a href="#clion" class="nl">CLion (可选)</a></div>
+<div class="ng"><div class="ngt">工具链</div>
+<a href="#git" class="nl">Git</a>
+<a href="#vcpkg" class="nl">vcpkg 包管理器</a>
+<a href="#wsl" class="nl">WSL2 子系统</a></div>
+<div class="ng"><div class="ngt">调试与分析</div>
+<a href="#debug" class="nl">调试器配置</a>
+<a href="#sanitizer" class="nl">Sanitizer 工具</a></div>
+<div class="ng"><div class="ngt">验证</div>
+<a href="#verify" class="nl">环境验证脚本</a>
+<a href="#trouble" class="nl">常见问题排查</a></div>
+</nav>
+
+<main class="main">
+
+<h1>Windows 跨平台 C++ 开发环境搭建指南</h1>
+<p class="sub">从零开始，在 Windows 上搭建一套完整的跨平台 C++ 开发环境。本指南会详细解释每个工具的作用、安装步骤和验证方法，并穿插一些行业趣闻，让你对工具有更深的理解。</p>
+
+<!-- ============================== OVERVIEW ============================== -->
+<div class="divider"><span>总览</span></div>
+
+<h2 id="overview">整体架构概览</h2>
+
+<p>在 Windows 上做跨平台 C++ 开发，你需要理解一个核心问题：<strong>Windows 和 Linux/macOS 使用不同的编译器、不同的 C 运行时库、不同的系统 API</strong>。你的代码需要在所有这些平台上编译通过并正确运行。因此，开发环境的核心思路是：</p>
+
+<p>在 Windows 上用 MSVC 或 Clang 做日常开发和调试，同时通过 WSL2 或 MinGW 验证代码在 Linux/GCC 环境下的行为。使用 CMake 作为统一的构建系统，确保同一份构建脚本在所有平台上都能工作。</p>
+
+<div class="arch-box">
+<div class="layer l1">你的 C++ 源代码 (.cpp / .h)</div>
+<span class="arrow">&darr;</span>
+<div class="layer l2">CMake (统一构建系统)</div>
+<span class="arrow">&darr; &nbsp;&nbsp;&nbsp;&nbsp; &darr; &nbsp;&nbsp;&nbsp;&nbsp; &darr;</span>
+<div class="layer l3">MSVC</div>
+<div class="layer l3">GCC (MinGW/WSL)</div>
+<div class="layer l3">Clang</div>
+<span class="arrow">&darr; &nbsp;&nbsp;&nbsp;&nbsp; &darr; &nbsp;&nbsp;&nbsp;&nbsp; &darr;</span>
+<div class="layer l4">Windows .exe</div>
+<div class="layer l4">Linux ELF</div>
+<div class="layer l4">macOS Mach-O</div>
+</div>
+
+<div class="callout story">
+<div class="ct">行业故事：为什么 C++ 跨平台这么"痛"？</div>
+<p>故事要从 1983 年说起。Bjarne Stroustrup 在贝尔实验室创造 C++ 时，C 语言已经以"可移植"著称——但 C 的可移植性其实是个美丽的谎言。不同平台的 <code>int</code> 大小不同、字节序不同、系统调用完全不同。C++ 继承了这个问题，还引入了更多复杂性：名字修饰（name mangling）没有统一标准，异常处理的 ABI 各异，甚至 <code>#include</code> 的文件名大小写敏感性在 Windows 和 Linux 上都不同。</p>
+<p>这就是为什么在 2000 年代，许多 C++ 团队不得不维护完全独立的项目文件（.vcproj / Makefile / .xcodeproj）。直到 CMake 在 2000 年由 Bill Hoffman 创建（灵感来自 KDE 项目的构建需求），C++ 社区才有了真正的跨平台构建标准。如今 CMake 已成为事实标准，被 Google、NASA、CERN 等机构广泛使用。</p>
+</div>
+
+<!-- ============================== CHECKLIST ============================== -->
+<h2 id="checklist">安装清单速查</h2>
+
+<p>以下是完整的安装清单，后续章节会逐项详细说明。你可以先快速浏览，了解全貌：</p>
+
+<table class="tbl">
+<tr><th>工具</th><th>用途</th><th>必要性</th><th>推荐版本</th></tr>
+<tr><td>Visual Studio 2022</td><td>IDE + MSVC 编译器</td><td>必装</td><td>17.10+</td></tr>
+<tr><td>CMake</td><td>跨平台构建系统</td><td>必装</td><td>3.28+</td></tr>
+<tr><td>Ninja</td><td>快速构建工具</td><td>必装</td><td>1.12+</td></tr>
+<tr><td>Git</td><td>版本控制</td><td>必装</td><td>2.44+</td></tr>
+<tr><td>vcpkg</td><td>第三方库包管理</td><td>强烈推荐</td><td>最新</td></tr>
+<tr><td>VS Code</td><td>轻量编辑器</td><td>推荐</td><td>最新</td></tr>
+<tr><td>MinGW-w64 (GCC)</td><td>Windows 上的 GCC 编译器</td><td>推荐</td><td>14.x</td></tr>
+<tr><td>WSL2</td><td>Linux 子系统</td><td>推荐</td><td>Ubuntu 22.04/24.04</td></tr>
+<tr><td>Clang / LLVM</td><td>替代编译器 + 工具链</td><td>可选</td><td>18+</td></tr>
+<tr><td>CLion</td><td>JetBrains C++ IDE</td><td>可选</td><td>2024.x</td></tr>
+</table>
+
+<!-- ============================== MSVC ============================== -->
+<div class="divider"><span>编译器</span></div>
+
+<h2 id="msvc">MSVC 编译器</h2>
+
+<h3>基础知识</h3>
+<p><strong>MSVC（Microsoft Visual C++）</strong>是微软自家的 C++ 编译器，包含在 Visual Studio 中。它是 Windows 平台上最成熟、兼容性最好的 C++ 编译器，对 Windows SDK 和 Win32 API 的支持无人能及。</p>
+
+<p>MSVC 的主要特点是：编译速度较快，错误提示清晰（尤其是 VS2022 之后的改进），对 C++ 最新标准的支持积极（C++20 modules、C++23 等），并且与 Windows 调试器完美集成。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：MSVC 的"C++ 方言"时代</div>
+<p>在 2010 年之前，MSVC 曾因为对 C++ 标准支持不佳而饱受诟病。许多在 GCC 上能编译的标准 C++ 代码在 MSVC 上会报错。这导致了一个有趣的现象：开源社区经常把"MSVC 兼容"当作一个专门的标签。著名游戏引擎 Unreal Engine 的代码风格——大量使用宏、自定义智能指针而非标准库——部分原因就是早期要兼容各种编译器的怪异行为。</p>
+<p>转机出现在 2015 年。微软在 Visual Studio 2015 中推出了重大更新的 MSVC 工具集（v140），开始积极追赶 C++ 标准。到 VS2019/VS2022，MSVC 已经成为一个优秀的标准兼容编译器，甚至在某些 C++20/23 特性上领先 GCC 和 Clang。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p><strong>下载 Visual Studio Installer</strong></p>
+<p>前往 <a href="https://visualstudio.microsoft.com/zh-hans/downloads/">visualstudio.microsoft.com</a> 下载 Visual Studio 2022 Community（免费）或 Professional。</p>
+</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p><strong>选择工作负载</strong></p>
+<p>在 Installer 中勾选以下工作负载：</p>
+</div></div>
+
+<table class="tbl">
+<tr><th>工作负载</th><th>作用</th><th>是否必选</th></tr>
+<tr><td>"使用 C++ 的桌面开发"</td><td>MSVC 编译器 + Windows SDK + CMake 集成</td><td>必选</td></tr>
+<tr><td>"使用 C++ 的 Linux 开发"</td><td>远程编译/调试 Linux 目标</td><td>推荐</td></tr>
+<tr><td>"使用 C++ 的游戏开发"</td><td>DirectX / 图形库支持</td><td>按需</td></tr>
+</table>
+
+<div class="step"><div class="step-num">3</div><div class="step-body">
+<p><strong>在"单个组件"中额外勾选</strong>（如未自动选中）：</p>
+</div></div>
+
+<ul>
+<li><code>MSVC v143 - VS 2022 C++ x64/x86 生成工具</code>（编译器本体）</li>
+<li><code>Windows 11 SDK</code>（最新版本即可）</li>
+<li><code>适用于 Windows 的 C++ CMake 工具</code>（CMake + Ninja 集成）</li>
+<li><code>C++ ATL (latest)</code>（如需要 COM 开发）</li>
+</ul>
+
+<div class="step"><div class="step-num">4</div><div class="step-body">
+<p>点击"安装"，等待下载完成（约 6-10 GB）。</p>
+</div></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code><span class="cm"># 打开 "x64 Native Tools Command Prompt for VS 2022"</span>
+<span class="cm"># （在开始菜单搜索即可找到）</span>
+
+cl
+<span class="cm"># 预期输出：Microsoft (R) C/C++ Optimizing Compiler Version 19.4x...</span>
+
+cl /?
+<span class="cm"># 显示所有编译器选项</span>
+
+<span class="cm"># 快速编译测试</span>
+echo int main(){return 0;} > test.cpp
+cl test.cpp
+test.exe
+echo %errorlevel%
+<span class="cm"># 预期输出：0</span></code></pre></div>
+
+<div class="callout info"><div class="ct">注意</div>
+<p>MSVC 的命令行工具必须在"开发者命令提示符"中使用，它会自动设置 <code>PATH</code>、<code>INCLUDE</code>、<code>LIB</code> 等环境变量。直接在普通 CMD/PowerShell 中运行 <code>cl</code> 会提示找不到命令。</p></div>
+
+<!-- ============================== GCC ============================== -->
+<h2 id="gcc">GCC (MinGW-w64)</h2>
+
+<h3>基础知识</h3>
+<p><strong>GCC（GNU Compiler Collection）</strong>是 Linux 世界的标准编译器。<strong>MinGW-w64</strong> 是 GCC 在 Windows 上的移植版本，能让你在 Windows 上用 GCC 编译 C++ 程序，并且链接 Windows 的系统库（而非 Cygwin 的 POSIX 层）。</p>
+
+<p>为什么 Windows 上还需要 GCC？因为你的代码最终可能要在 Linux 服务器上运行，而 GCC 和 MSVC 对 C++ 标准的解读有细微差异。在 Windows 上用 MinGW 编译一遍，能提前发现一些跨编译器兼容性问题。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：MinGW 与 Cygwin 的路线之争</div>
+<p>2000 年代初期，在 Windows 上使用 GCC 有两条路线：Cygwin（通过 POSIX 兼容层模拟 Linux 环境）和 MinGW（直接调用 Windows 原生 API）。Cygwin 的优势是兼容性好——大量 Linux 代码几乎不用改就能编译。代价是性能损失和运行时依赖 <code>cygwin1.dll</code>。</p>
+<p>MinGW 选择了更难但更纯粹的路：只生成原生 Windows 可执行文件，不需要额外的 DLL。这导致很多 Linux 代码编译不过（因为没有 <code>fork()</code>、<code>unistd.h</code> 等），但产出的程序性能和原生程序一样。游戏引擎、嵌入式工具等对性能敏感的项目偏爱 MinGW。</p>
+<p>如今，MinGW-w64（MinGW 的 64 位分支）已经成为主流，被 MSYS2 项目维护和分发。而 Cygwin 则更多用于学术研究和工具移植场景。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<p>推荐通过 <strong>MSYS2</strong> 安装 MinGW-w64，这是最方便的方式：</p>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p><strong>下载 MSYS2</strong></p>
+<p>前往 <a href="https://www.msys2.org/">msys2.org</a> 下载安装包，安装到默认路径 <code>C:\msys64</code>。</p>
+</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p><strong>打开 MSYS2 终端，更新包数据库</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag sh">MSYS2 Terminal</span></div>
+<pre><code><span class="cm"># 更新 MSYS2 自身</span>
+pacman -Syu
+
+<span class="cm"># 可能需要重启终端，再次运行：</span>
+pacman -Su</code></pre></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-body">
+<p><strong>安装 MinGW-w64 GCC 工具链</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag sh">MSYS2 Terminal</span></div>
+<pre><code><span class="cm"># 安装 GCC 编译器全家桶</span>
+pacman -S mingw-w64-ucrt-x86_64-gcc
+pacman -S mingw-w64-ucrt-x86_64-cmake
+pacman -S mingw-w64-ucrt-x86_64-ninja
+pacman -S mingw-w64-ucrt-x86_64-gdb
+
+<span class="cm"># 可选：安装常用库</span>
+pacman -S mingw-w64-ucrt-x86_64-boost
+pacman -S mingw-w64-ucrt-x86_64-SDL2</code></pre></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-body">
+<p><strong>将 MinGW 加入系统 PATH</strong></p>
+<p>在 Windows 设置 &rarr; 系统 &rarr; 高级系统设置 &rarr; 环境变量中，将以下路径添加到 <code>Path</code>：</p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag cfg">环境变量</span></div>
+<pre><code>C:\msys64\ucrt64\bin</code></pre></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>g++ --version
+<span class="cm"># 预期输出：g++ (Rev.., Built by MSYS2 project) 14.x.x</span>
+
+gdb --version
+<span class="cm"># 预期输出：GNU gdb (GDB) 14.x</span>
+
+<span class="cm"># 编译测试</span>
+echo '#include &lt;iostream&gt;' > test.cpp
+echo 'int main() { std::cout &lt;&lt; "GCC OK" &lt;&lt; std::endl; }' >> test.cpp
+g++ -std=c++20 -o test test.cpp
+.\test.exe
+<span class="cm"># 预期输出：GCC OK</span></code></pre></div>
+
+<!-- ============================== CLANG ============================== -->
+<h2 id="clang">Clang / LLVM</h2>
+
+<h3>基础知识</h3>
+<p><strong>Clang</strong> 是 LLVM 项目中的 C/C++ 编译器前端。它以<strong>编译错误信息极其友好</strong>著称——当你的代码有语法错误时，Clang 不仅告诉你错在哪一行，还会用彩色箭头标出确切位置，甚至给出修复建议。</p>
+
+<p>Clang 的另一个杀手锏是<strong>工具链生态</strong>：<code>clang-format</code>（代码格式化）、<code>clang-tidy</code>（静态分析）、<code>clangd</code>（语言服务器，为编辑器提供智能补全）。这些工具在现代 C++ 开发中几乎是标配。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：Clang 如何改变了编译器竞争格局</div>
+<p>2007 年，Apple 对 GCC 的进展不满——GCC 的代码库臃肿、编译速度慢、错误信息晦涩，而且 GCC 的许可证（GPL）限制了 Apple 将其深度集成到 Xcode 中。于是 Apple 大力投资 Chris Lattner 在伊利诺伊大学发起的 LLVM/Clang 项目。</p>
+<p>Clang 从设计之初就追求三件事：极致的编译速度、清晰的错误信息、模块化的架构（方便第三方工具复用编译器前端）。2009 年，Clang 首次完整编译了 FreeBSD 内核；2013 年，Google 开始在 Chrome 项目中使用 Clang。</p>
+<p>最有意思的是微软的反应。面对 Clang 的崛起，微软没有固守 MSVC，而是在 VS2019 中推出了 "Clang/LLVM for Windows"（也叫 clang-cl），让开发者可以在 Visual Studio 中使用 Clang 作为后端编译器。这标志着 Clang 已经从一个"Apple 的项目"变成了整个行业的标准。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<p>Clang 已包含在 Visual Studio 2022 中，也可单独安装：</p>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p><strong>方式一：通过 Visual Studio Installer</strong></p>
+<p>在"单个组件"中搜索并勾选 <code>C++ Clang for Windows</code> 和 <code>C++ Clang-cl for v143</code>。</p>
+</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p><strong>方式二：独立安装（推荐，获得完整工具链）</strong></p>
+<p>前往 <a href="https://github.com/llvm/llvm-project/releases">LLVM GitHub Releases</a> 下载最新的 <code>LLVM-*-win64.exe</code> 安装包。安装时勾选 <strong>"Add LLVM to the system PATH"</strong>。</p>
+</div></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>clang++ --version
+<span class="cm"># 预期输出：clang version 18.x.x</span>
+
+clang-format --version
+<span class="cm"># 预期输出：clang-format version 18.x.x</span>
+
+clang-tidy --version
+<span class="cm"># 预期输出：LLVM version 18.x.x</span>
+
+<span class="cm"># 编译测试</span>
+echo '#include &lt;iostream&gt;' > test.cpp
+echo 'int main() { std::cout &lt;&lt; "Clang OK" &lt;&lt; std::endl; }' >> test.cpp
+clang++ -std=c++20 -o test test.cpp
+.\test.exe
+<span class="cm"># 预期输出：Clang OK</span></code></pre></div>
+
+<!-- ============================== CMAKE ============================== -->
+<div class="divider"><span>构建系统</span></div>
+
+<h2 id="cmake">CMake</h2>
+
+<h3>基础知识</h3>
+<p><strong>CMake</strong> 是 C++ 世界的"构建系统的构建系统"。它本身不编译代码，而是根据你的 <code>CMakeLists.txt</code> 配置文件，<strong>生成</strong>对应平台的原生构建文件——在 Windows 上生成 VS 解决方案或 Ninja 文件，在 Linux 上生成 Makefile，在 macOS 上生成 Xcode 项目。</p>
+
+<p>这意味着你只需要维护一份 <code>CMakeLists.txt</code>，就能在所有平台上构建项目。这是 C++ 跨平台开发的基石。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：CMake 的诞生——KDE 项目的"救星"</div>
+<p>2000 年，KDE 桌面环境的开发者们面临一个痛苦的问题：他们使用的 autoconf/automake 构建系统极其复杂——一个 <code>configure.in</code> 文件动辄上千行，M4 宏语法晦涩难懂，而且在 Windows 上几乎不可用。</p>
+<p>Kitware 公司的 Bill Hoffman 当时正在为美国国家医学图书馆开发可视化软件 VTK。他也饱受构建系统之苦，于是创建了 CMake（Cross-platform Make），核心理念是"简单、跨平台、不依赖特定 IDE"。KDE 在 2006 年从 KDE 3 到 KDE 4 的迁移中全面采用了 CMake，这一决定极大地推动了 CMake 的普及。</p>
+<p>如今 CMake 已经成为 C++ 的事实标准构建系统。Google、Facebook、NASA JPL（用于火星探测器的飞行软件）、CERN（大型强子对撞机的控制软件）都在使用它。2019 年 CMake 3.15 引入了对 Windows 上 MSVC 的一流支持后，更是巩固了不可动摇的地位。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p>前往 <a href="https://cmake.org/download/">cmake.org/download</a> 下载 Windows x64 Installer（<code>cmake-*-windows-x86_64.msi</code>）。</p>
+<p>安装时<strong>务必勾选</strong> "Add CMake to the system PATH"（选择 "for all users" 或 "for current user" 均可）。</p>
+</div></div>
+
+<div class="callout warning"><div class="ct">注意</div>
+<p>Visual Studio 2022 也内置了一份 CMake，但版本可能不是最新的。建议单独安装最新版 CMake 并优先使用它。</p></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>cmake --version
+<span class="cm"># 预期输出：cmake version 3.28.x 或更高</span>
+<span class="cm">#            CMake suite maintained and supported by Kitware</span>
+
+<span class="cm"># 生成测试项目</span>
+mkdir cmake-test; cd cmake-test
+
+<span class="cm"># 创建最简单的 CMakeLists.txt</span>
+echo 'cmake_minimum_required(VERSION 3.20)' > CMakeLists.txt
+echo 'project(HelloTest LANGUAGES CXX)' >> CMakeLists.txt
+echo 'set(CMAKE_CXX_STANDARD 20)' >> CMakeLists.txt
+echo 'add_executable(hello main.cpp)' >> CMakeLists.txt
+
+<span class="cm"># 创建源文件</span>
+echo '#include &lt;iostream&gt;' > main.cpp
+echo 'int main() { std::cout &lt;&lt; "CMake OK" &lt;&lt; std::endl; }' >> main.cpp
+
+<span class="cm"># 生成并构建</span>
+cmake -B build -G Ninja
+cmake --build build
+.\build\hello.exe
+<span class="cm"># 预期输出：CMake OK</span></code></pre></div>
+
+<!-- ============================== NINJA ============================== -->
+<h2 id="ninja">Ninja</h2>
+
+<h3>基础知识</h3>
+<p><strong>Ninja</strong> 是一个专注于速度的小型构建工具，由 Google 的 Evan Martin 为 Chromium 项目开发。它的设计哲学是：<strong>只负责"构建"这一步，做到极致快</strong>，而把依赖分析和项目配置的复杂工作交给 CMake 等上层工具。</p>
+
+<p>与传统的 <code>nmake</code>（Windows）或 <code>make</code>（Linux）相比，Ninja 的构建速度通常快 2-5 倍，在大型项目中差距更明显。在 Visual Studio 中使用 CMake 时，Ninja 是默认的构建后端。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：为什么 Chromium 需要 Ninja？</div>
+<p>Chromium（Chrome 浏览器的开源版本）是人类历史上最大的 C++ 项目之一——超过 3500 万行代码，编译一次需要处理数万个源文件。2010 年之前，Chromium 使用 <code>make</code> 和 MSBuild 构建，但速度极慢：增量编译一次也要好几分钟，全量编译需要数小时。</p>
+<p>Google 工程师 Evan Martin 分析了原因：传统构建工具在启动时就要花大量时间解析 Makefile，而 Chromium 的 Makefile 经过层层展开后极其庞大。于是他创建了 Ninja——一个极简的构建执行器。Ninja 的构建文件（<code>build.ninja</code>）是机器生成的、不可读的，但解析速度极快。</p>
+<p>结果立竿见影：Chromium 的增量编译时间从几分钟缩短到几秒。Ninja 很快被 Android、LLVM 等大型项目采用，如今已成为 C++ 开发的标准配置。</p>
+</div>
+
+<h3>安装步骤</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code><span class="cm"># 方式一：通过 winget 安装（推荐）</span>
+winget install Ninja-build.Ninja
+
+<span class="cm"># 方式二：通过 Chocolatey</span>
+choco install ninja
+
+<span class="cm"># 方式三：通过 pip</span>
+pip install ninja</code></pre></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>ninja --version
+<span class="cm"># 预期输出：1.12.x 或更高</span></code></pre></div>
+
+<!-- ============================== VS ============================== -->
+<div class="divider"><span>IDE / 编辑器</span></div>
+
+<h2 id="vs">Visual Studio 2022</h2>
+
+<h3>基础知识</h3>
+<p><strong>Visual Studio</strong> 是 Windows 平台上最强大的 C++ IDE。对于从 C# 转过来的开发者来说，VS 应该是非常熟悉的环境。VS2022 对 C++ 的支持做了大幅改进：原生的 CMake 项目支持、IntelliSense 智能补全、集成的调试器、性能分析器等。</p>
+
+<h3>配置 CMake 项目</h3>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p>用 VS2022 打开一个包含 <code>CMakeLists.txt</code> 的文件夹（File &rarr; Open &rarr; Folder）。</p>
+</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p>VS 会自动识别 CMake 项目，并创建 <code>CMakeSettings.json</code>。建议配置如下：</p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag json">CMakeSettings.json</span></div>
+<pre><code>{
+  <span class="st">"configurations"</span>: [
+    {
+      <span class="st">"name"</span>: <span class="st">"x64-Debug"</span>,
+      <span class="st">"generator"</span>: <span class="st">"Ninja"</span>,
+      <span class="st">"configurationType"</span>: <span class="st">"Debug"</span>,
+      <span class="st">"buildRoot"</span>: <span class="st">"${projectDir}\\out\\build\\${name}"</span>,
+      <span class="st">"installRoot"</span>: <span class="st">"${projectDir}\\out\\install\\${name}"</span>,
+      <span class="st">"cmakeCommandArgs"</span>: <span class="st">""</span>,
+      <span class="st">"buildCommandArgs"</span>: <span class="st">"-v"</span>,
+      <span class="st">"ctestCommandArgs"</span>: <span class="st">""</span>,
+      <span class="st">"inheritEnvironments"</span>: [<span class="st">"msvc_x64_x64"</span>],
+      <span class="st">"variables"</span>: [
+        { <span class="st">"name"</span>: <span class="st">"CMAKE_TOOLCHAIN_FILE"</span>,
+          <span class="st">"value"</span>: <span class="st">"C:/vcpkg/scripts/buildsystems/vcpkg.cmake"</span> }
+      ]
+    },
+    {
+      <span class="st">"name"</span>: <span class="st">"x64-Release"</span>,
+      <span class="st">"generator"</span>: <span class="st">"Ninja"</span>,
+      <span class="st">"configurationType"</span>: <span class="st">"Release"</span>,
+      <span class="st">"inheritEnvironments"</span>: [<span class="st">"msvc_x64_x64"</span>]
+    }
+  ]
+}</code></pre></div>
+
+<div class="callout tip"><div class="ct">提示</div>
+<p><code>CMAKE_TOOLCHAIN_FILE</code> 指向 vcpkg 的 toolchain 文件后，VS 会自动使用 vcpkg 管理的第三方库。后面安装 vcpkg 时会详细说明。</p></div>
+
+<!-- ============================== VSCODE ============================== -->
+<h2 id="vscode">VS Code</h2>
+
+<h3>基础知识</h3>
+<p><strong>Visual Studio Code</strong> 是轻量级的跨平台编辑器。对于 C++ 开发，它的优势在于：启动速度快、扩展丰富（clangd、CMake Tools）、跨平台一致（你在 Linux 服务器上也可以用同样的配置）。很多 C++ 开发者同时使用 VS（做调试）和 VS Code（做日常编辑）。</p>
+
+<h3>必装扩展</h3>
+
+<table class="tbl">
+<tr><th>扩展名称</th><th>作用</th><th>说明</th></tr>
+<tr><td>C/C++ (Microsoft)</td><td>基础支持 + 调试</td><td>IntelliSense、调试器集成</td></tr>
+<tr><td>clangd</td><td>更智能的代码分析</td><td>替代 Microsoft 的 IntelliSense，更快更准</td></tr>
+<tr><td>CMake Tools</td><td>CMake 项目集成</td><td>配置、构建、调试一体化</td></tr>
+<tr><td>CodeLLDB</td><td>LLDB 调试器</td><td>使用 Clang 编译时推荐</td></tr>
+</table>
+
+<h3>安装与配置</h3>
+
+<div class="cb"><div class="ch"><span class="tag sh">命令行安装扩展</span></div>
+<pre><code><span class="cm"># 安装必装扩展</span>
+code --install-extension ms-vscode.cpptools
+code --install-extension llvm-vs-code-extensions.vscode-clangd
+code --install-extension ms-vscode.cmake-tools</code></pre></div>
+
+<p>推荐的 VS Code 用户设置（<code>settings.json</code>）：</p>
+
+<div class="cb"><div class="ch"><span class="tag json">settings.json</span></div>
+<pre><code>{
+  <span class="cm">// 使用 clangd 替代默认 IntelliSense</span>
+  <span class="st">"C_Cpp.intelliSenseEngine"</span>: <span class="st">"disabled"</span>,
+
+  <span class="cm">// clangd 参数</span>
+  <span class="st">"clangd.arguments"</span>: [
+    <span class="st">"--background-index"</span>,
+    <span class="st">"--clang-tidy"</span>,
+    <span class="st">"--header-insertion=iwyu"</span>,
+    <span class="st">"--completion-style=detailed"</span>,
+    <span class="st">"-j=8"</span>
+  ],
+
+  <span class="cm">// CMake 配置</span>
+  <span class="st">"cmake.generator"</span>: <span class="st">"Ninja"</span>,
+  <span class="st">"cmake.buildDirectory"</span>: <span class="st">"${workspaceFolder}/build"</span>,
+
+  <span class="cm">// 文件关联</span>
+  <span class="st">"files.associations"</span>: {
+    <span class="st">"*.h"</span>: <span class="st">"cpp"</span>,
+    <span class="st">"*.hpp"</span>: <span class="st">"cpp"</span>,
+    <span class="st">"*.inl"</span>: <span class="st">"cpp"</span>
+  }
+}</code></pre></div>
+
+<div class="callout story">
+<div class="ct">行业故事：VS Code 如何统一了编辑器体验</div>
+<p>在 VS Code 出现之前（2015 年），C++ 开发者在不同平台上使用完全不同的编辑器：Windows 上用 Visual Studio，Linux 上用 Vim/Emacs/KDevelop，macOS 上用 Xcode。每个编辑器的快捷键、配置方式、插件生态完全不同。</p>
+<p>VS Code 的出现改变了一切。它基于 Electron（Web 技术栈），在所有平台上提供完全一致的体验。更关键的是 Language Server Protocol（LSP）——由 VS Code 团队在 2016 年提出的协议，让任何语言服务器（如 <code>clangd</code>）都能为任何编辑器提供智能补全、跳转定义、重构等功能。</p>
+<p>今天，无论你用 VS Code、Neovim 还是 Emacs，都可以接入 <code>clangd</code> 获得相同的 C++ 分析能力。这种"编辑器无关"的工具链生态，是 C++ 社区近年来最大的进步之一。</p>
+</div>
+
+<!-- ============================== CLION ============================== -->
+<h2 id="clion">CLion（可选）</h2>
+
+<h3>基础知识</h3>
+<p><strong>CLion</strong> 是 JetBrains（IntelliJ、Rider 的开发商）推出的 C++ IDE。如果你是 Rider 或 IntelliJ 用户，CLion 的界面和快捷键会让你感到非常亲切。CLion 对 CMake 的支持是一等公民级别的——打开一个 <code>CMakeLists.txt</code> 就能自动识别项目结构。</p>
+
+<p>CLion 是付费软件（有免费试用），适合预算充足且喜欢 JetBrains 生态的开发者。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：JetBrains 为什么做 CLion</div>
+<p>JetBrains 最初以 Java IDE IntelliJ IDEA 闻名。2010 年左右，他们开始探索 C++ 领域。团队发现：C++ 开发者的工具体验远不如 Java/C# 开发者——没有好用的重构工具、没有智能的代码分析、调试体验粗糙。</p>
+<p>CLion 于 2015 年发布，核心卖点是将 IntelliJ 级别的代码分析带入 C++ 世界。CLion 自研了 C++ 解析引擎（而非依赖 Clang），能理解复杂的模板代码和宏展开，提供精准的重构建议。不过后来 CLion 也集成了 Clangd，实现了"自研 + Clangd"双引擎架构。</p>
+<p>有趣的是，JetBrains 自己的 C++ 项目（如 Kotlin/Native 编译器）就是用 CLion 开发的——真正的"dogfooding"。</p>
+</div>
+
+<!-- ============================== GIT ============================== -->
+<div class="divider"><span>工具链</span></div>
+
+<h2 id="git">Git</h2>
+
+<h3>基础知识</h3>
+<p>作为 C# 开发者，你肯定已经熟悉 Git。在 C++ 跨平台开发中，Git 有一些额外的注意事项：</p>
+
+<ul>
+<li><strong>行尾符</strong>：Windows 使用 <code>CRLF</code>（\r\n），Linux/macOS 使用 <code>LF</code>（\n）。跨平台项目必须统一为 LF。</li>
+<li><strong>文件编码</strong>：所有源文件应使用 UTF-8（不带 BOM）。MSVC 对 BOM 的处理和其他编译器不一致。</li>
+<li><strong>.gitignore</strong>：C++ 项目的构建产物（<code>build/</code>、<code>out/</code>、<code>*.obj</code>、<code>*.exe</code>）必须忽略。</li>
+</ul>
+
+<h3>安装与配置</h3>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code><span class="cm"># 安装 Git</span>
+winget install Git.Git
+
+<span class="cm"># 配置行尾符（重要！）</span>
+git config --global core.autocrlf false
+git config --global core.eol lf
+
+<span class="cm"># 配置默认编码</span>
+git config --global core.quotepath false
+git config --global i18n.commitEncoding utf-8</code></pre></div>
+
+<p>推荐的 C++ 项目 <code>.gitignore</code>：</p>
+
+<div class="cb"><div class="ch"><span class="tag cfg">.gitignore</span></div>
+<pre><code><span class="cm"># 构建输出</span>
+build/
+out/
+cmake-build-*/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+<span class="cm"># IDE 文件</span>
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+CMakeSettings.json
+
+<span class="cm"># 包管理器</span>
+vcpkg_installed/
+
+<span class="cm"># 编译数据库（clangd 用）</span>
+compile_commands.json</code></pre></div>
+
+<div class="callout story">
+<div class="ct">行业故事：CRLF 引发的"百万行 diff"惨案</div>
+<p>2012 年，一个大型开源 C++ 项目的新贡献者（使用 Windows）提交了一个 pull request。代码审查者打开 diff 一看——几乎所有文件都被标记为"已修改"，diff 高达数十万行。仔细检查后发现：这位贡献者的 Git 配置将 LF 自动转换成了 CRLF，导致每个文件的每一行都发生了变化。</p>
+<p>这次事件后，项目维护者在 <code>.gitattributes</code> 文件中加入了强制行尾符配置。这也是为什么我们推荐使用 <code>core.autocrlf false</code> 并让 <code>.gitattributes</code> 来统一管理的做法。以下是推荐的 <code>.gitattributes</code> 配置：</p>
+</div>
+
+<div class="cb"><div class="ch"><span class="tag cfg">.gitattributes</span></div>
+<pre><code><span class="cm"># 所有文本文件使用 LF</span>
+* text=auto eol=lf
+
+<span class="cm"># 二进制文件不做转换</span>
+*.png binary
+*.ico binary
+*.dll binary</code></pre></div>
+
+<!-- ============================== VCPKG ============================== -->
+<h2 id="vcpkg">vcpkg 包管理器</h2>
+
+<h3>基础知识</h3>
+<p><strong>vcpkg</strong> 是微软开发的 C++ 包管理器，类似于 C# 的 NuGet。它从源代码下载、编译并安装第三方 C++ 库（如 Boost、fmt、SDL2、OpenCV 等），并通过 CMake 的 toolchain 文件自动集成到你的项目中。</p>
+
+<p>C++ 的包管理比 C# 复杂得多——因为 C++ 库需要针对你的编译器、C++ 标准版本、构建配置（Debug/Release）分别编译。vcpkg 替你处理了这些复杂工作。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：C++ 为什么需要包管理器</div>
+<p>在 NuGet、npm、pip 等包管理器诞生多年后，C++ 社区仍然在"手动下载源码、编译、复制头文件、配置链接路径"的痛苦循环中。2016 年之前，一个典型的 C++ 项目引入 Boost 库的步骤是：下载源码 &rarr; 安装 b2 构建工具 &rarr; 花 30 分钟编译 &rarr; 手动设置 <code>INCLUDE</code> 和 <code>LIB</code> 路径 &rarr; 祈祷版本兼容。</p>
+<p>2016 年，微软的 Steve MacRobert 在 CppCon 大会上发布了 vcpkg。核心理念是：从源码编译（保证二进制兼容）、与 CMake 无缝集成、跨平台统一体验。到 2024 年，vcpkg 已经包含超过 2000 个库的"port"（构建配方），成为 C++ 包管理的事实标准之一（另一个竞争者是 Conan）。</p>
+<p>一个有趣的事实：vcpkg 自身也是用 C++ 写的，所以它也是自己的用户——开发团队称之为 "self-hosting"。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p><strong>克隆 vcpkg 到本地</strong>（推荐放在 <code>C:\vcpkg</code>）：</p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>cd C:\
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+<span class="cm"># 完成后生成 vcpkg.exe</span></code></pre></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p><strong>添加到 PATH</strong></p>
+<p>将 <code>C:\vcpkg</code> 添加到系统 PATH 环境变量。</p>
+</div></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-body">
+<p><strong>设置全局集成</strong>（让所有 CMake 项目自动使用 vcpkg）：</p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code><span class="cm"># 设置环境变量（永久生效）</span>
+[System.Environment]::SetEnvironmentVariable(
+    'CMAKE_TOOLCHAIN_FILE',
+    'C:\vcpkg\scripts\buildsystems\vcpkg.cmake',
+    'User'
+)
+
+<span class="cm"># 或：设置 VCPKG_ROOT</span>
+[System.Environment]::SetEnvironmentVariable(
+    'VCPKG_ROOT', 'C:\vcpkg', 'User'
+)</code></pre></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-body">
+<p><strong>安装第一个库试试</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code><span class="cm"># 搜索可用的库</span>
+vcpkg search fmt
+
+<span class="cm"># 安装 fmt 库（自动编译 + 集成）</span>
+vcpkg install fmt:x64-windows
+
+<span class="cm"># 查看已安装的库</span>
+vcpkg list</code></pre></div>
+
+<h3>在 CMake 项目中使用 vcpkg</h3>
+
+<div class="cb"><div class="ch"><span class="tag cfg">CMakeLists.txt</span></div>
+<pre><code>cmake_minimum_required(VERSION 3.20)
+project(MyApp LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+
+<span class="cm"># 使用 vcpkg 安装的库——和 NuGet 一样简单！</span>
+find_package(fmt CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+
+add_executable(myapp src/main.cpp)
+target_link_libraries(myapp PRIVATE
+    fmt::fmt
+    nlohmann_json::nlohmann_json
+)</code></pre></div>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>vcpkg version
+<span class="cm"># 预期输出：vcpkg package management program version 2024-xx-xx</span>
+
+vcpkg list
+<span class="cm"># 显示已安装的库列表</span></code></pre></div>
+
+<!-- ============================== WSL ============================== -->
+<h2 id="wsl">WSL2 子系统</h2>
+
+<h3>基础知识</h3>
+<p><strong>WSL2（Windows Subsystem for Linux 2）</strong>让你在 Windows 上运行真正的 Linux 内核。对于跨平台 C++ 开发，WSL2 的价值在于：你可以在同一台机器上用 Linux GCC 编译和测试代码，确保它在 Linux 服务器上的行为正确。</p>
+
+<p>WSL2 相比 WSL1 有本质提升：运行完整的 Linux 内核、完全的系统调用兼容性、更好的文件 I/O 性能（在 Linux 文件系统内）。</p>
+
+<div class="callout story">
+<div class="ct">行业故事：微软拥抱 Linux 的里程碑</div>
+<p>2016 年，当微软宣布在 Windows 10 中引入 WSL（当时叫 "Bash on Ubuntu on Windows"）时，整个科技界震惊了。要知道，微软前 CEO Steve Ballmer 曾在 2001 年公开称 Linux 为"癌症"。</p>
+<p>WSL 的诞生背后有一个有趣的技术合作：微软与 Canonical（Ubuntu 母公司）的工程师们花了大量时间解决 Windows 内核和 Linux 系统调用之间的翻译问题。最初的 WSL1 是一个"翻译层"，将 Linux 系统调用翻译成 Windows NT 内核调用——这个工程量之大，堪比当年 Wine（在 Linux 上运行 Windows 程序）的难度。</p>
+<p>2019 年推出的 WSL2 采用了更直接的方式：在 Hyper-V 轻量虚拟机中运行真正的 Linux 内核。这一决定让兼容性从"95%"提升到了"99.9%"，也让 C++ 开发者可以放心地在 WSL2 中使用 GCC、Valgrind、GDB 等 Linux 工具链。</p>
+</div>
+
+<h3>安装步骤</h3>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell（管理员）</span></div>
+<pre><code><span class="cm"># 一键安装 WSL2 + Ubuntu</span>
+wsl --install
+
+<span class="cm"># 或指定发行版</span>
+wsl --install -d Ubuntu-24.04
+
+<span class="cm"># 重启电脑后，Ubuntu 会自动配置</span>
+<span class="cm"># 设置用户名和密码</span></code></pre></div>
+
+<p>在 WSL2 中安装 C++ 开发工具链：</p>
+
+<div class="cb"><div class="ch"><span class="tag sh">WSL2 (Ubuntu)</span></div>
+<pre><code><span class="cm"># 更新系统</span>
+sudo apt update && sudo apt upgrade -y
+
+<span class="cm"># 安装 C++ 开发必备</span>
+sudo apt install -y \
+    build-essential \
+    cmake \
+    ninja-build \
+    gdb \
+    git \
+    pkg-config
+
+<span class="cm"># 安装 Clang 工具链（可选）</span>
+sudo apt install -y clang clang-format clang-tidy
+
+<span class="cm"># 安装 Sanitizer 支持</span>
+sudo apt install -y libasan8 libubsan1</code></pre></div>
+
+<h3>VS Code 连接 WSL2</h3>
+
+<p>VS Code 可以通过 <strong>WSL 扩展</strong>直接连接到 WSL2 中的项目：</p>
+
+<ol>
+<li>安装 VS Code 扩展 "WSL"（微软出品）</li>
+<li>在 WSL2 终端中进入项目目录，运行 <code>code .</code></li>
+<li>VS Code 会自动以 WSL2 为后端打开项目，编译和调试都直接在 Linux 环境中执行</li>
+</ol>
+
+<h3>验证安装</h3>
+<div class="cb"><div class="ch"><span class="tag sh">WSL2 (Ubuntu)</span></div>
+<pre><code>g++ --version
+<span class="cm"># 预期输出：g++ (Ubuntu 13.x.x) 13.x.x</span>
+
+cmake --version
+<span class="cm"># 预期输出：cmake version 3.28.x</span>
+
+ninja --version
+<span class="cm"># 预期输出：1.12.x</span>
+
+gdb --version
+<span class="cm"># 预期输出：GNU gdb (Ubuntu) 14.x</span>
+
+<span class="cm"># 完整的编译-运行测试</span>
+cat &lt;&lt; 'EOF' > test.cpp
+#include &lt;iostream&gt;
+int main() {
+    std::cout &lt;&lt; "WSL2 GCC OK - running on ";
+#ifdef __linux__
+    std::cout &lt;&lt; "Linux";
+#endif
+    std::cout &lt;&lt; std::endl;
+}
+EOF
+g++ -std=c++20 -Wall -Wextra -o test test.cpp && ./test
+<span class="cm"># 预期输出：WSL2 GCC OK - running on Linux</span></code></pre></div>
+
+<!-- ============================== DEBUG ============================== -->
+<div class="divider"><span>调试与分析</span></div>
+
+<h2 id="debug">调试器配置</h2>
+
+<h3>基础知识</h3>
+<p>C++ 调试器和 C# 调试器的工作原理类似（断点、单步执行、变量查看），但有一些 C++ 特有的概念需要理解：</p>
+
+<table class="tbl">
+<tr><th>调试器</th><th>平台</th><th>配套编译器</th><th>说明</th></tr>
+<tr><td>MSVC Debugger</td><td>Windows</td><td>MSVC</td><td>VS2022 内置，图形化体验最佳</td></tr>
+<tr><td>GDB</td><td>全平台</td><td>GCC</td><td>命令行调试器，功能强大</td></tr>
+<tr><td>LLDB</td><td>全平台</td><td>Clang</td><td>LLVM 项目的调试器</td></tr>
+<tr><td>WinDbg</td><td>Windows</td><td>MSVC</td><td>底层调试、内核调试</td></tr>
+</table>
+
+<div class="callout story">
+<div class="ct">行业故事：调试器如何改变了软件行业</div>
+<p>1947 年 9 月 9 日，哈佛大学 Mark II 计算机出故障了。Grace Hopper（后来成为 COBOL 语言之母）的同事们在继电器中发现了一只飞蛾。他们把飞蛾贴在日志本上，写道："First actual case of bug being found."——这就是"debug"一词的由来。</p>
+<p>在 C++ 的世界中，调试比 C# 更具挑战性。C# 的 GC 确保不会出现悬垂指针，异常系统确保错误被正确传播。而 C++ 的未定义行为（UB）可能让程序在完全无关的地方崩溃——一个数组越界写入可能在几百万次操作后才触发段错误。这就是为什么 C++ 社区如此重视 Sanitizer 工具（下一章会讲到），它们能在运行时检测大部分 UB，从根本上改变了 C++ 的调试方式。</p>
+</div>
+
+<h3>VS Code 调试配置</h3>
+
+<p>以下是在 VS Code 中使用 MSVC 调试器的 <code>launch.json</code> 配置：</p>
+
+<div class="cb"><div class="ch"><span class="tag json">.vscode/launch.json</span></div>
+<pre><code>{
+  <span class="st">"version"</span>: <span class="st">"0.2.0"</span>,
+  <span class="st">"configurations"</span>: [
+    {
+      <span class="st">"name"</span>: <span class="st">"(MSVC) Launch"</span>,
+      <span class="st">"type"</span>: <span class="st">"cppvsdbg"</span>,
+      <span class="st">"request"</span>: <span class="st">"launch"</span>,
+      <span class="st">"program"</span>: <span class="st">"${command:cmake.launchTargetPath}"</span>,
+      <span class="st">"args"</span>: [],
+      <span class="st">"cwd"</span>: <span class="st">"${workspaceFolder}"</span>,
+      <span class="st">"environment"</span>: [],
+      <span class="st">"console"</span>: <span class="st">"integratedTerminal"</span>
+    },
+    {
+      <span class="st">"name"</span>: <span class="st">"(GDB) Launch"</span>,
+      <span class="st">"type"</span>: <span class="st">"cppdbg"</span>,
+      <span class="st">"request"</span>: <span class="st">"launch"</span>,
+      <span class="st">"program"</span>: <span class="st">"${command:cmake.launchTargetPath}"</span>,
+      <span class="st">"MIMode"</span>: <span class="st">"gdb"</span>,
+      <span class="st">"miDebuggerPath"</span>: <span class="st">"C:/msys64/ucrt64/bin/gdb.exe"</span>,
+      <span class="st">"cwd"</span>: <span class="st">"${workspaceFolder}"</span>
+    }
+  ]
+}</code></pre></div>
+
+<!-- ============================== SANITIZER ============================== -->
+<h2 id="sanitizer">Sanitizer 工具</h2>
+
+<h3>基础知识</h3>
+<p><strong>Sanitizer</strong> 是一类在编译时注入检测代码的运行时分析工具，能在程序运行过程中检测各种内存错误和未定义行为。它们是现代 C++ 开发中最重要的质量保证工具。</p>
+
+<table class="tbl">
+<tr><th>Sanitizer</th><th>检测什么</th><th>编译器支持</th><th>性能开销</th></tr>
+<tr><td>AddressSanitizer (ASan)</td><td>缓冲区溢出、use-after-free、内存泄漏</td><td>GCC, Clang, MSVC</td><td>~2x 减速</td></tr>
+<tr><td>UndefinedBehaviorSanitizer</td><td>整数溢出、空指针解引用、对齐错误</td><td>GCC, Clang</td><td>~15% 减速</td></tr>
+<tr><td>ThreadSanitizer (TSan)</td><td>数据竞争（多线程）</td><td>GCC, Clang</td><td>~10x 减速</td></tr>
+<tr><td>MemorySanitizer (MSan)</td><td>使用未初始化的内存</td><td>Clang only</td><td>~3x 减速</td></tr>
+</table>
+
+<h3>在 CMake 中启用</h3>
+
+<div class="cb"><div class="ch"><span class="tag cfg">CMakeLists.txt</span></div>
+<pre><code><span class="cm"># 在 Debug 模式下自动启用 AddressSanitizer</span>
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(myapp PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        target_link_options(myapp PRIVATE -fsanitize=address)
+    elseif(MSVC)
+        <span class="cm"># MSVC 从 VS2019 16.9 开始支持 ASan</span>
+        target_compile_options(myapp PRIVATE /fsanitize=address)
+    endif()
+endif()</code></pre></div>
+
+<div class="callout tip"><div class="ct">强烈建议</div>
+<p>在 CI/CD 的 Debug 测试中始终启用 ASan 和 UBSan。Google 的工程实践是：所有 C++ 代码在提交前必须通过 ASan 和 TSan 检测。这个习惯能捕获 80% 以上的内存相关 bug。</p></div>
+
+<div class="callout story">
+<div class="ct">行业故事：AddressSanitizer 的前世今生</div>
+<p>AddressSanitizer（ASan）于 2011 年由 Google 工程师 Konstantin Serebryany 开发。灵感来自一个痛苦的现实：Google 的 C++ 代码库中有数百万行代码，而传统的内存检测工具（如 Valgrind）太慢——会让程序减速 20-50 倍，根本无法在日常测试中使用。</p>
+<p>ASan 的核心创新是"shadow memory"——用一块辅助内存来记录每个字节的可访问性。编译器在每次内存访问时插入检查代码，开销只有约 2 倍。这个速度足够快，可以在每次 CI 测试中运行。</p>
+<p>ASan 上线后，Google 内部立即发现了数千个潜伏多年的内存 bug——有些已经在生产环境中"安静地"运行了数年，只是碰巧没有触发可见的崩溃。Chrome 团队报告说，ASan 帮助他们修复的 bug 比所有其他方法加起来还多。如今 ASan 已经是 C++ 工具链中不可或缺的一部分。</p>
+</div>
+
+<!-- ============================== VERIFY ============================== -->
+<div class="divider"><span>验证</span></div>
+
+<h2 id="verify">环境验证脚本</h2>
+
+<p>以下是一个完整的环境验证脚本，运行它会检查所有工具是否安装正确：</p>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell — verify-env.ps1</span></div>
+<pre><code><span class="cm"># ======================================</span>
+<span class="cm"># C++ 跨平台开发环境验证脚本</span>
+<span class="cm"># ======================================</span>
+
+Write-Host "`n====== C++ Cross-Platform Dev Environment Check ======" -ForegroundColor Cyan
+
+$errors = @()
+$warnings = @()
+
+<span class="cm"># 1. 检查 Git</span>
+Write-Host "`n[1/8] Git..." -NoNewline
+try {
+    $gitVer = (git --version 2>&1) -replace 'git version ', ''
+    Write-Host " OK ($gitVer)" -ForegroundColor Green
+} catch {
+    Write-Host " MISSING" -ForegroundColor Red
+    $errors += "Git not found"
+}
+
+<span class="cm"># 2. 检查 CMake</span>
+Write-Host "[2/8] CMake..." -NoNewline
+try {
+    $cmakeVer = (cmake --version 2>&1 | Select-Object -First 1) -replace 'cmake version ', ''
+    Write-Host " OK ($cmakeVer)" -ForegroundColor Green
+} catch {
+    Write-Host " MISSING" -ForegroundColor Red
+    $errors += "CMake not found"
+}
+
+<span class="cm"># 3. 检查 Ninja</span>
+Write-Host "[3/8] Ninja..." -NoNewline
+try {
+    $ninjaVer = ninja --version 2>&1
+    Write-Host " OK ($ninjaVer)" -ForegroundColor Green
+} catch {
+    Write-Host " MISSING" -ForegroundColor Red
+    $errors += "Ninja not found"
+}
+
+<span class="cm"># 4. 检查 MSVC (cl.exe)</span>
+Write-Host "[4/8] MSVC..." -NoNewline
+$vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+if (Test-Path $vsWhere) {
+    $vsPath = & $vsWhere -latest -property installationPath
+    Write-Host " OK (VS at $vsPath)" -ForegroundColor Green
+} else {
+    Write-Host " NOT FOUND" -ForegroundColor Yellow
+    $warnings += "Visual Studio not detected"
+}
+
+<span class="cm"># 5. 检查 GCC (MinGW)</span>
+Write-Host "[5/8] GCC (MinGW)..." -NoNewline
+try {
+    $gccVer = (g++ --version 2>&1 | Select-Object -First 1)
+    Write-Host " OK ($gccVer)" -ForegroundColor Green
+} catch {
+    Write-Host " SKIP (optional)" -ForegroundColor Yellow
+    $warnings += "GCC (MinGW) not found - needed for cross-compiler testing"
+}
+
+<span class="cm"># 6. 检查 Clang</span>
+Write-Host "[6/8] Clang..." -NoNewline
+try {
+    $clangVer = (clang++ --version 2>&1 | Select-Object -First 1)
+    Write-Host " OK ($clangVer)" -ForegroundColor Green
+} catch {
+    Write-Host " SKIP (optional)" -ForegroundColor Yellow
+    $warnings += "Clang not found - recommended for clangd and tools"
+}
+
+<span class="cm"># 7. 检查 vcpkg</span>
+Write-Host "[7/8] vcpkg..." -NoNewline
+if (Test-Path "C:\vcpkg\vcpkg.exe") {
+    $vcpkgVer = (C:\vcpkg\vcpkg.exe version 2>&1 | Select-Object -First 1)
+    Write-Host " OK ($vcpkgVer)" -ForegroundColor Green
+} elseif (Get-Command vcpkg -ErrorAction SilentlyContinue) {
+    Write-Host " OK (found in PATH)" -ForegroundColor Green
+} else {
+    Write-Host " SKIP (optional)" -ForegroundColor Yellow
+    $warnings += "vcpkg not found"
+}
+
+<span class="cm"># 8. 检查 WSL</span>
+Write-Host "[8/8] WSL2..." -NoNewline
+try {
+    $wslStatus = wsl --status 2>&1
+    $wslList = wsl -l -v 2>&1
+    Write-Host " OK" -ForegroundColor Green
+} catch {
+    Write-Host " SKIP (optional)" -ForegroundColor Yellow
+    $warnings += "WSL2 not found - needed for Linux target testing"
+}
+
+<span class="cm"># 汇总</span>
+Write-Host "`n====== Summary ======" -ForegroundColor Cyan
+if ($errors.Count -eq 0 -and $warnings.Count -eq 0) {
+    Write-Host "All checks passed! Environment is ready." -ForegroundColor Green
+} elseif ($errors.Count -eq 0) {
+    Write-Host "Core tools OK. Warnings:" -ForegroundColor Yellow
+    $warnings | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+} else {
+    Write-Host "Errors found:" -ForegroundColor Red
+    $errors | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
+    $warnings | ForEach-Object { Write-Host "  - $_ (warning)" -ForegroundColor Yellow }
+}
+
+<span class="cm"># 编译测试</span>
+Write-Host "`n====== Compile Test ======" -ForegroundColor Cyan
+$testDir = "$env:TEMP\cpp-env-test"
+New-Item -ItemType Directory -Force -Path $testDir | Out-Null
+Set-Content "$testDir\main.cpp" @'
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;string&gt;
+
+int main() {
+    std::vector&lt;std::string&gt; items = {"MSVC", "CMake", "Ninja"};
+    std::sort(items.begin(), items.end());
+    for (const auto& item : items)
+        std::cout &lt;&lt; "  OK: " &lt;&lt; item &lt;&lt; std::endl;
+    std::cout &lt;&lt; "C++20 structured binding: ";
+    auto [a, b] = std::pair{42, 3.14};
+    std::cout &lt;&lt; a &lt;&lt; ", " &lt;&lt; b &lt;&lt; std::endl;
+    return 0;
+}
+'@
+
+Set-Content "$testDir\CMakeLists.txt" @'
+cmake_minimum_required(VERSION 3.20)
+project(EnvTest LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(envtest main.cpp)
+'@
+
+Push-Location $testDir
+cmake -B build -G Ninja 2>&1 | Out-Null
+cmake --build build 2>&1 | Out-Null
+if (Test-Path "build\envtest.exe") {
+    Write-Host "Compile test:" -NoNewline
+    Write-Host " PASSED" -ForegroundColor Green
+    & .\build\envtest.exe
+} else {
+    Write-Host "Compile test:" -NoNewline
+    Write-Host " FAILED" -ForegroundColor Red
+}
+Pop-Location
+Remove-Item -Recurse -Force $testDir -ErrorAction SilentlyContinue</code></pre></div>
+
+<p>将以上内容保存为 <code>verify-env.ps1</code>，然后在 PowerShell 中运行：</p>
+
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>powershell -ExecutionPolicy Bypass -File verify-env.ps1</code></pre></div>
+
+<p>如果所有检查项都显示绿色 <code>OK</code>，并且编译测试 <code>PASSED</code>，说明你的开发环境已经完全就绪。</p>
+
+<!-- ============================== TROUBLESHOOT ============================== -->
+<h2 id="trouble">常见问题排查</h2>
+
+<h3>Q1: <code>cl</code> 命令找不到</h3>
+<p>原因：没有在"开发者命令提示符"中运行。解决：在开始菜单搜索 <code>x64 Native Tools Command Prompt for VS 2022</code>，或者在普通 PowerShell 中运行：</p>
+<div class="cb"><div class="ch"><span class="tag ps">PowerShell</span></div>
+<pre><code>& "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64</code></pre></div>
+
+<h3>Q2: CMake 报 "No CMAKE_CXX_COMPILER could be found"</h3>
+<p>原因：CMake 找不到编译器。如果使用 MinGW，确保 <code>C:\msys64\ucrt64\bin</code> 在 PATH 中，并且在 CMake 命令中指定生成器：</p>
+<div class="cb"><div class="ch"><span class="tag sh">Shell</span></div>
+<pre><code>cmake -B build -G "MinGW Makefiles"</code></pre></div>
+
+<h3>Q3: vcpkg 安装的库在 CMake 中找不到</h3>
+<p>确保 CMake 使用了 vcpkg 的 toolchain 文件：</p>
+<div class="cb"><div class="ch"><span class="tag sh">Shell</span></div>
+<pre><code>cmake -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake</code></pre></div>
+
+<h3>Q4: WSL2 中访问 Windows 文件很慢</h3>
+<p>WSL2 访问 <code>/mnt/c/</code>（Windows 文件系统）的 I/O 性能较差。建议将项目文件放在 WSL2 的 Linux 文件系统中（如 <code>~/projects/</code>），而不是 <code>/mnt/c/Users/</code> 下。</p>
+
+<h3>Q5: 编译时提示 "C++20 特性不可用"</h3>
+<p>确保 CMakeLists.txt 中设置了正确的 C++ 标准：</p>
+<div class="cb"><div class="ch"><span class="tag cfg">CMakeLists.txt</span></div>
+<pre><code>set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)  <span class="cm"># 禁用编译器特定扩展</span></code></pre></div>
+
+<h3>Q6: clangd 不工作或智能补全不准确</h3>
+<p>clangd 需要 <code>compile_commands.json</code> 文件来理解项目结构。在 CMake 中启用：</p>
+<div class="cb"><div class="ch"><span class="tag sh">Shell</span></div>
+<pre><code>cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+<span class="cm"># 或添加到 CMakeLists.txt：</span>
+<span class="cm"># set(CMAKE_EXPORT_COMPILE_COMMANDS ON)</span>
+
+<span class="cm"># 然后在项目根目录创建符号链接：</span>
+cp build/compile_commands.json .</code></pre></div>
+
+<div style="margin-top:72px;padding:28px 0;border-top:1px solid var(--bd);text-align:center;color:var(--txm);font-size:14px">
+<p>Windows 跨平台 C++ 开发环境搭建指南 | 2026</p>
+</div>
+
+</main>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
+
+<script>
+const pbf=document.getElementById('pbf'),st=document.getElementById('scrollTop');
+window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-window.innerHeight;pbf.style.width=(window.scrollY/h*100)+'%';st.style.display=window.scrollY>400?'flex':'none'});
+const nls=document.querySelectorAll('.nl'),secs=[];
+nls.forEach(n=>{const id=n.getAttribute('href')?.slice(1);if(id){const el=document.getElementById(id);if(el)secs.push({el,link:n})}});
+function upd(){let c=null;for(const s of secs)if(s.el.getBoundingClientRect().top<=100)c=s;nls.forEach(l=>l.classList.remove('active'));if(c)c.link.classList.add('active')}
+window.addEventListener('scroll',upd);upd();
+nls.forEach(n=>n.addEventListener('click',()=>{if(window.innerWidth<=900)document.querySelector('.sidebar').classList.remove('open')}));
+</script>
+</body>
+</html>

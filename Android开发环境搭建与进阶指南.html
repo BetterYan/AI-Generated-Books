@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows 下 Android 开发环境搭建与进阶指南</title>
+<style>
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --border-color: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
+    --success: #238636;
+    --success-bg: #0f2d1a;
+    --warning: #d29922;
+    --warning-bg: #2d1f0f;
+    --danger: #da3633;
+    --danger-bg: #2d0f0f;
+    --info: #2f81f7;
+    --info-bg: #0f1f2d;
+    --code-bg: #1e2530;
+    --tag-bg: #1f2937;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0f2d1a 100%);
+    border-bottom: 1px solid var(--border-color);
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(88,166,255,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(35,134,54,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-size: 2.8em;
+    font-weight: 700;
+    background: linear-gradient(90deg, #58a6ff, #3fb950);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .hero .subtitle {
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hero .version-tag {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 6px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: var(--accent);
+    position: relative;
+  }
+
+  /* Navigation */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    background: rgba(13, 17, 23, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 100;
+    padding: 12px 0;
+  }
+
+  .nav-bar .container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-bar a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-bar a:hover {
+    color: var(--accent);
+    background: var(--bg-tertiary);
+  }
+
+  /* Sections */
+  section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  section:last-child {
+    border-bottom: none;
+  }
+
+  h2 {
+    font-size: 1.9em;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin: 32px 0 16px;
+    color: var(--accent);
+  }
+
+  h4 {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin: 24px 0 12px;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: var(--text-primary);
+  }
+
+  /* Info boxes */
+  .box {
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+
+  .box.info {
+    background: var(--info-bg);
+    border-color: var(--info);
+  }
+
+  .box.success {
+    background: var(--success-bg);
+    border-color: var(--success);
+  }
+
+  .box.warning {
+    background: var(--warning-bg);
+    border-color: var(--warning);
+  }
+
+  .box.danger {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+  }
+
+  .box-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    font-size: 0.88em;
+    line-height: 1.6;
+  }
+
+  code {
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #ff7b72;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: var(--text-primary);
+  }
+
+  .code-header {
+    background: var(--bg-tertiary);
+    padding: 8px 16px;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .code-header + pre {
+    margin-top: 0;
+    border-radius: 0 0 10px 10px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  th {
+    background: var(--bg-tertiary);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: rgba(88, 166, 255, 0.04);
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 14px 0;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 0.8em;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+
+  /* Tool cards */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .tool-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s;
+  }
+
+  .tool-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .tool-card h4 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tool-card .tool-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+  }
+
+  .tool-card .meta {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .tool-card p {
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  /* Steps */
+  .steps {
+    counter-reset: step;
+    margin: 20px 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .step-content h4 {
+    margin-top: 0;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 24px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding-left: 20px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--bg-primary);
+  }
+
+  /* Progress path */
+  .path-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .path-item {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .path-item .level {
+    font-size: 0.8em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .path-item h4 {
+    margin: 0 0 10px;
+  }
+
+  .path-item p {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    border-top: 1px solid var(--border-color);
+  }
+
+  /* Anchors */
+  a.anchor {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a.anchor:hover {
+    text-decoration: underline;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+
+  /* Checkbox list */
+  .checklist {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .checklist li {
+    padding-left: 28px;
+    position: relative;
+  }
+
+  .checklist li::before {
+    content: '\2610';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 1.1em;
+  }
+
+  .checklist li.checked::before {
+    content: '\2611';
+  }
+
+  /* Print styles */
+  @media print {
+    .nav-bar { display: none; }
+    body { background: white; color: black; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <h1>Windows 下 Android 开发环境搭建与进阶指南</h1>
+    <p class="subtitle">从零开始构建专业级 Android 开发环境，掌握调试技巧与工程化实战经验，迈向资深工程师之路</p>
+    <span class="version-tag">2026 最新版 | 适用于 Android 15 / Gradle 8.x</span>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+  <div class="container">
+    <a href="#overview">概览</a>
+    <a href="#prerequisites">前置依赖</a>
+    <a href="#android-studio">Android Studio</a>
+    <a href="#sdk">SDK 管理</a>
+    <a href="#emulator">模拟器</a>
+    <a href="#tools">核心工具</a>
+    <a href="#debug">调试技巧</a>
+    <a href="#skills">开发技巧</a>
+    <a href="#performance">性能优化</a>
+    <a href="#architecture">架构设计</a>
+    <a href="#roadmap">进阶路线</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- Overview -->
+<section id="overview">
+  <h2>📋 指南概览</h2>
+  <p>Android 开发环境搭建看似简单，但要搭建一个<strong>高效、稳定、可维护</strong>的专业级开发环境，需要对各个组件有深入理解。本指南将从 Windows 系统出发，带你完成从环境搭建到高级工程师所需的全部技能储备。</p>
+
+  <div class="box info">
+    <div class="box-title">🎯 学完本指南你将具备</div>
+    <ul>
+      <li>搭建企业级 Android 开发环境的能力</li>
+      <li>熟练使用各类调试工具定位复杂问题</li>
+      <li>掌握性能分析与优化的系统方法</li>
+      <li>理解现代 Android 架构设计模式</li>
+      <li>具备独立解决工程难题的思维框架</li>
+    </ul>
+  </div>
+
+  <h3>核心依赖清单</h3>
+  <table>
+    <tr>
+      <th>依赖项</th>
+      <th>推荐版本</th>
+      <th>作用</th>
+      <th>必需性</th>
+    </tr>
+    <tr>
+      <td>JDK (OpenJDK)</td>
+      <td>17 或 21</td>
+      <td>Java/Kotlin 编译运行环境</td>
+      <td><span class="tag">必需</span></td>
+    </tr>
+    <tr>
+      <td>Android Studio</td>
+      <td>最新稳定版</td>
+      <td>官方 IDE，集成开发环境</td>
+      <td><span class="tag">必需</span></td>
+    </tr>
+    <tr>
+      <td>Android SDK</td>
+      <td>API 21-35</td>
+      <td>编译目标平台与构建工具</td>
+      <td><span class="tag">必需</span></td>
+    </tr>
+    <tr>
+      <td>Gradle</td>
+      <td>8.7+</td>
+      <td>项目构建系统</td>
+      <td><span class="tag">必需</span></td>
+    </tr>
+    <tr>
+      <td>Git</td>
+      <td>2.40+</td>
+      <td>版本控制</td>
+      <td><span class="tag">必需</span></td>
+    </tr>
+    <tr>
+      <td>Windows Terminal</td>
+      <td>最新版</td>
+      <td>现代化命令行终端</td>
+      <td><span class="tag">强烈推荐</span></td>
+    </tr>
+  </table>
+</section>
+
+<!-- Prerequisites -->
+<section id="prerequisites">
+  <h2>🖥️ 前置依赖详解</h2>
+
+  <h3>1. JDK（Java Development Kit）</h3>
+  <p><strong>背景：</strong>Android 应用本质上运行在 Java 虚拟机（ART）上，JDK 是编译 Java/Kotlin 代码的基础工具链。Google 官方推荐使用 JetBrains 维护的 <strong>OpenJDK</strong>，而非 Oracle JDK（授权问题）。</p>
+
+  <div class="box info">
+    <div class="box-title">💡 为什么选 OpenJDK 17/21？</div>
+    <p>Android Studio 从 Arctic Fox 开始内置 OpenJDK，但独立安装系统级 JDK 能让你在命令行中使用 Gradle、keytool 等工具，且避免多个项目间 JDK 版本冲突。</p>
+  </div>
+
+  <h4>安装步骤</h4>
+  <div class="code-header">PowerShell</div>
+  <pre><code># 推荐：使用 JetBrains Runtime 或 Eclipse Temurin
+# 方式一：手动下载安装
+# 访问 https://adoptium.net/ 下载 Eclipse Temurin JDK 17 MSI 安装包
+
+# 方式二：使用 winget（Windows 包管理器）
+winget install EclipseAdoptium.Temurin.17.JDK
+
+# 验证安装
+java -version
+javac -version
+</code></pre>
+
+  <h4>环境变量配置</h4>
+  <div class="code-header">系统环境变量</div>
+  <pre><code>JAVA_HOME = C:\Program Files\Eclipse Adoptium\jdk-17.0.x.x-hotspot
+Path 追加：%JAVA_HOME%\bin
+</code></pre>
+
+  <h3>2. Git 版本控制</h3>
+  <p><strong>背景：</strong>Git 由 Linus Torvalds 于 2005 年创建，用于管理 Linux 内核源码。今天它已成为软件开发的事实标准，Android 开源项目（AOSP）本身就托管在 Git 上。</p>
+
+  <div class="box warning">
+    <div class="box-title">⚠️ Windows 下 Git 的换行符陷阱</div>
+    <p>Windows 使用 CRLF (\r\n)，而 Linux/macOS 使用 LF (\n)。Android 项目统一要求 LF，否则构建脚本可能报错。安装时选择 <strong>"Checkout as-is, commit Unix-style line endings"</strong>。</p>
+  </div>
+
+  <div class="code-header">PowerShell</div>
+  <pre><code># 安装 Git
+winget install Git.Git
+
+# 配置全局设置
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+git config --global core.autocrlf input
+
+# 验证
+git --version
+</code></pre>
+
+  <h3>3. Windows Terminal（强烈推荐）</h3>
+  <p><strong>背景：</strong>Windows 传统的 cmd.exe 和 PowerShell 5 功能有限。Windows Terminal 是微软 2019 年开源的现代化终端，支持多标签页、GPU 加速、自定义主题，并能同时运行 PowerShell、WSL、CMD 等 Shell。</p>
+
+  <div class="code-header">PowerShell</div>
+  <pre><code># 安装 Windows Terminal
+winget install Microsoft.WindowsTerminal
+
+# 推荐同时安装 PowerShell 7（跨平台、性能更好）
+winget install Microsoft.PowerShell
+</code></pre>
+</section>
+
+<!-- Android Studio -->
+<section id="android-studio">
+  <h2>🚀 Android Studio 安装与配置</h2>
+
+  <p><strong>背景：</strong>Android Studio 基于 IntelliJ IDEA Community Edition，由 Google 与 JetBrains 联合开发，2013 年发布首个预览版，2014 年成为官方 IDE。它集成了代码编辑、调试、性能分析、布局设计、APK 分析等全套工具，是 Android 开发的核心阵地。</p>
+
+  <h3>安装步骤</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h4>下载安装包</h4>
+        <p>访问 <a href="https://developer.android.com/studio" class="anchor">developer.android.com/studio</a> 下载 Windows (64-bit) 版本。推荐选择 <strong>.exe</strong> 安装包（带自动更新）。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <h4>运行安装向导</h4>
+        <p>勾选 <strong>Android Virtual Device</strong>（模拟器组件），安装路径建议改为非系统盘，如 <code>D:\Android\Android Studio</code>，避免 C 盘空间不足。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <h4>首次启动配置</h4>
+        <p>选择 <strong>Do not import settings</strong> → 选择主题（Darcula 或 Light）→ 安装类型选 <strong>Standard</strong> → 确认 SDK 安装路径。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>关键配置优化</h3>
+
+  <h4>1. 增大 IDE 内存</h4>
+  <p>Android Studio 默认内存较低，大型项目容易卡顿。修改 <code>studio64.exe.vmoptions</code>：</p>
+  <div class="code-header">Help → Edit Custom VM Options</div>
+  <pre><code>-Xms1024m
+-Xmx8192m
+-XX:ReservedCodeCacheSize=512m
+-XX:+UseG1GC
+-XX:SoftRefLRUPolicyMSPerMB=50
+-XX:CICompilerCount=2
+-XX:+HeapDumpOnOutOfMemoryError
+-Dfile.encoding=UTF-8
+</code></pre>
+
+  <h4>2. 配置 Gradle 加速</h4>
+  <div class="code-header">gradle.properties（全局）</div>
+  <pre><code># 开启并行编译
+org.gradle.parallel=true
+org.gradle.configureondemand=true
+org.gradle.caching=true
+
+# 守护进程优化
+org.gradle.daemon=true
+
+# 分配更多内存
+org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+
+# Android 特定优化
+android.useAndroidX=true
+android.enableJetifier=true
+android.nonTransitiveRClass=true
+android.nonFinalResIds=true
+</code></pre>
+
+  <h4>3. 设置代理（中国大陆开发者）</h4>
+  <div class="box warning">
+    <div class="box-title">🌐 网络加速方案</div>
+    <p>Google 服务在中国大陆访问受限，建议配置国内镜像或代理。常见方案：设置 HTTP 代理、使用公司 VPN、或配置镜像仓库。</p>
+  </div>
+
+  <div class="code-header">SDK Manager 代理设置（推荐）</div>
+  <pre><code># 打开 Settings → Appearance & Behavior → System Settings → HTTP Proxy
+# 选择 Manual proxy configuration
+
+# 科大镜像（HTTP）
+Host: mirrors.ustc.edu.cn
+Port: 80
+</code></pre>
+</section>
+
+<!-- SDK -->
+<section id="sdk">
+  <h2>📦 Android SDK 管理</h2>
+
+  <p><strong>背景：</strong>Android SDK（Software Development Kit）是开发 Android 应用的核心工具包，包含平台源码、构建工具、平台工具、模拟器镜像等。理解 SDK 的组成，是排查构建问题的基本功。</p>
+
+  <h3>SDK 目录结构</h3>
+  <table>
+    <tr>
+      <th>目录</th>
+      <th>内容</th>
+      <th>用途</th>
+    </tr>
+    <tr>
+      <td><code>platforms/</code></td>
+      <td>各版本 Android 平台 API</td>
+      <td>编译时引用 android.jar</td>
+    </tr>
+    <tr>
+      <td><code>platform-tools/</code></td>
+      <td>adb、fastboot、systrace</td>
+      <td>设备调试、刷机</td>
+    </tr>
+    <tr>
+      <td><code>build-tools/</code></td>
+      <td>aapt、dx、d8、apksigner、zipalign</td>
+      <td>编译打包 APK</td>
+    </tr>
+    <tr>
+      <td><code>tools/</code></td>
+      <td>模拟器、布局检查器、lint</td>
+      <td>开发辅助工具</td>
+    </tr>
+    <tr>
+      <td><code>emulator/</code></td>
+      <td>Android 模拟器程序</td>
+      <td>运行虚拟设备</td>
+    </tr>
+    <tr>
+      <td><code>extras/</code></td>
+      <td>Support Library、Google Play 服务</td>
+      <td>额外支持库</td>
+    </tr>
+  </table>
+
+  <h3>必装 SDK 组件清单</h3>
+  <div class="code-header">SDK Manager（Tools → SDK Manager）</div>
+  <pre><code>【SDK Platforms】
+☑ Android 15.0 (API 35)
+☑ Android 14.0 (API 34)
+☑ Android 13.0 (API 33)
+☑ Android 12.0 (API 31, 32)
+☑ Android 11.0 (API 30)
+☑ Android 10.0 (API 29)
+☑ Android 9.0  (API 28)
+☑ Android 8.0  (API 26, 27)
+☑ Android 5.0  (API 21)     // 最低兼容版本常用
+
+【SDK Tools】
+☑ Android SDK Build-Tools 35
+☑ Android SDK Platform-Tools (最新)
+☑ Android SDK Tools (最新)
+☑ Android Emulator
+☑ Intel x86 Emulator Accelerator (HAXM 或 Hyper-V)
+
+【SDK Update Sites】
+☑ Android Repository
+☑ Intel HAXM
+☑ Google Repository
+</code></pre>
+
+  <div class="box success">
+    <div class="box-title">✅ SDK 版本选择策略</div>
+    <ul>
+      <li><strong>compileSdk</strong>：通常用最新稳定版（如 35），可以使用最新 API</li>
+      <li><strong>targetSdk</strong>：用最新版，Google Play 要求 targetSdk 需跟上年度更新</li>
+      <li><strong>minSdk</strong>：根据业务需求定，国内应用一般 21（Android 5.0）起步，覆盖 98%+ 设备</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Emulator -->
+<section id="emulator">
+  <h2>📱 模拟器与真机调试</h2>
+
+  <h3>Android Emulator 加速</h3>
+  <p><strong>背景：</strong>Android 模拟器历史上因性能差被诟病。2018 年 Google 推出基于 Hyper-V / HAXM 的硬件加速方案，配合 x86 系统镜像，性能已接近真机。</p>
+
+  <h4>Windows 下启用硬件加速</h4>
+  <div class="code-header">PowerShell（管理员）</div>
+  <pre><code># 方案一：Hyper-V（Windows 10/11 专业版推荐）
+dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All
+
+# 方案二：Windows Hypervisor Platform（与 Hyper-V 二选一）
+dism.exe /Online /Enable-Feature:HypervisorPlatform /All
+
+# 方案三：Intel HAXM（仅 Intel CPU，旧方案）
+# 在 SDK Manager 中下载 Intel x86 Emulator Accelerator
+</code></pre>
+
+  <h4>创建高性能模拟器</h4>
+  <ol>
+    <li>打开 <strong>AVD Manager</strong>（Tools → Device Manager）</li>
+    <li>选择设备定义（推荐 Pixel 7 或 Pixel 8）</li>
+    <li>选择系统镜像时，务必选择带 <strong>(Google Play)</strong> 或 <strong>(Google APIs)</strong> 的 <strong>x86_64</strong> 镜像</li>
+    <li>在高级设置中：
+      <ul>
+        <li>RAM：不少于 2048 MB（推荐 4096 MB）</li>
+        <li>VM heap：512 MB</li>
+        <li>Graphics：Hardware - GLES 2.0 或 3.0</li>
+        <li>Multi-core CPU：2 或 4 核</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>真机调试配置</h3>
+  <div class="code-header">启用开发者选项步骤</div>
+  <pre><code>设置 → 关于手机 → 连续点击"版本号"7次 → 返回 → 系统 → 开发者选项
+
+必须开启的选项：
+☑ USB 调试
+☑ 仅充电模式下允许 ADB 调试
+☑ 安装 via USB（部分品牌）
+</code></pre>
+
+  <div class="box warning">
+    <div class="box-title">🔌 各品牌真机调试注意事项</div>
+    <ul>
+      <li><strong>华为/荣耀：</strong>需登录华为账号，开启"允许通过 HDB 连接设备"</li>
+      <li><strong>小米/Redmi：</strong>需开启"USB 调试"和"USB 安装"，插入 SIM 卡并登录小米账号</li>
+      <li><strong>OPPO/一加/realme：</strong>需开启"USB 调试"和"禁止权限监控"</li>
+      <li><strong>vivo/iQOO：</strong>需开启"USB 调试"，部分机型需申请开发者权限</li>
+      <li><strong>三星：</strong>相对开放，开启 USB 调试即可</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Tools -->
+<section id="tools">
+  <h2>🛠️ 核心工具详解</h2>
+  <p>以下是 Android 开发中不可或缺的工具，每个都说明了<strong>产生的背景</strong>和<strong>解决的问题</strong>。</p>
+
+  <h3>平台工具</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <h4><span class="tool-icon">🐛</span>ADB（Android Debug Bridge）</h4>
+      <div class="meta">背景 | 通用调试桥梁</div>
+      <p>ADB 诞生于 Android 早期，是连接 PC 与 Android 设备的通用命令行工具。它解决的是"如何在没有图形界面的情况下与设备通信"的问题，是 Android 调试的基石。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>安装 APK、查看日志、端口转发、进入 shell、截图录屏、性能数据采集。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">📊</span>Android Profiler</h4>
+      <div class="meta">背景 | Android Studio 3.0 集成</div>
+      <p>早期开发者需要用 DDMS、Traceview、MAT 等分散工具分析性能。Profiler 将它们统一为一个实时监控面板，解决"性能分析工具碎片化、学习成本高"的问题。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>CPU、Memory、Network、Energy 实时监控与方法追踪。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🎨</span>Layout Inspector</h4>
+      <div class="meta">背景 | 布局层级可视化</div>
+      <p>Android UI 是树形结构嵌套，过深的层级导致过度绘制和卡顿。Layout Inspector 让你实时查看每个 View 的属性、层级和渲染时间，解决"黑盒式 UI 调试"的痛点。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>查看视图层级、检查属性值、分析过度绘制。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">📦</span>APK Analyzer</h4>
+      <div class="meta">背景 | APK 体积爆炸时代</div>
+      <p>随着依赖库增多，APK 体积动辄上百 MB。APK Analyzer 直观展示 APK 内部结构（DEX、资源、SO 库占比），解决"不知道体积膨胀根因"的问题。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>分析 APK 组成、比较版本差异、查看 DEX 方法数。</p>
+    </div>
+  </div>
+
+  <h3>第三方调试神器</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <h4><span class="tool-icon">💧</span>LeakCanary</h4>
+      <div class="meta">Square 开源 | 内存泄漏检测</div>
+      <p>内存泄漏是 Android 最常见也最隐蔽的 Bug。LeakCanary 由 Square 公司开发，它通过监测 Activity/Fragment 的引用链，在泄漏发生时自动 dump 堆栈并生成可视化引用链，让"无法感知的内存泄漏"变得一目了然。</p>
+      <p style="margin-top:10px"><strong>解决的问题：</strong>Activity 因匿名内部类、静态引用、未注销监听器等原因无法被 GC 回收。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🔄</span>Flipper（原 Sonar）</h4>
+      <div class="meta">Meta(Facebook) 开源 | 移动端调试平台</div>
+      <p>Flipper 是 Facebook 推出的移动端调试平台，它将移动端内部状态以桌面应用的形式可视化展示。解决"移动端调试信息封闭、难以实时查看"的问题。</p>
+      <p style="margin-top:10px"><strong>核心插件：</strong>网络请求拦截、数据库浏览、SharedPreferences 查看、布局检查、崩溃日志。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🌐</span>Charles / Fiddler</h4>
+      <div class="meta">网络抓包工具 | HTTPS 解密</div>
+      <p>移动应用的网络请求发生在设备与服务器之间，传统 Wireshark 学习成本高。Charles 以中间人代理的方式拦截 HTTP/HTTPS 流量，解决"移动端网络请求黑盒"问题。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>查看请求/响应、Mock 接口数据、弱网模拟、HTTPS 解密。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🔍</span>Stetho</h4>
+      <div class="meta">Meta(Facebook) 开源 | Chrome DevTools 集成</div>
+      <p>让 Android 应用能够通过 Chrome 开发者工具进行调试。它解决的是"Android 开发者习惯 Web 调试工具但移动平台没有等价物"的问题。</p>
+      <p style="margin-top:10px"><strong>核心用途：</strong>数据库查看、网络监控、View 层级检查（部分被 Flipper 取代）。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🧪</span>Android Lint</h4>
+      <div class="meta">Google 官方 | 静态代码分析</div>
+      <p>Lint 是 Android 官方的静态分析工具，它在编译前扫描代码中的潜在问题。解决"代码质量问题发现滞后、代码规范难以统一"的问题。</p>
+      <p style="margin-top:10px"><strong>检测范围：</strong>性能、可用性、版本兼容性、安全性、国际化、正确性。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">📏</span>Systrace / Perfetto</h4>
+      <div class="meta">Google 官方 | 系统级性能追踪</div>
+      <p>Systrace 是 Android 系统级的性能追踪工具，能采集 CPU 调度、渲染管线、Binder 通信等底层数据。解决"应用卡顿但不知道是 App 问题还是系统问题"的困境。</p>
+      <p style="margin-top:10px"><strong>Perfetto</strong> 是 Systrace 的下一代，支持更大数据量和 SQL 查询。</p>
+    </div>
+  </div>
+
+  <h3>ADB 高级命令速查</h3>
+  <div class="code-header">ADB 常用命令</div>
+  <pre><code># 设备管理
+adb devices                    # 列出已连接设备
+adb connect <ip>:5555         # 无线调试（需先 USB 连接执行 adb tcpip 5555）
+adb disconnect                # 断开无线连接
+
+# 应用管理
+adb install app.apk           # 安装 APK
+adb install -r app.apk        # 覆盖安装（保留数据）
+adb uninstall com.example.app # 卸载应用
+adb shell pm clear com.example.app  # 清除应用数据
+
+# 日志
+adb logcat                    # 查看全部日志
+adb logcat -s TAG:D           # 过滤 TAG，级别 Debug 以上
+adb logcat -c                 # 清除日志缓冲区
+adb logcat | findstr "keyword" # Windows 下过滤（Linux/macOS 用 grep）
+
+# 文件传输
+adb push local.txt /sdcard/   # 推送到设备
+adb pull /sdcard/file.txt ./  # 拉取到电脑
+
+# Shell 操作
+adb shell                     # 进入设备 shell
+adb shell am start -n com.example/.MainActivity  # 启动 Activity
+adb shell input keyevent 26   # 模拟电源键
+adb shell screencap /sdcard/screen.png  # 截图
+adb shell screenrecord /sdcard/video.mp4 # 录屏（Ctrl+C 停止）
+
+# 性能
+adb shell dumpsys meminfo com.example.app  # 内存详情
+adb shell dumpsys battery     # 电池状态
+adb shell top -m 10           # 查看 CPU 占用 top10
+</code></pre>
+</section>
+
+<!-- Debug -->
+<section id="debug">
+  <h2>🐞 调试技巧大全</h2>
+
+  <h3>1. 断点高级玩法</h3>
+  <table>
+    <tr>
+      <th>断点类型</th>
+      <th>用法</th>
+      <th>适用场景</th>
+    </tr>
+    <tr>
+      <td>条件断点</td>
+      <td>右键断点 → 输入条件表达式，如 <code>userId == 12345</code></td>
+      <td>循环中只在特定值暂停</td>
+    </tr>
+    <tr>
+      <td>日志断点</td>
+      <td>勾选 "Evaluate and log"，不暂停只输出</td>
+      <td>不打断程序流，只观察变量值</td>
+    </tr>
+    <tr>
+      <td>异常断点</td>
+      <td>Run → View Breakpoints → 添加 Java Exception Breakpoints</td>
+      <td>捕获特定异常抛出的位置</td>
+    </tr>
+    <tr>
+      <td>方法断点</td>
+      <td>在方法签名上打断点</td>
+      <td>跟踪方法出入参（性能开销大，慎用）</td>
+    </tr>
+    <tr>
+      <td>Field Watchpoint</td>
+      <td>在字段上打断点，监控读写</td>
+      <td>追踪某个变量何时被修改</td>
+    </tr>
+  </table>
+
+  <h3>2. 卡顿定位三板斧</h3>
+
+  <h4>第一板斧：GPU 过度绘制检测</h4>
+  <div class="code-header">开发者选项</div>
+  <pre><code>设置 → 开发者选项 → 调试 GPU 过度绘制 → 显示过度绘制区域
+
+颜色含义：
+蓝色   = 绘制 1 次（理想）
+绿色   = 绘制 2 次（可接受）
+粉色   = 绘制 3 次（需优化）
+红色   = 绘制 4 次以上（必须优化）
+</code></pre>
+
+  <h4>第二板斧：Systrace 分析渲染管线</h4>
+  <div class="code-header">命令行</div>
+  <pre><code># 采集 5 秒 trace
+python systrace.py -a com.example.app sched gfx view wm am -b 32768 -t 5 -o trace.html
+
+# 在 Chrome 中打开 trace.html
+# 关注 "Frame" 行，绿色表示 16ms 内完成，黄色/红色表示掉帧
+</code></pre>
+
+  <h4>第三板斧：Profiler CPU 方法追踪</h4>
+  <ol>
+    <li>打开 Profiler → 选择 CPU 标签</li>
+    <li>选择 "Trace Java Methods"</li>
+    <li>录制卡顿发生时段</li>
+    <li>查看 "Bottom Up" 视图，找出耗时最长的方法调用链</li>
+  </ol>
+
+  <h3>3. 内存泄漏排查流程</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h4>集成 LeakCanary</h4>
+        <p>在 build.gradle 添加依赖，它会自动监控 Activity 和 Fragment。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <h4>复现场景</h4>
+        <p>反复进入/退出可疑页面，触发 LeakCanary 的泄漏检测。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <h4>分析引用链</h4>
+        <p>LeakCanary 会生成通知，展示从 GC Root 到泄漏对象的完整引用链。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <h4>确认根因</h4>
+        <p>常见根因：静态引用持有 Activity、匿名内部类持有外部类引用、未注销监听器、Handler 延迟消息。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>4. 网络调试技巧</h3>
+  <div class="code-header">Charles 抓包配置</div>
+  <pre><code># 1. 安装 Charles 根证书到手机
+Help → SSL Proxying → Install Charles Root Certificate on a Mobile Device
+
+# 2. 手机 WiFi 代理设置为电脑 IP + 端口 8888
+
+# 3. 在 Charles 添加 SSL 代理规则
+Proxy → SSL Proxying Settings → Add: *:443
+
+# 4. Android 7.0+ 需要在 App 中配置 network_security_config.xml
+// res/xml/network_security_config.xml
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;network-security-config&gt;
+    &lt;base-config cleartextTrafficPermitted="true"&gt;
+        &lt;trust-anchors&gt;
+            &lt;certificates src="user"/&gt;
+            &lt;certificates src="system"/&gt;
+        &lt;/trust-anchors&gt;
+    &lt;/base-config&gt;
+&lt;/network-security-config&gt;
+</code></pre>
+
+  <div class="box info">
+    <div class="box-title">💡 调试 release 版网络的技巧</div>
+    <p>有时 Bug 只在 release 包出现。可以创建 <code>debuggable true</code> 的 release 变体，或在测试环境关闭证书校验（仅测试环境）。</p>
+  </div>
+</section>
+
+<!-- Skills -->
+<section id="skills">
+  <h2>⚡ 开发技巧与工程经验</h2>
+
+  <h3>1. Gradle 提速实战</h3>
+  <p>Android 构建速度直接影响开发效率。以下是经过验证的提速方案：</p>
+
+  <div class="code-header">gradle.properties（项目级）</div>
+  <pre><code># 构建优化
+org.gradle.parallel=true
+org.gradle.configureondemand=true
+org.gradle.caching=true
+org.gradle.daemon=true
+
+# 内存配置（根据电脑内存调整）
+org.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=512m \
+  -XX:+HeapDumpOnOutOfMemoryError \
+  -Dfile.encoding=UTF-8
+
+# Android 优化
+android.useAndroidX=true
+android.enableJetifier=true
+android.nonTransitiveRClass=true
+android.nonFinalResIds=true
+</code></pre>
+
+  <div class="code-header">模块化 + Build Variant</div>
+  <pre><code>// 开发时只编译需要的模块
+// settings.gradle
+if (isDevMode()) {
+    include ':app', ':core', ':feature-home'
+} else {
+    include ':app', ':core', ':feature-home', ':feature-mine', ':feature-settings'
+}
+
+// build.gradle (app)
+android {
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false    // debug 不压缩资源
+            crunchPngs false         // debug 不压缩 PNG
+            splits.abi.enable false  // debug 不拆分 ABI
+        }
+    }
+}
+</code></pre>
+
+  <h3>2. 版本管理策略</h3>
+  <table>
+    <tr>
+      <th>策略</th>
+      <th>说明</th>
+      <th>适用场景</th>
+    </tr>
+    <tr>
+      <td>Git Flow</td>
+      <td>master、develop、feature、release、hotfix 分支模型</td>
+      <td>大型团队、版本发布周期明确</td>
+    </tr>
+    <tr>
+      <td>GitHub Flow</td>
+      <td>master + Pull Request 的轻量模型</td>
+      <td>敏捷团队、持续部署</td>
+    </tr>
+    <tr>
+      <td>Trunk-Based</td>
+      <td>主干开发，短期特性分支</td>
+      <td>成熟团队、高度自动化测试</td>
+    </tr>
+  </table>
+
+  <h3>3. 代码质量保障体系</h3>
+  <div class="code-header">build.gradle 集成代码检查</div>
+  <pre><code>// KtLint：Kotlin 代码风格检查
+plugins {
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+}
+
+// Detekt：Kotlin 静态分析
+plugins {
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
+}
+
+// Jacoco：单元测试覆盖率
+tasks.register&lt;JacocoReport&gt;("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+// 提交前自动检查（配合 git hooks）
+// .git/hooks/pre-commit
+#!/bin/bash
+./gradlew ktlintCheck detekt
+</code></pre>
+
+  <h3>4. 多模块项目设计原则</h3>
+  <ul>
+    <li><strong>按功能拆分：</strong>feature-login、feature-home、feature-search，而非按层拆分（data、domain、ui）</li>
+    <li><strong>依赖方向严格单向：</strong>App 模块 → Feature 模块 → Core 模块，禁止反向依赖</li>
+    <li><strong>API 显式暴露：</strong>每个模块通过 api/implementation 精确控制对外暴露的内容</li>
+    <li><strong>版本集中管理：</strong>在根目录 build.gradle.kts 或 libs.versions.toml 统一管理依赖版本</li>
+  </ul>
+
+  <div class="code-header">libs.versions.toml 示例</div>
+  <pre><code>[versions]
+kotlin = "1.9.24"
+agp = "8.4.0"
+coroutines = "1.8.1"
+compose = "2024.05.00"
+
+[libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+</code></pre>
+</section>
+
+<!-- Performance -->
+<section id="performance">
+  <h2>🚀 性能优化体系</h2>
+
+  <h3>启动优化</h3>
+  <p>应用启动是用户体验的第一道关卡。Android Vitals 监控冷启动时间，超过 5 秒会影响 Google Play 排名。</p>
+
+  <div class="code-header">Application.onCreate 优化</div>
+  <pre><code>class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        
+        // ❌ 错误：所有初始化放在主线程
+        // initNetwork()
+        // initDatabase()
+        // initPush()
+        // initAnalytics()
+        
+        // ✅ 正确：按优先级和线程分流
+        initCriticalOnMainThread()     // 必须在主线程且立即执行
+        
+        GlobalScope.launch(Dispatchers.IO) {
+            initDatabase()             // 数据库可以异步
+            initNetwork()
+        }
+        
+        mainExecutor.executeDelayed(2000) {
+            initPush()                 // 推送可以延迟
+            initAnalytics()
+        }
+    }
+}
+</code></pre>
+
+  <h3>内存优化 checklist</h3>
+  <ul class="checklist">
+    <li>使用 LeakCanary 定期检查内存泄漏</li>
+    <li>Bitmap 加载使用 Glide/Coil，不要手动 BitmapFactory.decode</li>
+    <li>List 使用 RecyclerView 而非 ListView，做好 ViewHolder 复用</li>
+    <li>避免在 onDraw 中创建对象（引起 GC）</li>
+    <li>使用 SparseArray 替代 HashMap&lt;Integer, Object&gt;</li>
+    <li>谨慎使用枚举（每个枚举值都是一个对象）</li>
+    <li>Fragment/Activity 中使用弱引用持有外部对象</li>
+  </ul>
+
+  <h3>电量优化</h3>
+  <div class="box info">
+    <div class="box-title">🔋 Doze 模式与后台限制</div>
+    <p>Android 6.0+ 引入 Doze 模式，系统会限制后台网络访问和 CPU 唤醒。开发时需使用 WorkManager 替代后台 Service，使用 FCM 替代轮询。</p>
+  </div>
+
+  <div class="code-header">WorkManager 后台任务</div>
+  <pre><code>val constraints = Constraints.Builder()
+    .setRequiredNetworkType(NetworkType.CONNECTED)
+    .setRequiresBatteryNotLow(true)
+    .build()
+
+val uploadWork = PeriodicWorkRequestBuilder&lt;UploadWorker&gt;(1, TimeUnit.HOURS)
+    .setConstraints(constraints)
+    .build()
+
+WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+    "upload",
+    ExistingPeriodicWorkPolicy.KEEP,
+    uploadWork
+)
+</code></pre>
+
+  <h3>APK 瘦身策略</h3>
+  <table>
+    <tr>
+      <th>策略</th>
+      <th>方法</th>
+      <th>预期效果</th>
+    </tr>
+    <tr>
+      <td>资源压缩</td>
+      <td><code>shrinkResources true</code> + <code>resConfigs "zh", "en"</code></td>
+      <td>减少 10%-30%</td>
+    </tr>
+    <tr>
+      <td>ABI 拆分</td>
+      <td><code>splits { abi { enable true } }</code></td>
+      <td>减少 50%+（Native 库）</td>
+    </tr>
+    <tr>
+      <td>图片优化</td>
+      <td>WebP 替代 PNG/JPEG，矢量图替代位图</td>
+      <td>减少 20%-40%</td>
+    </tr>
+    <tr>
+      <td>代码混淆</td>
+      <td><code>minifyEnabled true</code> + ProGuard/R8</td>
+      <td>减少 20%-50%</td>
+    </tr>
+    <tr>
+      <td>动态交付</td>
+      <td>Android App Bundle + Dynamic Features</td>
+      <td>用户只下载需要的模块</td>
+    </tr>
+  </table>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <h2>🏗️ 现代 Android 架构</h2>
+
+  <h3>Google 官方推荐架构（MVVM + Jetpack）</h3>
+  <div class="code-header">典型项目结构</div>
+  <pre><code>app/
+├── data/                      # 数据层
+│   ├── local/                 # Room 数据库、DataStore、SharedPreferences
+│   ├── remote/                # Retrofit API 接口、网络模型
+│   └── repository/            # 仓库模式，聚合多个数据源
+├── domain/                    # 领域层（可选，复杂项目使用）
+│   ├── model/                 # 业务模型
+│   └── usecase/               # 用例（单一职责的业务逻辑）
+├── ui/                        # UI 层
+│   ├── home/
+│   │   ├── HomeScreen.kt      # Compose UI
+│   │   ├── HomeViewModel.kt   # 状态持有者
+│   │   └── HomeUiState.kt     # UI 状态封装
+│   └── common/                # 通用组件
+└── di/                        # 依赖注入（Hilt 模块）
+</code></pre>
+
+  <h3>关键架构组件</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <h4><span class="tool-icon">📌</span>ViewModel</h4>
+      <div class="meta">AAC 组件 | 配置变更存活</div>
+      <p>屏幕旋转等配置变更会导致 Activity 重建，ViewModel 在作用域内保持存活，解决"配置变更导致状态丢失"的问题。它是 UI 数据的持有者，不持有 View 引用。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🔄</span>Repository 模式</h4>
+      <div class="meta">数据来源抽象层</div>
+      <p>ViewModel 不直接调用网络或数据库，而是通过 Repository。Repository 决定数据从哪来（本地缓存 or 远程服务器），解决"ViewModel 耦合具体数据来源"的问题。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">💉</span>Hilt（依赖注入）</h4>
+      <div class="meta">Dagger 上层封装 | 编译期生成</div>
+      <p>手动创建对象导致耦合严重、难以测试。Hilt 在编译期自动生成工厂代码，零运行时反射开销，解决"依赖管理混乱、单元测试难以 mock"的问题。</p>
+    </div>
+
+    <div class="tool-card">
+      <h4><span class="tool-icon">🌊</span>Kotlin Coroutines + Flow</h4>
+      <div class="meta">异步编程模型</div>
+      <p>替代 RxJava 和 AsyncTask，编译器支持、语法简洁、结构化并发自动处理生命周期。Flow 是响应式数据流，完美适配 LiveData 到 StateFlow 的演进。</p>
+    </div>
+  </div>
+
+  <h3>Compose 声明式 UI</h3>
+  <p><strong>背景：</strong>传统的 View 体系基于命令式编程（findViewById → 修改属性），代码冗长且容易不一致。Jetpack Compose 是 Google 2021 年推出的全新声明式 UI 框架，用 Kotlin 函数描述 UI，框架自动处理刷新。</p>
+
+  <div class="code-header">Compose 示例</div>
+  <pre><code>@Composable
+fun UserProfile(user: User) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        AsyncImage(
+            model = user.avatarUrl,
+            contentDescription = "头像",
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = user.name,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Text(
+            text = user.bio,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+</code></pre>
+
+  <div class="box info">
+    <div class="box-title">💡 Compose 学习建议</div>
+    <ul>
+      <li>理解 <strong>重组（Recomposition）</strong> 机制：什么情况下会触发、如何避免不必要重组</li>
+      <li>掌握 <strong>remember / rememberSaveable</strong> 状态管理</li>
+      <li>使用 <strong>derivedStateOf</strong> 避免频繁计算</li>
+      <li>利用 <strong>LaunchedEffect / SideEffect / DisposableEffect</strong> 处理副作用</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section id="roadmap">
+  <h2>🎯 高级工程师进阶路线</h2>
+
+  <h3>分阶段成长路径</h3>
+  <div class="path-container">
+    <div class="path-item">
+      <div class="level">阶段一 · 1-3 个月</div>
+      <h4>初级工程师</h4>
+      <p>熟练掌握 Kotlin、Activity/Fragment 生命周期、基础 UI 开发、Retrofit + Room 基础 CRUD</p>
+    </div>
+    <div class="path-item">
+      <div class="level">阶段二 · 3-6 个月</div>
+      <h4>中级工程师</h4>
+      <p>Jetpack 全家桶、MVVM 架构、Coroutine + Flow、自定义 View、性能优化基础</p>
+    </div>
+    <div class="path-item">
+      <div class="level">阶段三 · 6-12 个月</div>
+      <h4>高级工程师</h4>
+      <p>模块化架构、插件化/组件化、性能深度优化、AOSP 源码阅读、技术方案设计</p>
+    </div>
+    <div class="path-item">
+      <div class="level">阶段四 · 1-2 年</div>
+      <h4>资深/专家</h4>
+      <p>跨端技术（Flutter/KMP）、大型 App 架构演进、性能体系建设、团队技术规划</p>
+    </div>
+  </div>
+
+  <h3>必读书单与资源</h3>
+  <table>
+    <tr>
+      <th>资源</th>
+      <th>类型</th>
+      <th>价值</th>
+    </tr>
+    <tr>
+      <td>《Android 开发艺术探索》</td>
+      <td>书籍</td>
+      <td>原理深度讲解，面试必备</td>
+    </tr>
+    <tr>
+      <td>《Kotlin 实战》</td>
+      <td>书籍</td>
+      <td>Kotlin 进阶语法与惯用法</td>
+    </tr>
+    <tr>
+      <td>Android 官方文档 / Codelabs</td>
+      <td>文档</td>
+      <td>最权威、最及时的知识源</td>
+    </tr>
+    <tr>
+      <td>AOSP 源码（frameworks/base）</td>
+      <td>源码</td>
+      <td>理解系统机制的根本途径</td>
+    </tr>
+    <tr>
+      <td>Google I/O / Android Dev Summit</td>
+      <td>视频</td>
+      <td>了解技术演进方向</td>
+    </tr>
+    <tr>
+      <td>kotlinlang.org/docs</td>
+      <td>文档</td>
+      <td>Kotlin 协程、Flow 官方教程</td>
+    </tr>
+  </table>
+
+  <h3>高级工程师的 10 个标志</h3>
+  <ol>
+    <li>能独立设计一个可扩展的模块化架构</li>
+    <li>遇到崩溃能在 10 分钟内定位到根因</li>
+    <li>不写没有单元测试覆盖的核心逻辑</li>
+    <li>能从 Systrace 中看出卡顿发生在哪个系统服务</li>
+    <li>能向产品经理解释为什么某个需求技术上不可行</li>
+    <li>熟悉至少一个第三方库的源码实现</li>
+    <li>能写 Gradle Plugin 解决团队痛点</li>
+    <li>知道什么时候该用 Service，什么时候该用 WorkManager</li>
+    <li>能审查代码时指出潜在的内存泄漏和线程安全问题</li>
+    <li>有自己的技术判断，不盲目追新</li>
+  </ol>
+
+  <div class="box success">
+    <div class="box-title">🎉 写在最后</div>
+    <p>Android 开发是一门<strong>实践学科</strong>。读完这份指南只是起点，真正的成长来自于：</p>
+    <ul>
+      <li><strong>写代码：</strong>每天至少写 2 小时高质量代码</li>
+      <li><strong>读源码：</strong>从 Jetpack 源码开始，逐步深入 AOSP</li>
+      <li><strong>解 Bug：</strong>每个 Bug 都是深入理解系统的机会</li>
+      <li><strong>做总结：</strong>写技术博客，教别人是最好的学习方式</li>
+    </ul>
+    <p style="margin-top:12px">坚持 6 个月，你会脱胎换骨。坚持 2 年，你将成为团队里那个"什么难题都能解决"的人。</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>Windows 下 Android 开发环境搭建与进阶指南 | 2026 版</p>
+    <p style="margin-top:8px; font-size:0.85em;">本文档涵盖环境搭建、工具使用、调试技巧、性能优化、架构设计等完整知识体系</p>
+  </div>
+</footer>
+
+<script>
+// Smooth scroll for nav links
+document.querySelectorAll('.nav-bar a').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Highlight active nav on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-bar a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (scrollY >= sectionTop - 100) {
+      current = section.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.style.color = '';
+    if (link.getAttribute('href') === '#' + current) {
+      link.style.color = 'var(--accent)';
+    }
+  });
+});
+</script>
+
+</body>
+</html>

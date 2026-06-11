@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ 系统教程 - 写给 C# 开发者</title>
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2333;--border:#30363d;--text:#e6edf3;--text-muted:#8b949e;--accent:#58a6ff;--accent2:#3fb950;--accent3:#d2a8ff;--accent4:#ff7b72;--accent5:#ffa657;--cpp:#00599c;--cs:#68217a;--tip-bg:#12261e;--tip-bd:#3fb950;--warn-bg:#2a1f0e;--warn-bd:#ffa657;--danger-bg:#2d1214;--danger-bd:#ff7b72;--info-bg:#0d1f3c;--info-bd:#58a6ff}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:16px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:280px;min-width:280px;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;padding:24px 0;z-index:100;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-title{padding:0 20px 20px;font-size:18px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);margin-bottom:12px}
+.sidebar-title small{display:block;font-size:12px;color:var(--text-muted);font-weight:400;margin-top:4px}
+.nav-group{margin-bottom:8px}
+.nav-group-title{padding:8px 20px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+.nav-link{display:block;padding:5px 20px 5px 28px;color:var(--text-muted);text-decoration:none;font-size:14px;transition:all .15s;border-left:2px solid transparent}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.03);border-left-color:var(--accent)}
+.nav-link.active{color:var(--accent);border-left-color:var(--accent);background:rgba(88,166,255,.06)}
+.main{flex:1;margin-left:280px;padding:40px 60px 80px;max-width:960px}
+h1{font-size:36px;font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:18px;color:var(--text-muted);margin-bottom:40px}
+h2{font-size:28px;font-weight:700;margin:56px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--border);color:var(--text);scroll-margin-top:24px}
+h3{font-size:21px;font-weight:600;margin:36px 0 14px;color:var(--text);scroll-margin-top:24px}
+h4{font-size:17px;font-weight:600;margin:24px 0 10px;color:var(--accent5);scroll-margin-top:24px}
+p{margin-bottom:16px;color:var(--text)}strong{color:var(--accent);font-weight:600}em{color:var(--accent3)}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:.88em;color:var(--accent5)}
+.code-block{position:relative;margin:16px 0 24px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.code-header{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted)}
+.code-lang{font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.code-lang.cpp{color:var(--cpp)}.code-lang.cs{color:#9b4f96}.code-lang.sh{color:var(--accent2)}
+.code-label{display:inline-block;padding:1px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.code-label.cpp{background:rgba(0,89,156,.25);color:#4da6e8}.code-label.cs{background:rgba(104,33,122,.25);color:#c77dd4}
+pre{background:var(--bg);padding:16px 20px;overflow-x:auto;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:14px;line-height:1.6;scrollbar-width:thin}
+pre code{background:none;padding:0;color:var(--text);font-size:inherit}
+.kw{color:#ff7b72}.tp{color:#79c0ff}.fn{color:#d2a8ff}.st{color:#a5d6ff}.cm{color:#8b949e;font-style:italic}.nu{color:#ffa657}.pp{color:#7ee787}.op{color:#ff7b72}
+.callout{padding:16px 20px;border-radius:8px;margin:20px 0;border-left:4px solid;font-size:15px}
+.callout-title{font-weight:700;margin-bottom:6px;font-size:14px;text-transform:uppercase;letter-spacing:.5px}
+.callout.tip{background:var(--tip-bg);border-color:var(--tip-bd)}.callout.tip .callout-title{color:var(--accent2)}
+.callout.warning{background:var(--warn-bg);border-color:var(--warn-bd)}.callout.warning .callout-title{color:var(--accent5)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-bd)}.callout.danger .callout-title{color:var(--accent4)}
+.callout.info{background:var(--info-bg);border-color:var(--info-bd)}.callout.info .callout-title{color:var(--accent)}
+.compare-table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.compare-table th{background:var(--surface2);padding:12px 16px;text-align:left;font-weight:700;border-bottom:2px solid var(--border);color:var(--text)}
+.compare-table td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:none}.compare-table tr:hover td{background:rgba(255,255,255,.02)}
+.compare-table td:first-child{font-weight:600;color:var(--accent3);white-space:nowrap}.compare-table td code{font-size:12px}
+.code-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0 24px}
+.code-compare .code-block{margin:0}
+ol,ul{margin:12px 0 20px 24px}li{margin-bottom:8px;color:var(--text)}li::marker{color:var(--accent)}
+.scroll-top{position:fixed;bottom:30px;right:30px;width:44px;height:44px;background:var(--accent);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:20px;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:200}
+.scroll-top:hover{background:var(--accent3)}
+.progress-bar{position:fixed;top:0;left:280px;right:0;height:3px;z-index:150}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .1s}
+.chapter-divider{margin:60px 0 40px;text-align:center;position:relative}
+.chapter-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.chapter-divider span{background:var(--bg);padding:0 20px;position:relative;color:var(--text-muted);font-size:13px;text-transform:uppercase;letter-spacing:2px}
+.sidebar-toggle{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:18px}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:transform .3s}.sidebar.open{transform:translateX(0)}.sidebar-toggle{display:block}.main{margin-left:0;padding:40px 20px 80px}.progress-bar{left:0}.code-compare{grid-template-columns:1fr}}
+@media print{.sidebar,.sidebar-toggle,.scroll-top,.progress-bar{display:none!important}.main{margin-left:0;max-width:100%}body{background:#fff;color:#000}h1{-webkit-text-fill-color:#00599c}pre{background:#f6f8fa}pre code{color:#24292f}}
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+<div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+<div class="sidebar-title">C++ 系统教程<small>写给 C# 开发者</small></div>
+<div class="nav-group"><div class="nav-group-title">基础篇</div>
+<a href="#ch1" class="nav-link">1. 哲学差异与语言概览</a>
+<a href="#ch2" class="nav-link">2. 编译模型与项目结构</a>
+<a href="#ch3" class="nav-link">3. 类型系统差异</a>
+<a href="#ch4" class="nav-link">4. 指针与引用</a>
+<a href="#ch5" class="nav-link">5. 内存管理</a></div>
+<div class="nav-group"><div class="nav-group-title">核心篇</div>
+<a href="#ch6" class="nav-link">6. 函数深入</a>
+<a href="#ch7" class="nav-link">7. 面向对象编程</a>
+<a href="#ch8" class="nav-link">8. 运算符重载</a>
+<a href="#ch9" class="nav-link">9. 异常处理</a>
+<a href="#ch10" class="nav-link">10. 模板编程</a></div>
+<div class="nav-group"><div class="nav-group-title">进阶篇</div>
+<a href="#ch11" class="nav-link">11. STL 标准库</a>
+<a href="#ch12" class="nav-link">12. Lambda 与函数式</a>
+<a href="#ch13" class="nav-link">13. 智能指针与 RAII</a>
+<a href="#ch14" class="nav-link">14. 并发编程</a>
+<a href="#ch15" class="nav-link">15. 现代 C++ 特性</a></div>
+<div class="nav-group"><div class="nav-group-title">实战篇</div>
+<a href="#ch16" class="nav-link">16. 构建系统与工具链</a>
+<a href="#ch17" class="nav-link">17. 常见陷阱与最佳实践</a>
+<a href="#ch18" class="nav-link">18. 推荐学习路径</a></div>
+</nav>
+<main class="main">
+
+<h1>C++ 系统教程</h1>
+<p class="subtitle">一份面向 C# 开发者的 C++ 完整学习指南 - 利用你已有的 C# 经验，快速掌握 C++ 的核心概念与实践技巧。</p>
+
+<div class="callout info"><div class="callout-title">如何使用本文档</div>
+<p>本文假设你已熟练掌握 C#。每个章节都会从 C# 的对应概念出发，解释 C++ 中相同或不同的做法。代码示例会同时给出 C# 和 C++ 版本以便对照学习。</p></div>
+
+<div class="chapter-divider"><span>基础篇</span></div>
+
+<h2 id="ch1">1. 哲学差异与语言概览</h2>
+<p>C# 和 C++ 都是 C 家族的强类型语言，但它们的设计哲学有本质区别。理解这些差异是学好 C++ 的第一步。</p>
+
+<h3>1.1 设计哲学对比</h3>
+<table class="compare-table">
+<tr><th>维度</th><th>C#</th><th>C++</th></tr>
+<tr><td>抽象层次</td><td>高级抽象，依赖 CLR 运行时</td><td>零成本抽象，直接映射到硬件</td></tr>
+<tr><td>性能理念</td><td>"足够快"，JIT 编译优化</td><td>"你不使用的东西不应付出代价"</td></tr>
+<tr><td>内存管理</td><td>GC 自动回收</td><td>手动管理 + RAII + 智能指针</td></tr>
+<tr><td>编译目标</td><td>IL 中间代码 &rarr; JIT</td><td>直接编译为原生机器码</td></tr>
+<tr><td>安全模型</td><td>内存安全（默认），类型安全</td><td>信任程序员，允许底层操作</td></tr>
+<tr><td>标准库</td><td>.NET BCL（极其庞大）</td><td>STL（精简高效）+ 第三方库</td></tr>
+<tr><td>向后兼容</td><td>版本迭代较平滑</td><td>极度重视向后兼容（C 兼容）</td></tr>
+</table>
+
+<h3>1.2 "零成本抽象"的含义</h3>
+<p>这是 C++ 最核心的设计原则。在 C# 中，使用高级特性（如 LINQ、反射、装箱）往往有运行时开销。C++ 的设计目标是：你使用的抽象（类、模板、迭代器等）在编译后应和手写的底层代码一样高效。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// std::sort 在编译时展开为针对具体类型的高效排序代码</span>
+<span class="cm">// 没有虚函数调用、没有装箱、没有委托开销</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+
+<span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">5</span>, <span class="nu">2</span>, <span class="nu">8</span>, <span class="nu">1</span>, <span class="nu">9</span>};
+<span class="tp">std</span>::<span class="fn">sort</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>());  <span class="cm">// 编译后等价于手写的 int 排序</span></code></pre></div>
+
+<h3>1.3 C++ 标准演进</h3>
+<p>C++ 每三年发布一次新标准。作为 C# 开发者，你主要会接触到现代 C++（C++11 及之后）：</p>
+<table class="compare-table">
+<tr><th>标准</th><th>关键特性</th><th>类比 C#</th></tr>
+<tr><td>C++11</td><td>auto、lambda、智能指针、move 语义、range-for</td><td>C# 3.0 (var, lambda, LINQ)</td></tr>
+<tr><td>C++14</td><td>泛型 lambda、auto 返回类型、make_unique</td><td>C# 的小幅改进</td></tr>
+<tr><td>C++17</td><td>结构化绑定、optional、if constexpr、文件系统库</td><td>模式匹配、Nullable</td></tr>
+<tr><td>C++20</td><td>concepts、ranges、coroutines、modules、三路比较</td><td>泛型约束、async/await</td></tr>
+<tr><td>C++23</td><td>std::print、deducing this、expected</td><td>字符串插值、Result</td></tr>
+</table>
+
+<div class="callout tip"><div class="callout-title">建议</div>
+<p>作为新项目，建议直接使用 C++17 或 C++20 标准。它们提供了大量现代语法糖，让你从 C# 过渡时更加顺畅。</p></div>
+
+<h2 id="ch2">2. 编译模型与项目结构</h2>
+<p>这是 C# 开发者学习 C++ 时遇到的第一个根本性差异。C++ 没有 CLR，没有统一的程序集概念，编译模型完全不同。</p>
+
+<h3>2.1 编译流程</h3>
+<p>C# 的编译流程是：<code>.cs</code> 文件 &rarr; 编译器 &rarr; IL 程序集 &rarr; JIT 运行时编译为机器码。</p>
+<p>C++ 的编译流程分为三步：</p>
+<ol>
+<li><strong>预处理</strong>（Preprocessing）：处理 <code>#include</code>、<code>#define</code>、<code>#ifdef</code> 等指令，展开头文件。</li>
+<li><strong>编译</strong>（Compilation）：每个 <code>.cpp</code> 文件独立编译为 <code>.obj</code>（Windows）或 <code>.o</code>（Linux）目标文件。</li>
+<li><strong>链接</strong>（Linking）：将所有目标文件和库文件链接为最终的可执行文件或动态库。</li>
+</ol>
+
+<div class="code-block"><div class="code-header"><span class="code-lang sh">Shell</span></div>
+<pre><code><span class="cm"># 编译单个源文件</span>
+g++ -std=c++20 -Wall -O2 main.cpp -o myapp
+
+<span class="cm"># 编译多个源文件</span>
+g++ -std=c++20 -Wall -O2 main.cpp math.cpp logger.cpp -o myapp
+
+<span class="cm"># 分步编译：先编译为目标文件，再链接</span>
+g++ -c math.cpp -o math.o
+g++ -c logger.cpp -o logger.o
+g++ main.cpp math.o logger.o -o myapp</code></pre></div>
+
+<h3>2.2 头文件与源文件</h3>
+<p>C++ 项目的代码组织方式与 C# 截然不同。C# 中每个类通常放在一个 <code>.cs</code> 文件中，编译器自动处理所有依赖。C++ 中需要将接口声明和实现分开：</p>
+
+<table class="compare-table">
+<tr><th>概念</th><th>C#</th><th>C++</th></tr>
+<tr><td>接口声明</td><td>直接在 .cs 文件中</td><td>头文件 (.h / .hpp)</td></tr>
+<tr><td>实现</td><td>直接在 .cs 文件中</td><td>源文件 (.cpp)</td></tr>
+<tr><td>引入其他文件</td><td><code>using</code> 命名空间</td><td><code>#include</code> 头文件（文本替换）</td></tr>
+<tr><td>前向声明</td><td>一般不需要</td><td>常用，减少编译依赖</td></tr>
+<tr><td>模块系统</td><td>程序集 + using</td><td>C++20 Modules（尚不普及）</td></tr>
+</table>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="cm">// Player.cs - 一个文件搞定一切</span>
+<span class="kw">namespace</span> Game
+{
+    <span class="kw">public class</span> <span class="tp">Player</span>
+    {
+        <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; }
+        <span class="kw">public int</span> Health { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="nu">100</span>;
+
+        <span class="kw">public void</span> <span class="fn">TakeDamage</span>(<span class="kw">int</span> amount)
+        {
+            Health -= amount;
+        }
+    }
+}</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// Player.h - 头文件（声明）</span>
+<span class="pp">#pragma once</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="kw">class</span> <span class="tp">Player</span> {
+<span class="kw">public</span>:
+    <span class="tp">std</span>::<span class="tp">string</span> name;
+    <span class="tp">int</span> health = <span class="nu">100</span>;
+
+    <span class="kw">void</span> <span class="fn">TakeDamage</span>(<span class="tp">int</span> amount);
+};
+
+<span class="cm">// Player.cpp - 源文件（实现）</span>
+<span class="pp">#include</span> <span class="st">"Player.h"</span>
+
+<span class="kw">void</span> <span class="tp">Player</span>::<span class="fn">TakeDamage</span>(<span class="tp">int</span> amount) {
+    health -= amount;
+}</code></pre></div>
+</div>
+
+<div class="callout warning"><div class="callout-title">注意</div>
+<p><code>#include</code> 是<strong>文本替换</strong>，不是 C# 的 <code>using</code>。<code>#include "Player.h"</code> 会把 Player.h 的全部内容复制粘贴到当前位置。这就是为什么需要头文件保护（<code>#pragma once</code>）来防止重复包含。</p></div>
+
+<h3>2.3 翻译单元与 ODR</h3>
+<p>每个 <code>.cpp</code> 文件加上它包含的所有头文件构成一个<strong>翻译单元</strong>（Translation Unit）。C++ 有一个关键规则叫 <strong>ODR（One Definition Rule，单一定义规则）</strong>：任何变量、函数、类在整个程序中只能有一个定义。违反 ODR 会导致链接错误。</p>
+
+<div class="callout tip"><div class="callout-title">内联函数例外</div>
+<p>标记为 <code>inline</code> 的函数和模板可以放在头文件中，它们不受 ODR 限制。C++17 的 <code>inline</code> 变量也是如此。</p></div>
+
+<h2 id="ch3">3. 类型系统差异</h2>
+
+<h3>3.1 基础类型对照</h3>
+<table class="compare-table">
+<tr><th>C#</th><th>C++</th><th>说明</th></tr>
+<tr><td><code>int</code></td><td><code>int</code></td><td>C++ 中 int 大小取决于平台（通常 32 位）</td></tr>
+<tr><td><code>uint</code></td><td><code>unsigned int</code></td><td>C++ 的无符号类型更常用</td></tr>
+<tr><td><code>long</code> (64 位)</td><td><code>long long</code></td><td>C++ 的 long 在 Windows 上只有 32 位！</td></tr>
+<tr><td><code>byte</code></td><td><code>uint8_t</code></td><td>推荐用 <code>&lt;cstdint&gt;</code> 固定宽度类型</td></tr>
+<tr><td><code>float</code> / <code>double</code></td><td><code>float</code> / <code>double</code></td><td>相同</td></tr>
+<tr><td><code>bool</code></td><td><code>bool</code></td><td>相同</td></tr>
+<tr><td><code>char</code> (UTF-16)</td><td><code>char</code> (1 字节)</td><td><strong>重要差异！</strong>C++ 的 char 只有 1 字节</td></tr>
+<tr><td><code>string</code></td><td><code>std::string</code></td><td>C++ 字符串是值类型，不需要 GC</td></tr>
+<tr><td><code>object</code></td><td><code>void*</code> / <code>std::any</code></td><td>C++ 没有统一的基类</td></tr>
+</table>
+
+<div class="callout danger"><div class="callout-title">陷阱：整数类型大小</div>
+<p>C# 明确保证 <code>int</code> 是 32 位、<code>long</code> 是 64 位。C++ 标准只规定了最小范围，实际大小取决于平台和编译器。在跨平台代码中，强烈建议使用 <code>&lt;cstdint&gt;</code> 中的固定宽度类型：<code>int32_t</code>、<code>int64_t</code>、<code>uint8_t</code> 等。</p></div>
+
+<h3>3.2 值类型 vs 引用类型</h3>
+<p>这是从 C# 到 C++ 最关键的思维转换之一。C# 严格区分值类型（<code>struct</code>）和引用类型（<code>class</code>）。在 C++ 中，<strong>所有类型都可以是值类型</strong>，取决于你如何使用它。</p>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="cm">// class = 引用类型（在堆上分配）</span>
+<span class="kw">var</span> p1 = <span class="kw">new</span> <span class="tp">Player</span>();
+<span class="kw">var</span> p2 = p1;  <span class="cm">// p1 和 p2 指向同一个对象</span>
+
+<span class="cm">// struct = 值类型（在栈上分配）</span>
+<span class="kw">var</span> v1 = <span class="kw">new</span> <span class="tp">Vector2</span>(<span class="nu">1</span>, <span class="nu">2</span>);
+<span class="kw">var</span> v2 = v1;  <span class="cm">// v2 是 v1 的独立副本</span></code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// 栈上创建 - 值语义</span>
+<span class="tp">Player</span> p1;
+<span class="tp">Player</span> p2 = p1;  <span class="cm">// p2 是 p1 的独立副本！</span>
+
+<span class="cm">// 堆上创建 - 需要手动管理</span>
+<span class="tp">auto</span>* p3 = <span class="kw">new</span> <span class="tp">Player</span>();
+<span class="tp">auto</span>* p4 = p3;   <span class="cm">// p3 和 p4 指向同一对象</span>
+<span class="kw">delete</span> p3;        <span class="cm">// 必须手动释放</span>
+
+<span class="cm">// 现代 C++：用智能指针</span>
+<span class="kw">auto</span> p5 = <span class="tp">std</span>::<span class="fn">make_shared</span>&lt;<span class="tp">Player</span>&gt;();
+<span class="kw">auto</span> p6 = p5;    <span class="cm">// 引用计数 +1，类似 C# 引用</span></code></pre></div>
+</div>
+
+<div class="callout info"><div class="callout-title">核心区别</div>
+<p>在 C# 中，<code>class</code> 和 <code>struct</code> 的区别决定了内存分配方式。在 C++ 中，<code>class</code> 和 <code>struct</code> 的唯一区别是默认访问权限（<code>class</code> 默认 private，<code>struct</code> 默认 public）。对象是栈分配还是堆分配取决于你<strong>如何创建</strong>它，而非类型定义。</p></div>
+
+<h3>3.3 const 正确性</h3>
+<p>C++ 的 <code>const</code> 比 C# 的 <code>readonly</code> 和 <code>const</code> 强大得多。<code>const</code> 在 C++ 中是一种"契约"，贯穿整个类型系统。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// const 变量</span>
+<span class="kw">const int</span> MAX_HP = <span class="nu">100</span>;       <span class="cm">// 编译期常量</span>
+<span class="kw">constexpr int</span> AREA = <span class="nu">10</span> * <span class="nu">20</span>;  <span class="cm">// 强制编译期计算</span>
+
+<span class="cm">// const 成员函数 - 承诺不修改对象</span>
+<span class="kw">class</span> <span class="tp">Player</span> {
+    <span class="tp">int</span> health;
+<span class="kw">public</span>:
+    <span class="tp">int</span> <span class="fn">GetHealth</span>() <span class="kw">const</span> { <span class="kw">return</span> health; }
+    <span class="kw">void</span> <span class="fn">TakeDamage</span>(<span class="tp">int</span> dmg);
+};
+
+<span class="cm">// const 引用 - 避免拷贝又不允许修改</span>
+<span class="kw">void</span> <span class="fn">PrintPlayer</span>(<span class="kw">const</span> <span class="tp">Player</span>&amp; p) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; p.<span class="fn">GetHealth</span>();  <span class="cm">// OK</span>
+    <span class="cm">// p.TakeDamage(10);        // 编译错误！</span>
+}</code></pre></div>
+
+<div class="callout tip"><div class="callout-title">最佳实践</div>
+<p>养成"const 正确性"的习惯：如果成员函数不修改对象，就标记为 <code>const</code>；如果函数参数不需要修改，就用 <code>const</code> 引用传递。</p></div>
+
+<h3>3.4 enum 与 enum class</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">enum</span> <span class="tp">Direction</span>
+{
+    Up, Down, Left, Right
+}
+<span class="kw">int</span> d = (<span class="kw">int</span>)Direction.Up;</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">enum class</span> <span class="tp">Direction</span> {
+    Up, Down, Left, Right
+};
+<span class="kw">auto</span> d = <span class="tp">Direction</span>::Up;
+<span class="kw">int</span> i = <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(d);</code></pre></div>
+</div>
+<p>始终使用 <code>enum class</code> 而非旧式的 <code>enum</code>。<code>enum class</code> 提供了作用域限定和类型安全。</p>
+
+<h2 id="ch4">4. 指针与引用</h2>
+<p>这是 C# 开发者转向 C++ 时必须跨越的最大障碍之一。C# 中指针只在 <code>unsafe</code> 代码中出现，而 C++ 中指针和引用无处不在。</p>
+
+<h3>4.1 理解内存地址</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">int</span> x = <span class="nu">42</span>;
+
+<span class="tp">int</span>* ptr = &amp;x;       <span class="cm">// ptr 存储了 x 的内存地址</span>
+<span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; ptr;     <span class="cm">// 输出地址，如 0x7fff1234</span>
+<span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; *ptr;    <span class="cm">// 解引用：输出 42</span>
+
+*ptr = <span class="nu">100</span>;             <span class="cm">// 通过指针修改 x 的值</span>
+<span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; x;       <span class="cm">// 输出 100</span></code></pre></div>
+
+<h3>4.2 指针 vs 引用</h3>
+<table class="compare-table">
+<tr><th>特性</th><th>指针 (<code>T*</code>)</th><th>引用 (<code>T&amp;</code>)</th></tr>
+<tr><td>能否为空</td><td>可以（<code>nullptr</code>）</td><td>不能（必须绑定到有效对象）</td></tr>
+<tr><td>能否重新绑定</td><td>可以指向其他对象</td><td>不能，一旦绑定就不可变</td></tr>
+<tr><td>语法</td><td>需要 <code>*</code> 解引用</td><td>直接使用，和原变量一样</td></tr>
+<tr><td>多级间接</td><td>支持（<code>T**</code>）</td><td>不支持</td></tr>
+<tr><td>何时使用</td><td>可选参数、动态分配、底层操作</td><td>函数参数、避免拷贝（最常用）</td></tr>
+</table>
+
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">void</span> <span class="fn">Example</span>() {
+    <span class="tp">std::string</span> name = <span class="st">"Alice"</span>;
+
+    <span class="tp">std::string</span>&amp; ref = name;      <span class="cm">// 引用 - 别名</span>
+    ref = <span class="st">"Bob"</span>;                    <span class="cm">// name 也变成 "Bob"</span>
+
+    <span class="kw">const</span> <span class="tp">std::string</span>&amp; cref = name; <span class="cm">// const 引用 - 只读</span>
+
+    <span class="tp">std::string</span>* p = &amp;name;       <span class="cm">// 指针 - 可以为空</span>
+    *p = <span class="st">"Charlie"</span>;
+    p = <span class="kw">nullptr</span>;
+}</code></pre></div>
+
+<h3>4.3 函数参数传递方式</h3>
+<table class="compare-table">
+<tr><th>方式</th><th>C#</th><th>C++</th><th>说明</th></tr>
+<tr><td>按值传递</td><td><code>void Foo(int x)</code></td><td><code>void foo(int x)</code></td><td>拷贝，适合小类型</td></tr>
+<tr><td>引用传递</td><td><code>void Foo(ref int x)</code></td><td><code>void foo(int&amp; x)</code></td><td>不拷贝，可修改原值</td></tr>
+<tr><td>只读引用</td><td><code>void Foo(in int x)</code></td><td><code>void foo(const int&amp; x)</code></td><td>不拷贝，不可修改</td></tr>
+<tr><td>指针传递</td><td><code>unsafe void Foo(int* x)</code></td><td><code>void foo(int* x)</code></td><td>可以为 null</td></tr>
+</table>
+
+<div class="callout warning"><div class="callout-title">悬垂引用</div>
+<p>不要返回局部变量的引用！局部变量在函数结束后销毁，引用变成悬垂引用（dangling reference），行为未定义。</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// 危险！不要这样做！</span>
+<span class="tp">std::string</span>&amp; <span class="fn">GetName</span>() {
+    <span class="tp">std::string</span> name = <span class="st">"Alice"</span>;
+    <span class="kw">return</span> name;  <span class="cm">// 灾难！name 在函数结束后被销毁</span>
+}
+
+<span class="cm">// 正确做法：按值返回（编译器会做 RVO 优化）</span>
+<span class="tp">std::string</span> <span class="fn">GetName</span>() {
+    <span class="tp">std::string</span> name = <span class="st">"Alice"</span>;
+    <span class="kw">return</span> name;  <span class="cm">// OK：编译器优化后不会真正拷贝</span>
+}</code></pre></div>
+
+<h2 id="ch5">5. 内存管理</h2>
+<p>内存管理是 C# 和 C++ 之间最大的鸿沟。C# 有 GC 自动管理内存；C++ 则需要你理解并手动控制内存的分配与释放——不过现代 C++ 提供了 RAII 和智能指针来大幅简化这件事。</p>
+
+<h3>5.1 栈 vs 堆</h3>
+<table class="compare-table">
+<tr><th>特性</th><th>栈 (Stack)</th><th>堆 (Heap)</th></tr>
+<tr><td>分配方式</td><td>自动（变量声明时）</td><td>手动（new 或智能指针）</td></tr>
+<tr><td>释放方式</td><td>自动（离开作用域时）</td><td>手动 delete 或智能指针</td></tr>
+<tr><td>速度</td><td>极快（移动栈指针）</td><td>较慢（搜索可用内存块）</td></tr>
+<tr><td>大小限制</td><td>有限（通常 1-8 MB）</td><td>很大（受系统内存限制）</td></tr>
+<tr><td>生命周期</td><td>作用域结束即销毁</td><td>直到手动释放或程序结束</td></tr>
+</table>
+
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">void</span> <span class="fn">Example</span>() {
+    <span class="cm">// === 栈分配（推荐，默认首选） ===</span>
+    <span class="tp">int</span> x = <span class="nu">42</span>;
+    <span class="tp">Player</span> player;
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums(<span class="nu">100</span>);
+
+    <span class="cm">// === 智能指针（现代 C++ 推荐） ===</span>
+    <span class="kw">auto</span> sp = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Player</span>&gt;();
+    <span class="kw">auto</span> sh = <span class="tp">std</span>::<span class="fn">make_shared</span>&lt;<span class="tp">Player</span>&gt;();
+} <span class="cm">// 所有变量在这里自动销毁/释放</span></code></pre></div>
+
+<h3>5.2 RAII — C++ 最重要的惯用法</h3>
+<p><strong>RAII（Resource Acquisition Is Initialization，资源获取即初始化）</strong>是 C++ 的核心理念：把资源的生命周期绑定到对象的生命周期上。对象在栈上创建时获取资源，离开作用域时自动调用析构函数释放资源。</p>
+<p>这相当于 C# 的 <code>using</code> 语句 / <code>IDisposable</code> 模式，但不需要你显式写 <code>using</code>，完全自动化。</p>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="cm">// C# 需要显式 using 或 try/finally</span>
+<span class="kw">using</span> (<span class="kw">var</span> file = File.OpenRead(<span class="st">"data.txt"</span>))
+{
+    <span class="cm">// 使用 file</span>
+} <span class="cm">// using 结束时自动 Dispose</span></code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// C++ RAII：析构函数自动清理</span>
+{
+    <span class="tp">std::ifstream</span> file(<span class="st">"data.txt"</span>);
+    <span class="cm">// 使用 file</span>
+} <span class="cm">// file 离开作用域，析构函数自动关闭</span>
+
+{
+    <span class="kw">auto</span> ptr = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Player</span>&gt;();
+    <span class="cm">// 使用 ptr</span>
+} <span class="cm">// unique_ptr 析构时自动 delete</span></code></pre></div>
+</div>
+
+<div class="callout danger"><div class="callout-title">现代 C++ 几乎不需要裸 new/delete</div>
+<p>在现代 C++ 中，应优先使用智能指针和容器来管理内存。直接使用 <code>new</code>/<code>delete</code> 是遗留风格，容易出错。</p></div>
+
+<div class="chapter-divider"><span>核心篇</span></div>
+
+<h2 id="ch6">6. 函数深入</h2>
+
+<h3>6.1 函数重载与默认参数</h3>
+<p>C++ 和 C# 都支持函数重载。C++ 的默认参数有一些独特规则：默认参数必须从右向左连续提供，且默认值写在声明中（头文件），C++ 不支持命名参数。</p>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">void</span> <span class="fn">Spawn</span>(<span class="kw">string</span> name,
+    <span class="kw">int</span> health = <span class="nu">100</span>,
+    <span class="kw">float</span> scale = <span class="nu">1.0f</span>) { }
+
+<span class="cm">// 可以用命名参数跳过中间参数</span>
+<span class="fn">Spawn</span>(<span class="st">"Boss"</span>, scale: <span class="nu">2.5f</span>);</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">void</span> <span class="fn">Spawn</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; name,
+    <span class="tp">int</span> health = <span class="nu">100</span>,
+    <span class="tp">float</span> scale = <span class="nu">1.0f</span>);
+
+<span class="fn">Spawn</span>(<span class="st">"Boss"</span>);           <span class="cm">// OK</span>
+<span class="fn">Spawn</span>(<span class="st">"Boss"</span>, <span class="nu">200</span>);       <span class="cm">// OK</span>
+<span class="cm">// 不能跳过中间参数！</span></code></pre></div>
+</div>
+
+<h3>6.2 函数指针与 std::function</h3>
+<p>C# 有 <code>delegate</code>、<code>Action</code>、<code>Func</code>。C++ 对应的是函数指针和 <code>std::function</code>。</p>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="tp">Func</span>&lt;<span class="kw">int</span>, <span class="kw">int</span>, <span class="kw">int</span>&gt; add =
+    (a, b) =&gt; a + b;
+<span class="kw">int</span> result = <span class="fn">add</span>(<span class="nu">3</span>, <span class="nu">4</span>);  <span class="cm">// 7</span></code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">std::function</span>&lt;<span class="tp">int</span>(<span class="tp">int</span>, <span class="tp">int</span>)&gt; add =
+    [](<span class="tp">int</span> a, <span class="tp">int</span> b) { <span class="kw">return</span> a + b; };
+<span class="tp">int</span> result = <span class="fn">add</span>(<span class="nu">3</span>, <span class="nu">4</span>);  <span class="cm">// 7</span></code></pre></div>
+</div>
+
+<h2 id="ch7">7. 面向对象编程</h2>
+
+<h3>7.1 类的基础</h3>
+<p>C++ 的类与 C# 有很多相似之处，但语法差异显著。最大的不同是没有属性（Property）语法和接口（Interface）关键字。</p>
+
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">public class</span> <span class="tp">Animal</span>
+{
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public virtual int</span> Age { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">Animal</span>(<span class="kw">string</span> name) {
+        Name = name;
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">Speak</span>() {
+        Console.WriteLine(<span class="st">"..."</span>);
+    }
+}</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">class</span> <span class="tp">Animal</span> {
+<span class="kw">public</span>:
+    <span class="tp">std::string</span> name;
+    <span class="tp">int</span> age;
+
+    <span class="fn">Animal</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; n)
+        : name(n), age(<span class="nu">0</span>) {}
+
+    <span class="kw">virtual void</span> <span class="fn">Speak</span>() <span class="kw">const</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"..."</span>;
+    }
+
+    <span class="kw">virtual</span> ~<span class="fn">Animal</span>() = <span class="kw">default</span>;
+};</code></pre></div>
+</div>
+
+<h3>7.2 构造函数与析构函数</h3>
+<p>C++ 有多种构造函数，比 C# 丰富得多：</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">class</span> <span class="tp">Player</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">int</span> health;
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; scores;
+
+<span class="kw">public</span>:
+    <span class="cm">// 1. 默认构造函数</span>
+    <span class="fn">Player</span>() : name(<span class="st">"Unknown"</span>), health(<span class="nu">100</span>) {}
+
+    <span class="cm">// 2. 参数化构造函数（初始化列表，推荐！）</span>
+    <span class="fn">Player</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; n, <span class="tp">int</span> hp)
+        : name(n), health(hp) {}
+
+    <span class="cm">// 3. 委托构造函数</span>
+    <span class="fn">Player</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; n)
+        : <span class="fn">Player</span>(n, <span class="nu">100</span>) {}
+
+    <span class="cm">// 4. 拷贝构造函数</span>
+    <span class="fn">Player</span>(<span class="kw">const</span> <span class="tp">Player</span>&amp; other);
+
+    <span class="cm">// 5. 移动构造函数（C++11）</span>
+    <span class="fn">Player</span>(<span class="tp">Player</span>&amp;&amp; other) <span class="kw">noexcept</span>;
+
+    <span class="cm">// 6. 析构函数 - C# 没有对应物！</span>
+    ~<span class="fn">Player</span>() { <span class="cm">/* 清理资源 */</span> }
+};</code></pre></div>
+
+<div class="callout info"><div class="callout-title">Rule of Five / Rule of Zero</div>
+<p>如果你需要自定义析构、拷贝构造、拷贝赋值、移动构造、移动赋值中的任何一个，通常需要全部五个都自定义（Rule of Five）。但如果你的类只使用 RAII 类型（如 <code>std::string</code>、<code>std::vector</code>、智能指针），则一个都不需要写（Rule of Zero）——编译器自动生成的版本就是正确的。</p></div>
+
+<h3>7.3 继承与多态</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">public class</span> <span class="tp">Dog</span> : <span class="tp">Animal</span>
+{
+    <span class="kw">public override void</span> <span class="fn">Speak</span>() {
+        Console.WriteLine(<span class="st">"Woof!"</span>);
+    }
+}
+
+<span class="tp">Animal</span> a = <span class="kw">new</span> <span class="tp">Dog</span>();
+a.<span class="fn">Speak</span>();  <span class="cm">// "Woof!"</span></code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">class</span> <span class="tp">Dog</span> : <span class="kw">public</span> <span class="tp">Animal</span> {
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Speak</span>() <span class="kw">const override</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Woof!"</span>;
+    }
+};
+
+<span class="cm">// 多态必须通过指针或引用！</span>
+<span class="tp">Dog</span> dog;
+<span class="tp">Animal</span>&amp; a = dog;
+a.<span class="fn">Speak</span>();  <span class="cm">// "Woof!" - 正确</span>
+
+<span class="cm">// 注意：按值传递会"切片"！</span>
+<span class="tp">Animal</span> b = dog;  <span class="cm">// 切片！</span>
+b.<span class="fn">Speak</span>();  <span class="cm">// "..." - 丢失了 Dog</span></code></pre></div>
+</div>
+
+<div class="callout danger"><div class="callout-title">对象切片 (Object Slicing)</div>
+<p>这是 C# 开发者最容易踩的坑。在 C++ 中，如果按值赋值（不是引用或指针），派生类会被"切片"为基类部分。要实现多态，<strong>必须通过指针或引用</strong>。</p></div>
+
+<h3>7.4 纯虚函数与抽象类</h3>
+<p>C++ 没有 <code>interface</code> 关键字，用纯虚函数（<code>= 0</code>）实现接口效果：</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">class</span> <span class="tp">IDrawable</span> {
+<span class="kw">public</span>:
+    <span class="kw">virtual void</span> <span class="fn">Draw</span>() = <span class="nu">0</span>;       <span class="cm">// 纯虚函数</span>
+    <span class="kw">virtual int</span> <span class="fn">GetLayer</span>() = <span class="nu">0</span>;
+    <span class="kw">virtual</span> ~<span class="fn">IDrawable</span>() = <span class="kw">default</span>; <span class="cm">// 虚析构函数必须有！</span>
+};
+
+<span class="kw">class</span> <span class="tp">Sprite</span> : <span class="kw">public</span> <span class="tp">IDrawable</span> {
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Draw</span>() <span class="kw">override</span> { <span class="cm">/* 绘制 */</span> }
+    <span class="tp">int</span> <span class="fn">GetLayer</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="nu">1</span>; }
+};</code></pre></div>
+
+<div class="callout warning"><div class="callout-title">虚析构函数</div>
+<p>如果一个类有任何虚函数，<strong>一定要给它声明虚析构函数</strong>。否则通过基类指针 delete 派生类对象时，派生类的析构函数不会被调用，导致资源泄漏。</p></div>
+
+<h3>7.5 多重继承</h3>
+<p>C# 只支持单继承，C++ 支持多重继承。实际项目中，多重继承通常只用于"接口 + 一个实现类"的模式。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">class</span> <span class="tp">Sprite</span> : <span class="kw">public</span> <span class="tp">GameObject</span>,   <span class="cm">// 基类实现</span>
+               <span class="kw">public</span> <span class="tp">IDrawable</span>,    <span class="cm">// 接口</span>
+               <span class="kw">public</span> <span class="tp">ISerializable</span> <span class="cm">// 接口</span>
+{
+    <span class="cm">// 实现所有纯虚函数</span>
+};</code></pre></div>
+
+<h2 id="ch8">8. 运算符重载</h2>
+<p>C++ 的运算符重载比 C# 灵活得多。C++ 允许重载几乎所有运算符，且可以自由定义返回类型。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">struct</span> <span class="tp">Vec2</span> {
+    <span class="tp">float</span> x, y;
+
+    <span class="tp">Vec2</span> <span class="kw">operator</span>+(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; other) <span class="kw">const</span> {
+        <span class="kw">return</span> {x + other.x, y + other.y};
+    }
+    <span class="tp">Vec2</span> <span class="kw">operator</span>*(<span class="tp">float</span> scalar) <span class="kw">const</span> {
+        <span class="kw">return</span> {x * scalar, y * scalar};
+    }
+    <span class="tp">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; other) <span class="kw">const</span> {
+        <span class="kw">return</span> x == other.x &amp;&amp; y == other.y;
+    }
+    <span class="tp">float</span>&amp; <span class="kw">operator</span>[](<span class="tp">int</span> index) {
+        <span class="kw">return</span> index == <span class="nu">0</span> ? x : y;
+    }
+    <span class="kw">friend</span> <span class="tp">std::ostream</span>&amp; <span class="kw">operator</span>&lt;&lt;(<span class="tp">std::ostream</span>&amp; os, <span class="kw">const</span> <span class="tp">Vec2</span>&amp; v) {
+        <span class="kw">return</span> os &lt;&lt; <span class="st">"("</span> &lt;&lt; v.x &lt;&lt; <span class="st">", "</span> &lt;&lt; v.y &lt;&lt; <span class="st">")"</span>;
+    }
+};
+
+<span class="tp">Vec2</span> a{<span class="nu">1</span>, <span class="nu">2</span>}, b{<span class="nu">3</span>, <span class="nu">4</span>};
+<span class="kw">auto</span> c = a + b * <span class="nu">2.0f</span>;
+<span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; c;  <span class="cm">// "(7, 10)"</span></code></pre></div>
+
+<h2 id="ch9">9. 异常处理</h2>
+
+<h3>9.1 基本语法对比</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">try</span> {
+    <span class="kw">throw new</span> <span class="tp">ArgumentException</span>(<span class="st">"Bad!"</span>);
+}
+<span class="kw">catch</span> (<span class="tp">Exception</span> ex) {
+    Console.WriteLine(ex.Message);
+}
+<span class="kw">finally</span> {
+    Cleanup();
+}</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">try</span> {
+    <span class="kw">throw</span> <span class="tp">std::runtime_error</span>(<span class="st">"Bad!"</span>);
+}
+<span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">std::exception</span>&amp; e) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; e.<span class="fn">what</span>();
+}
+<span class="cm">// 没有 finally！用 RAII 代替</span></code></pre></div>
+</div>
+
+<h3>9.2 关键差异</h3>
+<table class="compare-table">
+<tr><th>特性</th><th>C#</th><th>C++</th></tr>
+<tr><td>异常基类</td><td><code>System.Exception</code></td><td><code>std::exception</code></td></tr>
+<tr><td>finally 块</td><td>有</td><td>没有（用 RAII 代替）</td></tr>
+<tr><td>throw 的对象</td><td>只能是 Exception 子类</td><td>任何类型</td></tr>
+<tr><td>noexcept</td><td>无对应</td><td><code>noexcept</code> 标记不抛异常</td></tr>
+<tr><td>性能哲学</td><td>异常较常用</td><td>异常开销大，不建议用于控制流</td></tr>
+</table>
+
+<div class="callout info"><div class="callout-title">C++ 异常使用哲学</div>
+<p>在 C++ 社区中，异常的使用比 C# 保守得多。很多项目（如游戏引擎、嵌入式系统）完全禁用异常。替代方案包括：返回错误码、<code>std::optional</code>、<code>std::expected</code>（C++23）。</p></div>
+
+<h3>9.3 RAII 替代 finally</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// C# 的 try/finally 在 C++ 中用 RAII 替代</span>
+{
+    <span class="tp">std::ofstream</span> file(<span class="st">"log.txt"</span>);
+    <span class="kw">if</span> (!file) <span class="kw">throw</span> <span class="tp">std::runtime_error</span>(<span class="st">"Cannot open"</span>);
+    file &lt;&lt; <span class="st">"some data"</span>;
+    <span class="cm">// 即使抛异常，file 析构时也会自动关闭</span>
+}
+
+<span class="cm">// 自定义 ScopeGuard（类似 defer / finally）</span>
+<span class="kw">struct</span> <span class="tp">ScopeGuard</span> {
+    <span class="tp">std::function</span>&lt;<span class="kw">void</span>()&gt; cleanup;
+    ~<span class="fn">ScopeGuard</span>() { <span class="fn">cleanup</span>(); }
+};
+
+{
+    <span class="fn">AcquireLock</span>();
+    <span class="tp">ScopeGuard</span> guard{[] { <span class="fn">ReleaseLock</span>(); }};
+    <span class="cm">// 即使抛异常，锁也会被释放</span>
+}</code></pre></div>
+
+<h2 id="ch10">10. 模板编程</h2>
+<p>C++ 模板表面上类似 C# 泛型，但底层机制完全不同。</p>
+
+<h3>10.1 模板 vs 泛型</h3>
+<table class="compare-table">
+<tr><th>特性</th><th>C# 泛型</th><th>C++ 模板</th></tr>
+<tr><td>实现机制</td><td>运行时实例化（JIT）</td><td>编译时展开（代码生成）</td></tr>
+<tr><td>类型约束</td><td><code>where T : class</code></td><td>concepts / SFINAE</td></tr>
+<tr><td>特化</td><td>不支持</td><td>支持完全特化和部分特化</td></tr>
+<tr><td>非类型参数</td><td>不支持</td><td>支持（如 <code>template&lt;int N&gt;</code>）</td></tr>
+<tr><td>编译错误</td><td>清晰</td><td>极其冗长（concepts 改善了）</td></tr>
+<tr><td>代码膨胀</td><td>无</td><td>有（每种类型生成一份）</td></tr>
+</table>
+
+<h3>10.2 函数模板与类模板</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="cm">// 函数模板</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">T</span> <span class="fn">Max</span>(<span class="tp">T</span> a, <span class="tp">T</span> b) {
+    <span class="kw">return</span> (a >= b) ? a : b;
+}
+
+<span class="tp">int</span> m = <span class="fn">Max</span>(<span class="nu">3</span>, <span class="nu">7</span>);  <span class="cm">// 类型推断</span>
+
+<span class="cm">// 类模板 + 非类型模板参数</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="tp">size_t</span> N&gt;
+<span class="kw">class</span> <span class="tp">RingBuffer</span> {
+    <span class="tp">T</span> data[N];  <span class="cm">// N 是编译期常量</span>
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Push</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; item) { <span class="cm">/* ... */</span> }
+};
+
+<span class="tp">RingBuffer</span>&lt;<span class="tp">int</span>, <span class="nu">16</span>&gt; buf;  <span class="cm">// 容量 16</span></code></pre></div>
+
+<h3>10.3 C++20 Concepts</h3>
+<p>Concepts 是 C++20 引入的模板约束机制，类似于 C# 泛型的 <code>where</code> 约束。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;concepts&gt;</span>
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">concept</span> <span class="tp">Addable</span> = <span class="kw">requires</span>(<span class="tp">T</span> a, <span class="tp">T</span> b) {
+    { a + b } -&gt; <span class="tp">std::convertible_to</span>&lt;<span class="tp">T</span>&gt;;
+};
+
+<span class="kw">template</span>&lt;<span class="tp">Addable</span> <span class="tp">T</span>&gt;
+<span class="tp">T</span> <span class="fn">Sum</span>(<span class="tp">T</span> a, <span class="tp">T</span> b) { <span class="kw">return</span> a + b; }
+
+<span class="cm">// 简写形式</span>
+<span class="tp">auto</span> <span class="fn">Sum</span>(<span class="tp">Addable</span> <span class="kw">auto</span> a, <span class="tp">Addable</span> <span class="kw">auto</span> b) {
+    <span class="kw">return</span> a + b;
+}</code></pre></div>
+
+<div class="chapter-divider"><span>进阶篇</span></div>
+
+<h2 id="ch11">11. STL 标准库</h2>
+<p>STL（Standard Template Library）是 C++ 的核心库，相当于 C# 的 <code>System.Collections</code> 和 <code>System.Linq</code>。</p>
+
+<h3>11.1 容器对照表</h3>
+<table class="compare-table">
+<tr><th>C# 集合</th><th>C++ 容器</th><th>说明</th></tr>
+<tr><td><code>List&lt;T&gt;</code></td><td><code>std::vector&lt;T&gt;</code></td><td>动态数组，最常用</td></tr>
+<tr><td><code>LinkedList&lt;T&gt;</code></td><td><code>std::list&lt;T&gt;</code></td><td>双向链表</td></tr>
+<tr><td><code>Queue&lt;T&gt;</code></td><td><code>std::queue&lt;T&gt;</code></td><td>队列</td></tr>
+<tr><td><code>Stack&lt;T&gt;</code></td><td><code>std::stack&lt;T&gt;</code></td><td>栈</td></tr>
+<tr><td><code>HashSet&lt;T&gt;</code></td><td><code>std::unordered_set&lt;T&gt;</code></td><td>哈希集合</td></tr>
+<tr><td><code>SortedSet&lt;T&gt;</code></td><td><code>std::set&lt;T&gt;</code></td><td>有序集合（红黑树）</td></tr>
+<tr><td><code>Dictionary&lt;K,V&gt;</code></td><td><code>std::unordered_map&lt;K,V&gt;</code></td><td>哈希字典</td></tr>
+<tr><td><code>SortedDictionary</code></td><td><code>std::map&lt;K,V&gt;</code></td><td>有序字典</td></tr>
+<tr><td><code>T[]</code></td><td><code>std::array&lt;T,N&gt;</code></td><td>固定大小数组</td></tr>
+<tr><td><code>Tuple&lt;...&gt;</code></td><td><code>std::tuple&lt;...&gt;</code></td><td>元组</td></tr>
+<tr><td><code>Nullable&lt;T&gt;</code></td><td><code>std::optional&lt;T&gt;</code></td><td>可选值（C++17）</td></tr>
+</table>
+
+<h3>11.2 std::vector 与算法</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">var</span> list = <span class="kw">new</span> <span class="tp">List</span>&lt;<span class="kw">int</span>&gt; { <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span> };
+list.<span class="fn">Add</span>(<span class="nu">4</span>);
+list.<span class="fn">Sort</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in</span> list)
+    Console.WriteLine(item);
+
+<span class="kw">var</span> evens = list
+    .<span class="fn">Where</span>(x =&gt; x % <span class="nu">2</span> == <span class="nu">0</span>).<span class="fn">ToList</span>();
+<span class="kw">int</span> sum = list.<span class="fn">Sum</span>();</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; v = {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>};
+v.<span class="fn">push_back</span>(<span class="nu">4</span>);
+<span class="tp">std</span>::<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());
+
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; item : v)
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; item &lt;&lt; <span class="st">" "</span>;
+
+<span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; evens;
+<span class="tp">std</span>::<span class="fn">copy_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(),
+    <span class="tp">std</span>::<span class="fn">back_inserter</span>(evens),
+    [](<span class="tp">int</span> x) { <span class="kw">return</span> x % <span class="nu">2</span> == <span class="nu">0</span>; });
+<span class="tp">int</span> sum = <span class="tp">std</span>::<span class="fn">accumulate</span>(
+    v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="nu">0</span>);</code></pre></div>
+</div>
+
+<div class="callout tip"><div class="callout-title">默认选择 std::vector</div>
+<p>除非有明确的性能需求，否则默认使用 <code>std::vector</code>。由于 CPU 缓存局部性，<code>vector</code> 在大多数场景下比 <code>list</code> 更快。</p></div>
+
+<h3>11.3 std::string</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">std::string</span> name = <span class="st">"Alice"</span>;
+name += <span class="st">" Bob"</span>;
+<span class="tp">std::string</span> full = name + <span class="st">" Charlie"</span>;
+
+<span class="tp">size_t</span> len = name.<span class="fn">size</span>();
+<span class="tp">bool</span> empty = name.<span class="fn">empty</span>();
+<span class="kw">auto</span> sub = name.<span class="fn">substr</span>(<span class="nu">0</span>, <span class="nu">5</span>);
+<span class="kw">auto</span> pos = name.<span class="fn">find</span>(<span class="st">"Bob"</span>);
+<span class="kw">const char</span>* cstr = name.<span class="fn">c_str</span>();
+
+<span class="cm">// C++20 格式化</span>
+<span class="pp">#include</span> <span class="st">&lt;format&gt;</span>
+<span class="tp">std::string</span> msg = <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"Hello, {}! Age: {}"</span>, name, <span class="nu">25</span>);
+
+<span class="cm">// C++23</span>
+<span class="pp">#include</span> <span class="st">&lt;print&gt;</span>
+<span class="tp">std</span>::<span class="fn">print</span>(<span class="st">"Hello, {}!\n"</span>, name);</code></pre></div>
+
+<h3>11.4 迭代器与 C++20 Ranges</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; v = {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>, <span class="nu">50</span>};
+
+<span class="cm">// Range-based for（最常用）</span>
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; x : v) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; x &lt;&lt; <span class="st">" "</span>;
+}
+
+<span class="cm">// STL 算法</span>
+<span class="tp">std</span>::<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());
+<span class="kw">auto</span> it = <span class="tp">std</span>::<span class="fn">find</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="nu">30</span>);
+<span class="tp">int</span> cnt = <span class="tp">std</span>::<span class="fn">count_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(),
+    [](<span class="tp">int</span> x) { <span class="kw">return</span> x &gt; <span class="nu">20</span>; });
+
+<span class="cm">// C++20 Ranges（链式调用，类似 LINQ）</span>
+<span class="pp">#include</span> <span class="st">&lt;ranges&gt;</span>
+<span class="kw">auto</span> result = v
+    | <span class="tp">std::views</span>::<span class="fn">filter</span>([](<span class="tp">int</span> x) { <span class="kw">return</span> x % <span class="nu">2</span> == <span class="nu">0</span>; })
+    | <span class="tp">std::views</span>::<span class="fn">transform</span>([](<span class="tp">int</span> x) { <span class="kw">return</span> x * x; })
+    | <span class="tp">std::views</span>::<span class="fn">take</span>(<span class="nu">5</span>);</code></pre></div>
+
+<h2 id="ch12">12. Lambda 与函数式编程</h2>
+
+<h3>12.1 Lambda 语法与捕获列表</h3>
+<p>C++ lambda 的捕获列表是 C# 中没有的概念。C# 的 lambda 自动捕获所有使用的外部变量，而 C++ 要求你明确指定如何捕获：</p>
+
+<table class="compare-table">
+<tr><th>语法</th><th>含义</th><th>说明</th></tr>
+<tr><td><code>[x]</code></td><td>按值捕获 x</td><td>lambda 内有一份 x 的拷贝</td></tr>
+<tr><td><code>[&amp;x]</code></td><td>按引用捕获 x</td><td>引用原始的 x</td></tr>
+<tr><td><code>[=]</code></td><td>按值捕获所有</td><td>方便但不推荐</td></tr>
+<tr><td><code>[&amp;]</code></td><td>按引用捕获所有</td><td>注意生命周期</td></tr>
+<tr><td><code>[this]</code></td><td>捕获当前对象指针</td><td>成员函数中使用</td></tr>
+<tr><td><code>[*this]</code></td><td>捕获当前对象拷贝</td><td>C++17，适合异步</td></tr>
+<tr><td><code>[x = expr]</code></td><td>init capture</td><td>C++14，捕获时初始化</td></tr>
+</table>
+
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">int</span> a = <span class="nu">10</span>, b = <span class="nu">20</span>;
+
+<span class="kw">auto</span> f1 = [a] { <span class="kw">return</span> a; };        <span class="cm">// 按值捕获</span>
+<span class="kw">auto</span> f2 = [&amp;a] { a += <span class="nu">5</span>; };          <span class="cm">// 按引用捕获</span>
+<span class="kw">auto</span> f3 = [a, &amp;b] { b = a + <span class="nu">1</span>; };   <span class="cm">// 混合捕获</span>
+
+<span class="cm">// 捕获 unique_ptr（只能 move）</span>
+<span class="kw">auto</span> ptr = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Player</span>&gt;();
+<span class="kw">auto</span> f4 = [p = <span class="tp">std</span>::<span class="fn">move</span>(ptr)] { p-&gt;<span class="fn">Speak</span>(); };</code></pre></div>
+
+<h2 id="ch13">13. 智能指针与 RAII</h2>
+
+<h3>13.1 三种智能指针</h3>
+<table class="compare-table">
+<tr><th>类型</th><th>所有权模型</th><th>类比 C#</th><th>何时使用</th></tr>
+<tr><td><code>unique_ptr</code></td><td>独占所有权</td><td>IDisposable 独占资源</td><td>默认首选</td></tr>
+<tr><td><code>shared_ptr</code></td><td>共享所有权（引用计数）</td><td>普通引用</td><td>多个持有者</td></tr>
+<tr><td><code>weak_ptr</code></td><td>不拥有，观察</td><td><code>WeakReference</code></td><td>打破循环引用</td></tr>
+</table>
+
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+
+<span class="cm">// unique_ptr — 独占所有权</span>
+{
+    <span class="kw">auto</span> p = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Player</span>&gt;(<span class="st">"Alice"</span>, <span class="nu">100</span>);
+    p-&gt;<span class="fn">Speak</span>();
+    <span class="kw">auto</span> p2 = <span class="tp">std</span>::<span class="fn">move</span>(p);  <span class="cm">// 转移所有权</span>
+    <span class="cm">// auto p3 = p;            // 编译错误！不能拷贝</span>
+} <span class="cm">// 自动 delete</span>
+
+<span class="cm">// shared_ptr — 引用计数</span>
+{
+    <span class="kw">auto</span> s1 = <span class="tp">std</span>::<span class="fn">make_shared</span>&lt;<span class="tp">Player</span>&gt;(<span class="st">"Bob"</span>, <span class="nu">80</span>);
+    {
+        <span class="kw">auto</span> s2 = s1;  <span class="cm">// 引用计数 = 2</span>
+    } <span class="cm">// s2 销毁，引用计数 = 1</span>
+} <span class="cm">// s1 销毁，引用计数 = 0，delete</span>
+
+<span class="cm">// weak_ptr — 打破循环引用</span>
+{
+    <span class="kw">auto</span> shared = <span class="tp">std</span>::<span class="fn">make_shared</span>&lt;<span class="tp">Player</span>&gt;(<span class="st">"C"</span>, <span class="nu">90</span>);
+    <span class="tp">std::weak_ptr</span>&lt;<span class="tp">Player</span>&gt; weak = shared;
+    <span class="kw">if</span> (<span class="kw">auto</span> locked = weak.<span class="fn">lock</span>()) {
+        locked-&gt;<span class="fn">Speak</span>();  <span class="cm">// 对象还活着</span>
+    }
+}</code></pre></div>
+
+<h3>13.2 Move 语义</h3>
+<p>Move 语义是 C++11 引入的核心特性，C# 没有直接对应物。核心思想：对于即将销毁的临时对象，直接"偷走"它的资源而非深拷贝。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; <span class="fn">CreateLargeVector</span>() {
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; v(<span class="nu">1000000</span>);
+    <span class="kw">return</span> v;  <span class="cm">// 不会拷贝！自动 move 或 RVO</span>
+}
+
+<span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; data = <span class="fn">CreateLargeVector</span>();  <span class="cm">// 零拷贝</span>
+
+<span class="tp">std::string</span> s1 = <span class="st">"Hello World This Is Long"</span>;
+<span class="tp">std::string</span> s2 = <span class="tp">std</span>::<span class="fn">move</span>(s1);  <span class="cm">// s2 偷走了 s1 的缓冲区</span>
+                                  <span class="cm">// s1 现在是有效但未定义的状态</span></code></pre></div>
+
+<h2 id="ch14">14. 并发编程</h2>
+
+<h3>14.1 线程与异步</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">await</span> <span class="tp">Task</span>.<span class="fn">Run</span>(() =&gt; {
+    Console.WriteLine(<span class="st">"Worker"</span>);
+});
+
+<span class="kw">var</span> t = <span class="kw">new</span> <span class="tp">Thread</span>(() =&gt; { });
+t.<span class="fn">Start</span>();
+t.<span class="fn">Join</span>();</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;thread&gt;</span>
+
+<span class="tp">std::thread</span> t([] {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Worker"</span>;
+});
+t.<span class="fn">join</span>();  <span class="cm">// 必须 join 或 detach</span>
+
+<span class="cm">// std::async（更接近 Task）</span>
+<span class="kw">auto</span> f = <span class="tp">std</span>::<span class="fn">async</span>(<span class="tp">std::launch::async</span>, [] {
+    <span class="kw">return</span> <span class="nu">42</span>;
+});
+<span class="tp">int</span> r = f.<span class="fn">get</span>();  <span class="cm">// 阻塞获取结果</span></code></pre></div>
+</div>
+
+<h3>14.2 同步原语</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;mutex&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;atomic&gt;</span>
+
+<span class="tp">std::mutex</span> mtx;
+<span class="tp">int</span> counter = <span class="nu">0</span>;
+
+<span class="kw">void</span> <span class="fn">Increment</span>() {
+    <span class="cm">// RAII 锁（推荐！）</span>
+    <span class="tp">std::lock_guard</span>&lt;<span class="tp">std::mutex</span>&gt; lock(mtx);
+    ++counter;
+    <span class="cm">// 离开作用域自动解锁</span>
+}
+
+<span class="cm">// 原子变量（无锁并发）</span>
+<span class="tp">std::atomic</span>&lt;<span class="tp">int</span>&gt; atomic_counter{<span class="nu">0</span>};
+atomic_counter++;</code></pre></div>
+
+<h3>14.3 C++20 协程</h3>
+<p>C++20 引入了协程，类似于 C# 的 async/await，但更底层。C# 的 async/await 是"即开即用"的高层抽象，C++20 协程只提供了编译器基础设施，通常需要第三方库（如 asio、cppcoro）。</p>
+
+<div class="chapter-divider"><span>实战篇</span></div>
+
+<h2 id="ch15">15. 现代 C++ 特性</h2>
+
+<h3>15.1 auto 与类型推导</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">auto</span> x = <span class="nu">42</span>;                   <span class="cm">// int</span>
+<span class="kw">auto</span> pi = <span class="nu">3.14</span>;                <span class="cm">// double</span>
+<span class="kw">auto</span> name = <span class="tp">std::string</span>(<span class="st">"Hi"</span>); <span class="cm">// std::string</span>
+
+<span class="kw">decltype</span>(x) y = <span class="nu">100</span>;            <span class="cm">// y 的类型是 int</span>
+
+<span class="cm">// C++20：函数参数中的 auto（简写模板）</span>
+<span class="kw">void</span> <span class="fn">Print</span>(<span class="kw">const auto</span>&amp; value) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; value;
+}</code></pre></div>
+
+<h3>15.2 结构化绑定 (C++17)</h3>
+<div class="code-compare">
+<div class="code-block"><div class="code-header"><span class="code-lang cs">C#</span></div>
+<pre><code><span class="kw">var</span> (x, y) = (<span class="nu">10</span>, <span class="nu">20</span>);
+
+<span class="kw">var</span> dict = <span class="kw">new</span> <span class="tp">Dictionary</span>&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt;();
+<span class="kw">foreach</span> (<span class="kw">var</span> (key, val) <span class="kw">in</span> dict) {
+    <span class="cm">// ...</span>
+}</code></pre></div>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">auto</span> [x, y] = <span class="tp">std::pair</span>{<span class="nu">10</span>, <span class="nu">20</span>};
+
+<span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>&gt; dict;
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; [key, val] : dict) {
+    <span class="cm">// ...</span>
+}
+
+<span class="kw">if</span> (<span class="kw">auto</span> [iter, ok] = map.<span class="fn">insert</span>({<span class="st">"k"</span>, <span class="nu">42</span>}); ok) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Inserted!"</span>;
+}</code></pre></div>
+</div>
+
+<h3>15.3 std::optional, std::variant, std::any</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;optional&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;variant&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;any&gt;</span>
+
+<span class="cm">// std::optional — 类似 Nullable&lt;T&gt;</span>
+<span class="tp">std::optional</span>&lt;<span class="tp">int</span>&gt; <span class="fn">FindIndex</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt;&amp; v, <span class="tp">int</span> t) {
+    <span class="kw">for</span> (<span class="tp">size_t</span> i = <span class="nu">0</span>; i &lt; v.<span class="fn">size</span>(); ++i)
+        <span class="kw">if</span> (v[i] == t) <span class="kw">return</span> <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(i);
+    <span class="kw">return</span> <span class="tp">std</span>::nullopt;
+}
+<span class="kw">if</span> (<span class="kw">auto</span> idx = <span class="fn">FindIndex</span>(data, <span class="nu">42</span>)) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Found at "</span> &lt;&lt; *idx;
+}
+
+<span class="cm">// std::variant — 类型安全的 union</span>
+<span class="tp">std::variant</span>&lt;<span class="tp">int</span>, <span class="tp">std::string</span>, <span class="tp">double</span>&gt; val = <span class="st">"hello"</span>;
+<span class="tp">std</span>::<span class="fn">visit</span>([](<span class="kw">auto</span>&amp;&amp; v) { <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; v; }, val);
+
+<span class="cm">// std::any — 任意类型（类似 C# object）</span>
+<span class="tp">std::any</span> anything = <span class="nu">42</span>;
+<span class="tp">int</span> n = <span class="tp">std</span>::<span class="fn">any_cast</span>&lt;<span class="tp">int</span>&gt;(anything);</code></pre></div>
+
+<h3>15.4 if constexpr — 编译期条件</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">std::string</span> <span class="fn">ToString</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; value) {
+    <span class="kw">if constexpr</span> (<span class="tp">std::is_arithmetic_v</span>&lt;<span class="tp">T</span>&gt;) {
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">to_string</span>(value);
+    } <span class="kw">else if constexpr</span> (<span class="tp">std::is_same_v</span>&lt;<span class="tp">T</span>, <span class="tp">std::string</span>&gt;) {
+        <span class="kw">return</span> value;
+    } <span class="kw">else</span> {
+        <span class="kw">return</span> <span class="st">"[object]"</span>;
+    }
+}</code></pre></div>
+
+<h2 id="ch16">16. 构建系统与工具链</h2>
+
+<h3>16.1 CMake — C++ 的事实标准构建系统</h3>
+<p>C# 有 MSBuild / dotnet CLI，C++ 的跨平台标准构建系统是 CMake。</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang sh">CMakeLists.txt</span></div>
+<pre><code><span class="cm"># 最低 CMake 版本要求</span>
+cmake_minimum_required(VERSION 3.20)
+
+<span class="cm"># 项目名称和 C++ 标准</span>
+project(MyGame VERSION 1.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+<span class="cm"># 添加可执行文件</span>
+add_executable(mygame
+    src/main.cpp
+    src/Player.cpp
+    src/GameEngine.cpp
+)
+
+<span class="cm"># 包含目录</span>
+target_include_directories(mygame PRIVATE include)
+
+<span class="cm"># 链接库</span>
+target_link_libraries(mygame PRIVATE glfw OpenGL::GL)
+
+<span class="cm"># 编译选项</span>
+target_compile_options(mygame PRIVATE
+    $&lt;$&lt;CXX_COMPILER_ID:MSVC&gt;:/W4 /WX&gt;
+    $&lt;$&lt;NOT:$&lt;CXX_COMPILER_ID:MSVC&gt;&gt;:-Wall -Wextra&gt;
+)</code></pre></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang sh">Shell</span></div>
+<pre><code><span class="cm"># 生成构建系统</span>
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+<span class="cm"># 编译</span>
+cmake --build build --config Release
+
+<span class="cm"># 运行</span>
+./build/mygame</code></pre></div>
+
+<h3>16.2 包管理器</h3>
+<p>C# 有 NuGet，C++ 常用的包管理器有：</p>
+<table class="compare-table">
+<tr><th>工具</th><th>特点</th><th>类比</th></tr>
+<tr><td>vcpkg</td><td>微软开发，集成 CMake 最好</td><td>NuGet</td></tr>
+<tr><td>Conan</td><td>功能最全，Python 生态</td><td>NuGet + MSBuild</td></tr>
+<tr><td>CPM.cmake</td><td>轻量级 CMake 原生</td><td>直接下载源码编译</td></tr>
+</table>
+
+<h3>16.3 调试工具</h3>
+<table class="compare-table">
+<tr><th>工具</th><th>平台</th><th>说明</th></tr>
+<tr><td>Visual Studio</td><td>Windows</td><td>最强大的 C++ IDE，内置调试器</td></tr>
+<tr><td>GDB / LLDB</td><td>Linux / macOS</td><td>命令行调试器</td></tr>
+<tr><td>Valgrind</td><td>Linux</td><td>内存泄漏检测</td></tr>
+<tr><td>AddressSanitizer</td><td>跨平台</td><td>编译时注入内存检查（推荐）</td></tr>
+<tr><td>cppcheck</td><td>跨平台</td><td>静态代码分析</td></tr>
+</table>
+
+<div class="callout tip"><div class="callout-title">开发环境推荐</div>
+<p>如果你来自 C# / Visual Studio 的世界，建议继续使用 Visual Studio 2022（安装"C++ 桌面开发"工作负载）。如果做跨平台开发，VS Code + CMake Tools + clangd 是优秀的免费组合。CLion（JetBrains 出品，与 Rider 同厂）也是极好的选择。</p></div>
+
+<h2 id="ch17">17. 常见陷阱与最佳实践</h2>
+
+<h3>17.1 C# 开发者最容易犯的 10 个错误</h3>
+
+<h4>1. 忘记 #include 头文件</h4>
+<p>C# 的 <code>using</code> 只是引入命名空间。C++ 的 <code>#include</code> 是真正地把文件内容复制过来。忘记 <code>#include</code> 会导致编译错误，但错误信息可能很晦涩。</p>
+
+<h4>2. 对象切片</h4>
+<p>如前所述，多态必须通过引用或指针。按值传递派生类对象会丢失派生类部分。</p>
+
+<h4>3. 忘记虚析构函数</h4>
+<p>有虚函数的类必须有虚析构函数。否则通过基类指针 delete 时，派生类析构函数不会被调用。</p>
+
+<h4>4. 悬垂指针 / 悬垂引用</h4>
+<p>返回局部变量的引用、使用已释放的内存、容器 resize 后迭代器失效——这些都会导致未定义行为。</p>
+
+<h4>5. 混用 signed 和 unsigned</h4>
+<p><code>std::vector::size()</code> 返回 <code>size_t</code>（无符号），与 <code>int</code> 比较可能产生意外结果。</p>
+
+<h4>6. 忘记初始化变量</h4>
+<p>C++ 的内置类型（int, float, 指针等）不会自动初始化为零！必须显式初始化。</p>
+<div class="code-block"><div class="code-header"><span class="code-lang cpp">C++</span></div>
+<pre><code><span class="tp">int</span> x;        <span class="cm">// 未初始化！值是不确定的垃圾值</span>
+<span class="tp">int</span> y{};      <span class="cm">// 零初始化，值为 0（推荐）</span>
+<span class="tp">int</span> z = <span class="nu">0</span>;    <span class="cm">// 显式初始化为 0</span>
+
+<span class="tp">int</span>* p;       <span class="cm">// 未初始化！危险的野指针</span>
+<span class="tp">int</span>* q = <span class="kw">nullptr</span>;  <span class="cm">// 安全</span></code></pre></div>
+
+<h4>7. 头文件循环依赖</h4>
+<p>两个头文件互相 <code>#include</code> 会导致编译失败。解决方案：使用前向声明（forward declaration）代替不必要的 <code>#include</code>。</p>
+
+<h4>8. 忽略 const 正确性</h4>
+<p>在 C++ 社区中，const 正确性是代码质量的重要标志。不写 const 会传播：一个非 const 方法会导致所有调用它的地方都无法使用 const。</p>
+
+<h4>9. 使用裸 new/delete</h4>
+<p>现代 C++ 几乎总是应该使用智能指针。裸 new/delete 是内存泄漏的温床。</p>
+
+<h4>10. 忽略移动语义</h4>
+<p>不理解 move 语义意味着错过大量性能优化机会，也意味着无法正确使用某些现代 C++ 特性。</p>
+
+<h3>17.2 最佳实践清单</h3>
+<table class="compare-table">
+<tr><th>实践</th><th>说明</th></tr>
+<tr><td>优先栈分配</td><td>默认用栈，只在必要时用堆（智能指针）</td></tr>
+<tr><td>const 正确性</td><td>不修改的参数用 const&amp;，不修改的方法用 const</td></tr>
+<tr><td>Rule of Zero</td><td>用 RAII 成员（string, vector, unique_ptr），不手写析构/拷贝</td></tr>
+<tr><td>使用 auto</td><td>减少冗长的类型声明，但保持可读性</td></tr>
+<tr><td>用 &lt;cstdint&gt;</td><td>跨平台代码使用 int32_t, uint64_t 等固定宽度类型</td></tr>
+<tr><td>范围 for</td><td>优先使用 range-based for 循环</td></tr>
+<tr><td>智能指针</td><td>unique_ptr 优先，只在共享所有权时用 shared_ptr</td></tr>
+<tr><td>STL 算法</td><td>用 STL 算法替代手写循环</td></tr>
+<tr><td>编译警告</td><td>开启 -Wall -Wextra -Werror（MSVC: /W4 /WX）</td></tr>
+<tr><td>现代标准</td><td>至少使用 C++17，推荐 C++20</td></tr>
+</table>
+
+<h2 id="ch18">18. 推荐学习路径</h2>
+
+<h3>18.1 学习路线图</h3>
+<p>作为有 C# 经验的开发者，推荐按以下顺序学习：</p>
+<ol>
+<li><strong>第 1 周</strong>：编译模型 + 头文件 + 基础类型 + 指针引用。写几个小控制台程序练手。</li>
+<li><strong>第 2 周</strong>：内存管理 + RAII + 智能指针。这是最关键的思维转换期。</li>
+<li><strong>第 3 周</strong>：类 + 继承 + 多态。注意切片问题和虚析构函数。</li>
+<li><strong>第 4 周</strong>：STL 容器 + 算法 + 迭代器。学习用 STL 替代手写循环。</li>
+<li><strong>第 5-6 周</strong>：模板 + Lambda + 现代 C++ 特性。开始感受 C++ 的表达力。</li>
+<li><strong>第 7-8 周</strong>：并发 + CMake + 实战项目。选择一个感兴趣的项目开始动手。</li>
+</ol>
+
+<h3>18.2 推荐资源</h3>
+<table class="compare-table">
+<tr><th>资源</th><th>类型</th><th>说明</th></tr>
+<tr><td>A Tour of C++</td><td>书籍</td><td>Bjarne Stroustrup 著，适合有经验的程序员快速概览</td></tr>
+<tr><td>Effective Modern C++</td><td>书籍</td><td>Scott Meyers 著，C++11/14 最佳实践</td></tr>
+<tr><td>cppreference.com</td><td>在线参考</td><td>C++ 标准库最权威的参考文档</td></tr>
+<tr><td>Compiler Explorer (godbolt.org)</td><td>在线工具</td><td>实时查看 C++ 编译后的汇编代码，理解零成本抽象</td></tr>
+<tr><td>C++ Core Guidelines</td><td>指南</td><td>Bjarne Stroustrup 和 Herb Sutter 维护的官方最佳实践</td></tr>
+<tr><td>The Cherno - C++ Series</td><td>视频</td><td>YouTube 上的优质 C++ 教程系列</td></tr>
+</table>
+
+<h3>18.3 实战项目建议</h3>
+<p>以下项目按难度递增，适合练习 C++ 各项特性：</p>
+<ol>
+<li><strong>命令行计算器</strong> — 练习基础语法、字符串处理、异常处理</li>
+<li><strong>学生管理系统</strong> — 练习 STL 容器、文件 I/O、序列化</li>
+<li><strong>简单的游戏引擎</strong> — 练习类层次、多态、智能指针、设计模式</li>
+<li><strong>HTTP 服务器</strong> — 练习并发、网络编程、RAII</li>
+<li><strong>JSON 解析器</strong> — 练习模板、variant、递归</li>
+</ol>
+
+<div class="callout tip"><div class="callout-title">最后的建议</div>
+<p>C++ 是一门极其深邃的语言，没有人能完全掌握它的所有特性。作为 C# 开发者，你已经有非常好的编程基础。不要试图一次学会所有东西，循序渐进地掌握核心概念（RAII、const 正确性、智能指针、STL），然后在做项目的过程中逐步深入。享受从"掌控一切"的 C# 到"理解底层"的 C++ 的转换过程吧！</p></div>
+
+<div style="margin-top:80px;padding:30px 0;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:14px;">
+<p>C++ 系统教程 - 写给 C# 开发者 | 2026</p>
+</div>
+
+</main>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
+
+<script>
+// Progress bar
+const progressFill = document.getElementById('progressFill');
+const scrollTop = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const p = (window.scrollY / h) * 100;
+  progressFill.style.width = p + '%';
+  scrollTop.style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
+
+// Active nav link
+const links = document.querySelectorAll('.nav-link');
+const sections = [];
+links.forEach(l => {
+  const id = l.getAttribute('href')?.slice(1);
+  if (id) {
+    const el = document.getElementById(id);
+    if (el) sections.push({ el, link: l });
+  }
+});
+
+function updateActive() {
+  let current = null;
+  for (const s of sections) {
+    if (s.el.getBoundingClientRect().top <= 100) current = s;
+  }
+  links.forEach(l => l.classList.remove('active'));
+  if (current) current.link.classList.add('active');
+}
+window.addEventListener('scroll', updateActive);
+updateActive();
+
+// Close sidebar on mobile link click
+links.forEach(l => {
+  l.addEventListener('click', () => {
+    if (window.innerWidth <= 900) {
+      document.querySelector('.sidebar').classList.remove('open');
+    }
+  });
+});
+</script>
+</body>
+</html>
