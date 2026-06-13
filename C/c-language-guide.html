@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C 语言完全指南 — 写给 C++ 开发者的 C 语言学习文档</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232735;
+    --border: #2e3348;
+    --text: #e2e4ed;
+    --text-muted: #8b8fa7;
+    --accent: #6c8cff;
+    --accent2: #4ecdc4;
+    --accent3: #ff6b6b;
+    --accent4: #ffd93d;
+    --code-bg: #151822;
+    --cpp: #ff9f43;
+    --c-lang: #6c8cff;
+    --success: #2ed573;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+  /* Navigation */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 280px; background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 100;
+    padding: 24px 0;
+    transition: transform 0.3s;
+  }
+  .sidebar-title {
+    padding: 0 20px 20px;
+    font-size: 18px; font-weight: 700;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar-title span { color: var(--accent2); }
+  .nav-group { padding: 8px 0; }
+  .nav-group-title {
+    padding: 4px 20px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-muted); font-weight: 600;
+  }
+  .nav-link {
+    display: block; padding: 6px 20px 6px 28px;
+    color: var(--text-muted); text-decoration: none;
+    font-size: 14px; transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .nav-link:hover, .nav-link.active {
+    color: var(--accent); background: rgba(108,140,255,0.06);
+    border-left-color: var(--accent);
+  }
+  /* Main */
+  .main { margin-left: 280px; padding: 40px 60px 80px; max-width: 1060px; }
+  /* Hero */
+  .hero {
+    text-align: center; padding: 60px 0 50px;
+    border-bottom: 1px solid var(--border); margin-bottom: 50px;
+  }
+  .hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 16px; }
+  .hero h1 .c-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero .subtitle { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+  /* Section */
+  section { margin-bottom: 60px; scroll-margin-top: 24px; }
+  h2 {
+    font-size: 28px; font-weight: 700; margin-bottom: 24px;
+    padding-bottom: 12px; border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  h2 .icon { font-size: 32px; }
+  h3 {
+    font-size: 20px; font-weight: 600; margin: 28px 0 14px;
+    color: var(--accent2);
+  }
+  h4 { font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: var(--accent4); }
+  p { margin-bottom: 14px; }
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin: 18px 0;
+  }
+  .card-compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border); margin: 18px 0;
+  }
+  .card-compare .col { padding: 20px; }
+  .card-compare .col-c { background: rgba(108,140,255,0.06); border-right: 1px solid var(--border); }
+  .card-compare .col-cpp { background: rgba(255,159,67,0.06); }
+  .col-label {
+    display: inline-block; padding: 2px 10px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .col-label.c { background: var(--c-lang); color: #fff; }
+  .col-label.cpp { background: var(--cpp); color: #1a1d27; }
+  /* Code */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 22px;
+    overflow-x: auto; margin: 14px 0; font-size: 14px;
+    line-height: 1.7;
+  }
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 14px;
+  }
+  p code, li code {
+    background: var(--surface2); padding: 2px 7px;
+    border-radius: 5px; font-size: 13.5px;
+    border: 1px solid var(--border);
+  }
+  .kw { color: #c792ea; }
+  .type { color: #82aaff; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cm { color: #546e7a; font-style: italic; }
+  .pp { color: #89ddff; }
+  .op { color: #89ddff; }
+  /* Callout */
+  .callout {
+    border-radius: 10px; padding: 16px 20px; margin: 18px 0;
+    border-left: 4px solid; display: flex; gap: 12px;
+  }
+  .callout-tip { background: rgba(46,213,115,0.08); border-color: var(--success); }
+  .callout-warn { background: rgba(255,217,61,0.08); border-color: var(--accent4); }
+  .callout-note { background: rgba(108,140,255,0.08); border-color: var(--accent); }
+  .callout-danger { background: rgba(255,107,107,0.08); border-color: var(--accent3); }
+  .callout .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .callout .callout-body { flex: 1; }
+  .callout .callout-title { font-weight: 700; margin-bottom: 4px; }
+  /* Table */
+  table {
+    width: 100%; border-collapse: collapse; margin: 14px 0;
+    font-size: 14.5px;
+  }
+  th {
+    background: var(--surface2); text-align: left;
+    padding: 10px 14px; font-weight: 600;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px; border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+  /* Timeline */
+  .timeline { position: relative; padding-left: 32px; margin: 20px 0; }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px;
+    width: 2px; background: var(--border);
+  }
+  .timeline-item { position: relative; margin-bottom: 24px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -28px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+  }
+  .timeline-year {
+    font-weight: 700; color: var(--accent);
+    font-size: 15px; margin-bottom: 4px;
+  }
+  /* Analogy box */
+  .analogy {
+    background: linear-gradient(135deg, rgba(78,205,196,0.08), rgba(108,140,255,0.08));
+    border: 1px solid rgba(78,205,196,0.2);
+    border-radius: 12px; padding: 18px 22px; margin: 18px 0;
+  }
+  .analogy .analogy-title {
+    font-weight: 700; color: var(--accent2); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  /* Tags */
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; margin: 2px 4px 2px 0;
+  }
+  .tag-blue { background: rgba(108,140,255,0.15); color: var(--accent); }
+  .tag-green { background: rgba(46,213,115,0.15); color: var(--success); }
+  .tag-orange { background: rgba(255,159,67,0.15); color: var(--cpp); }
+  .tag-red { background: rgba(255,107,107,0.15); color: var(--accent3); }
+  /* Grid cards */
+  .grid { display: grid; gap: 16px; margin: 18px 0; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .grid-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+  }
+  .grid-card h4 { margin-top: 0; }
+  /* Mobile toggle */
+  .menu-toggle {
+    display: none; position: fixed; top: 12px; left: 12px;
+    z-index: 200; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-size: 20px; cursor: pointer;
+  }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 24px 20px 60px; }
+    .menu-toggle { display: block; }
+    .card-compare { grid-template-columns: 1fr; }
+    .card-compare .col-c { border-right: none; border-bottom: 1px solid var(--border); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+  }
+  /* Back to top */
+  .back-top {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 50%;
+    width: 44px; height: 44px; font-size: 20px;
+    cursor: pointer; opacity: 0; transition: opacity 0.3s;
+    z-index: 50; box-shadow: 0 4px 16px rgba(108,140,255,0.3);
+  }
+  .back-top.show { opacity: 1; }
+  /* Highlight diff */
+  .diff-add { color: var(--success); }
+  .diff-del { color: var(--accent3); text-decoration: line-through; }
+  ul, ol { margin: 10px 0 14px 24px; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<nav class="sidebar">
+  <div class="sidebar-title">C 语言<span>完全指南</span></div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">开篇</div>
+    <a class="nav-link" href="#history">历史与发展</a>
+    <a class="nav-link" href="#philosophy">设计哲学</a>
+    <a class="nav-link" href="#vs-cpp">C 与 C++ 总览</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">基础语法</div>
+    <a class="nav-link" href="#basics">数据类型与变量</a>
+    <a class="nav-link" href="#operators">运算符与表达式</a>
+    <a class="nav-link" href="#control">控制流</a>
+    <a class="nav-link" href="#functions">函数</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">核心能力</div>
+    <a class="nav-link" href="#arrays">数组与字符串</a>
+    <a class="nav-link" href="#pointers">指针</a>
+    <a class="nav-link" href="#memory">内存管理</a>
+    <a class="nav-link" href="#struct">结构体与联合体</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">进阶特性</div>
+    <a class="nav-link" href="#preprocessor">预处理器</a>
+    <a class="nav-link" href="#io">文件 I/O</a>
+    <a class="nav-link" href="#stdlib">标准库</a>
+    <a class="nav-link" href="#advanced">高级主题</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">工程实践</div>
+    <a class="nav-link" href="#environment">开发环境</a>
+    <a class="nav-link" href="#tools">常用工具与框架</a>
+    <a class="nav-link" href="#usecases">使用场景</a>
+    <a class="nav-link" href="#bestpractice">最佳实践</a>
+  </div>
+</nav>
+
+<main class="main">
+  <div class="hero">
+    <h1><span class="c-badge">C 语言</span>完全指南</h1>
+    <p class="subtitle">写给 C++ 开发者的 C 语言学习手册 — 从历史到实战，用类比和对比帮你快速掌握 C 的精髓</p>
+  </div>
+
+  <!-- ==================== 历史与发展 ==================== -->
+  <section id="history">
+    <h2><span class="icon">📜</span> 一、历史与发展</h2>
+
+    <p>C 语言的历史是一部关于「如何在抽象与效率之间走钢丝」的故事。理解这段历史，会让你明白为什么 C 语言长成今天这个样子，以及为什么它在 50 多年后仍然是世界上最重要的编程语言之一。</p>
+
+    <h3>1.1 前传：从 CPL 到 B</h3>
+
+    <p>故事要从 1960 年代说起。那时剑桥大学的 Martin Richards 设计了 <strong>CPL</strong>（Combined Programming Language），一门功能强大但极其复杂的语言。后来 Ken Thompson 在贝尔实验室将其简化为 <strong>BCPL</strong> 的精华版本，取名为 <strong>B 语言</strong>——取 BCPL 的首字母。</p>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>如果说 CPL 是一辆装满各种工具的卡车，B 语言就是一个精简的工具箱。B 把所有东西都当作一个字（word）来处理，就像你把所有食材都当成"一份"来计算——简单，但不够精确。</p>
+    </div>
+
+    <h3>1.2 诞生：Dennis Ritchie 的天才之作</h3>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-year">1969 年</div>
+        <p>Ken Thompson 和 Dennis Ritchie 在贝尔实验室开始开发 UNIX 操作系统，最初用汇编语言编写。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1972 年</div>
+        <p>Dennis Ritchie 在 B 语言的基础上加入了数据类型系统，创造了 <strong>C 语言</strong>。C 既保持了 B 的简洁，又引入了 <code>int</code>、<code>char</code>、<code>float</code> 等类型，让编译器能生成更高效的机器码。这是关键的一步——类型系统不是为了程序员的方便，而是为了让编译器知道该生成什么样的指令。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1973 年</div>
+        <p>UNIX 内核用 C 语言重写完成。这是操作系统历史上的里程碑——证明了高级语言可以用来编写系统软件。在此之前，人们普遍认为只有汇编才能写出足够快的操作系统。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1978 年</div>
+        <p>Brian Kernighan 和 Dennis Ritchie 合著的 <strong>《The C Programming Language》</strong>（俗称 K&R）出版。这本书成为了事实上的语言规范，也被称为"K&R C"。全书不到 200 页，却定义了一门改变世界的语言。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1989 年</div>
+        <p>ANSI 发布了 C 语言标准，称为 <strong>C89</strong>（也叫 ANSI C）。主要增加了函数原型声明（借鉴了 C++）、<code>void</code> 指针、<code>const</code>/<code>volatile</code> 限定符等。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1999 年</div>
+        <p><strong>C99</strong> 标准发布，引入了 <code>long long</code>、<code>bool</code>（通过 <code>&lt;stdbool.h&gt;</code>）、变长数组（VLA）、指定初始化器、<code>//</code> 单行注释等现代特性。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2011 年</div>
+        <p><strong>C11</strong> 标准增加了多线程支持（<code>&lt;threads.h&gt;</code>）、原子操作（<code>&lt;stdatomic.h&gt;</code>）、匿名结构体/联合体、<code>_Static_assert</code> 等。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2017/2023 年</div>
+        <p><strong>C17</strong> 是一个小修订版。而 <strong>C23</strong> 标准（2023年发布）带来了 <code>constexpr</code>、<code>typeof</code>、改进的 <code>nullptr</code>（<code>nullptr</code>）以及更好的类型安全特性。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">💬</span>
+      <div class="callout-body">
+        <div class="callout-title">一个有趣的事实</div>
+        <p>C 语言的名字来源于字母表顺序——它是 B 语言的继任者，所以叫 C。而不是因为"在 A 和 B 之后"。事实上，B 之前确实有过一个叫 BCPL 的语言。如果 Ritchie 继续用字母表命名，下一门语言应该叫 D——后来确实有一门语言叫 D，但它和 C 没有直接关系。</p>
+      </div>
+    </div>
+
+    <h3>1.3 C 与 C++ 的血缘关系</h3>
+
+    <p>1983 年，Bjarne Stroustrup 在贝尔实验室开始开发"C with Classes"，后来更名为 C++。C++ 最初是 C 的超集，添加了类、继承、运算符重载等面向对象特性。但随着时间推移，两者各自发展，兼容性逐渐降低。今天的 C 和 C++ 更像是「兄弟」而非「父子」关系——它们共享很多语法，但理念和最佳实践已经大不相同。</p>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>C 和 C++ 就像一对从小一起长大的兄弟。小时候他们穿一样的衣服、说一样的话（语法兼容），但长大后一个成了极简主义者（C），一个成了全能主义者（C++）。C 信奉"少即是多"，C++ 追求"我全都要"。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 设计哲学 ==================== -->
+  <section id="philosophy">
+    <h2><span class="icon">🧠</span> 二、设计哲学</h2>
+
+    <p>C 语言的设计哲学可以用四句话来概括：</p>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4>信任程序员</h4>
+        <p>C 假设你知道自己在做什么。它不会阻止你进行危险的指针运算或直接操作内存。这份信任带来了极大的自由，也意味着更大的责任。</p>
+      </div>
+      <div class="grid-card">
+        <h4>保持简单</h4>
+        <p>语言核心极小——只有 32 个关键字（C89）。没有异常处理、没有类、没有泛型、没有垃圾回收。一切复杂性都留给程序员和库来实现。</p>
+      </div>
+      <div class="grid-card">
+        <h4>贴近硬件</h4>
+        <p>C 常被称为"可移植的汇编"。它的操作直接映射到机器指令，让程序员能精确控制内存布局和性能。</p>
+      </div>
+      <div class="grid-card">
+        <h4>最小化开销</h4>
+        <p>零成本原则：C 语言不会在运行时引入任何你看不到的开销。没有虚函数表、没有 RTTI、没有隐式构造/析构、没有垃圾回收。</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比：C 与 C++ 的哲学差异</div>
+      <p>如果 C 是一把瑞士军刀，C++ 就是一个装满电动工具的工具箱。C 给你最基础但最可靠的工具，相信你能做出正确的选择；C++ 则提供了大量的"安全网"和自动化机制，但也带来了复杂性。</p>
+      <p>C 的哲学是 <strong>"Trust the programmer"（信任程序员）</strong>；C++ 的哲学更接近 <strong>"Don't pay for what you don't use"（不要为不用的东西付费）</strong>——虽然 C++ 也继承了这一点，但它"用"的东西通常比 C 多得多。</p>
+    </div>
+  </section>
+
+  <!-- ==================== C 与 C++ 全面对比 ==================== -->
+  <section id="vs-cpp">
+    <h2><span class="icon">⚔️</span> 三、C 与 C++ 全面对比</h2>
+
+    <p>作为 C++ 开发者，理解两者的差异是你学习 C 的最快捷径。下表覆盖了主要的差异点：</p>
+
+    <table>
+      <tr><th style="width:20%">特性</th><th style="width:40%">C</th><th style="width:40%">C++</th></tr>
+      <tr>
+        <td><strong>编程范式</strong></td>
+        <td>纯过程式编程。没有类、对象、继承。</td>
+        <td>多范式：过程式 + 面向对象 + 泛型 + 函数式。</td>
+      </tr>
+      <tr>
+        <td><strong>类型系统</strong></td>
+        <td>较弱。隐式转换更多，<code>void*</code> 可隐式转换为任意指针。</td>
+        <td>较强。更严格的类型检查，<code>void*</code> 需显式转换。</td>
+      </tr>
+      <tr>
+        <td><strong>内存管理</strong></td>
+        <td><code>malloc</code>/<code>free</code>，手动管理。</td>
+        <td><code>new</code>/<code>delete</code>，加上 RAII、智能指针。</td>
+      </tr>
+      <tr>
+        <td><strong>字符串</strong></td>
+        <td>以 <code>'\0'</code> 结尾的字符数组（C-string）。</td>
+        <td><code>std::string</code> + C-string。</td>
+      </tr>
+      <tr>
+        <td><strong>输入/输出</strong></td>
+        <td><code>printf</code>/<code>scanf</code> 系列函数。</td>
+        <td><code>std::cin</code>/<code>std::cout</code> 流式 I/O + C 标准 I/O。</td>
+      </tr>
+      <tr>
+        <td><strong>命名空间</strong></td>
+        <td>无。全局作用域是平的。</td>
+        <td><code>namespace</code> 支持。</td>
+      </tr>
+      <tr>
+        <td><strong>异常处理</strong></td>
+        <td>无。通过返回值和 <code>errno</code> 传递错误。</td>
+        <td><code>try</code>/<code>catch</code>/<code>throw</code> 机制。</td>
+      </tr>
+      <tr>
+        <td><strong>函数重载</strong></td>
+        <td>不支持。每个函数名必须唯一。</td>
+        <td>支持同名不同参数的函数。</td>
+      </tr>
+      <tr>
+        <td><strong>泛型编程</strong></td>
+        <td>通过 <code>void*</code> + 函数指针，或宏（C11 起可用 <code>_Generic</code>）。</td>
+        <td><code>template</code> 模板系统。</td>
+      </tr>
+      <tr>
+        <td><strong>标准库规模</strong></td>
+        <td>极小，约 20+ 个标准头文件。</td>
+        <td>庞大，STL 容器、算法、并发库等。</td>
+      </tr>
+      <tr>
+        <td><strong>编译单位</strong></td>
+        <td><code>.c</code> 文件 + <code>.h</code> 头文件。</td>
+        <td><code>.cpp</code> 文件 + <code>.h/.hpp</code> 头文件 + 模块（C++20）。</td>
+      </tr>
+      <tr>
+        <td><strong>布尔类型</strong></td>
+        <td>C99 起通过 <code>&lt;stdbool.h&gt;</code> 提供 <code>bool</code>（本质是宏）。</td>
+        <td>内置 <code>bool</code> 类型。</td>
+      </tr>
+    </table>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">最大的思维转变</div>
+        <p>从 C++ 转向 C，最大的挑战不是语法差异，而是<strong>思维方式的转变</strong>。你需要放弃"对象"思维，转向"数据 + 函数"的过程式思维。没有类来封装数据和行为，你需要通过结构体 + 独立函数来组织代码。这不是"退步"，而是一种不同的抽象方式。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 数据类型与变量 ==================== -->
+  <section id="basics">
+    <h2><span class="icon">🧱</span> 四、数据类型与变量</h2>
+
+    <h3>4.1 基本数据类型</h3>
+
+    <p>C 语言的基本数据类型比 C++ 少了一些"花样"，但更贴近硬件的本质。</p>
+
+    <table>
+      <tr><th>类型</th><th>说明</th><th>典型大小 (64位)</th><th>与 C++ 的差异</th></tr>
+      <tr><td><code>char</code></td><td>字符型（也是最小整数）</td><td>1 字节</td><td>相同</td></tr>
+      <tr><td><code>int</code></td><td>整型</td><td>4 字节</td><td>相同</td></tr>
+      <tr><td><code>short</code></td><td>短整型</td><td>2 字节</td><td>相同</td></tr>
+      <tr><td><code>long</code></td><td>长整型</td><td>4 字节(Windows) / 8 字节(Linux)</td><td>相同</td></tr>
+      <tr><td><code>long long</code></td><td>超长整型 (C99)</td><td>8 字节</td><td>相同</td></tr>
+      <tr><td><code>float</code></td><td>单精度浮点</td><td>4 字节</td><td>相同</td></tr>
+      <tr><td><code>double</code></td><td>双精度浮点</td><td>8 字节</td><td>相同</td></tr>
+      <tr><td><code>void</code></td><td>无类型</td><td>—</td><td>相同</td></tr>
+      <tr><td><code>_Bool</code></td><td>布尔 (C99)</td><td>1 字节</td><td>C++ 是内置 <code>bool</code></td></tr>
+      <tr><td><code>_Complex</code></td><td>复数 (C99)</td><td>取决于基类型</td><td>C++ 无内置</td></tr>
+    </table>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">C++ 开发者注意</div>
+        <p>在 C 中使用 <code>bool</code> 需要 <code>#include &lt;stdbool.h&gt;</code>（C99 起）。C23 起 <code>bool</code> 成为关键字，不再需要头文件。C 中没有 <code>wchar_t</code> 作为内置类型（它是 <code>&lt;stddef.h&gt;</code> 中的 typedef）。</p>
+      </div>
+    </div>
+
+    <h3>4.2 类型限定符</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="kw">const</span> <span class="type">int</span> MAX = 100;
+<span class="kw">volatile</span> <span class="type">int</span> *port;
+<span class="kw">restrict</span> <span class="type">int</span> *ptr;  <span class="cm">// C99 新增</span>
+<span class="cm">// restrict 告诉编译器：这个指针</span>
+<span class="cm">// 是访问该内存的唯一方式，</span>
+<span class="cm">// 允许更激进的优化</span></code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="kw">const</span> <span class="type">int</span> MAX = 100;
+<span class="kw">volatile</span> <span class="type">int</span> *port;
+<span class="cm">// 无 restrict 关键字</span>
+<span class="cm">// C++20 起有 [[no_unique_address]]</span>
+<span class="cm">// 等属性标注，但无直接等价物</span>
+<span class="cm">// </span></code></pre>
+      </div>
+    </div>
+
+    <h3>4.3 类型定义与别名</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="cm">// typedef 是唯一方式</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> Point {
+    <span class="type">int</span> x;
+    <span class="type">int</span> y;
+} Point;
+
+<span class="cm">// 使用时需要 typedef</span>
+<span class="cm">// 或者直接写 struct Point</span>
+Point p = {1, 2};
+<span class="kw">struct</span> Point q = {3, 4};</code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="cm">// typedef 或 using</span>
+<span class="kw">struct</span> Point {
+    <span class="type">int</span> x;
+    <span class="type">int</span> y;
+};
+<span class="kw">using</span> Point2D = Point; <span class="cm">// C++11</span>
+
+<span class="cm">// C++ 中 struct 名可直接使用</span>
+<span class="cm">// 无需 typedef 或 struct 前缀</span>
+Point p = {1, 2};
+Point2D q = {3, 4};</code></pre>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>在 C 中，<code>struct</code> 标签名和 <code>typedef</code> 名生活在两个不同的"世界"。写 <code>struct Point p;</code> 和 <code>Point p;</code> 是不同的——前者引用结构体标签，后者引用 typedef 别名。这就像同一个人有"身份证号"和"昵称"两个身份。C++ 把它们统一了，但 C 坚持这种分离，因为它更符合 C 的编译模型。</p>
+    </div>
+
+    <h3>4.4 枚举</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="kw">enum</span> Color { RED, GREEN, BLUE };
+
+<span class="kw">enum</span> Color c = RED;
+<span class="type">int</span> n = c;    <span class="cm">// 隐式转换为 int</span>
+
+<span class="cm">// C23 起可用 enum class 类似语法</span>
+<span class="cm">// 之前只有普通 enum</span>
+<span class="cm">// 枚举值泄漏到外层作用域</span></code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="kw">enum class</span> Color { RED, GREEN, BLUE };
+
+Color c = Color::RED;
+<span class="type">int</span> n = <span class="kw">static_cast</span>&lt;<span class="type">int</span>&gt;(c); <span class="cm">// 需显式</span>
+
+<span class="cm">// C++11 起推荐 enum class</span>
+<span class="cm">// 枚举值不泄漏，有作用域保护</span>
+<span class="cm">// 可指定底层类型</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 运算符 ==================== -->
+  <section id="operators">
+    <h2><span class="icon">⚡</span> 五、运算符与表达式</h2>
+
+    <p>C 和 C++ 共享大部分运算符，但有一些细微但重要的差异。</p>
+
+    <h3>5.1 运算符对照</h3>
+
+    <table>
+      <tr><th>类别</th><th>运算符</th><th>C 与 C++ 差异</th></tr>
+      <tr><td>算术</td><td><code>+ - * / % ++ --</code></td><td>完全相同</td></tr>
+      <tr><td>关系</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td><td>完全相同</td></tr>
+      <tr><td>逻辑</td><td><code>&& || !</code></td><td>完全相同</td></tr>
+      <tr><td>位运算</td><td><code>& | ^ ~ &lt;&lt; &gt;&gt;</code></td><td>完全相同</td></tr>
+      <tr><td>赋值</td><td><code>= += -= *= /= %= 等</code></td><td>完全相同</td></tr>
+      <tr><td>条件</td><td><code>? :</code></td><td>C++ 中结果可以是左值，C 中总是右值</td></tr>
+      <tr><td>逗号</td><td><code>,</code></td><td>完全相同</td></tr>
+      <tr><td>sizeof</td><td><code>sizeof</code></td><td>相同，但 C 中 <code>sizeof(char)</code> 保证为 1</td></tr>
+      <tr><td>类型转换</td><td><code>(type)expr</code></td><td>C 只有 C 风格转换；C++ 额外有 <code>static_cast</code> 等</td></tr>
+    </table>
+
+    <h3>5.2 C 语言独有的运算符特性</h3>
+
+    <div class="card">
+      <h4>复合字面量 (Compound Literals, C99)</h4>
+      <p>这是 C99 引入的一个强大特性，允许在表达式中直接创建匿名结构体或数组：</p>
+<pre><code><span class="cm">// 匿名结构体</span>
+Point p = (Point){.<span class="fn">x</span> = 1, .<span class="fn">y</span> = 2};
+
+<span class="cm">// 匿名数组</span>
+<span class="type">int</span> *arr = (<span class="type">int</span>[]){1, 2, 3, 4, 5};
+
+<span class="cm">// 作为函数参数</span>
+<span class="fn">draw_rect</span>((Rect){.<span class="fn">x</span>=0, .<span class="fn">y</span>=0, .<span class="fn">w</span>=100, .<span class="fn">h</span>=50});
+
+<span class="cm">// 指定初始化器 (Designated Initializers)</span>
+<span class="type">int</span> sparse[100] = {[0]=1, [50]=2, [99]=3}; <span class="cm">// 其余为0</span></code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">指定初始化器 — C 的杀手级特性</div>
+        <p>指定初始化器（<code>.field = value</code>）是 C99 的一大亮点。在 C++ 中，你通常需要用构造函数或花括号初始化列表按顺序赋值。C 允许你按名称指定，这在初始化大型结构体时非常实用——类似于其他语言中的命名参数。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 控制流 ==================== -->
+  <section id="control">
+    <h2><span class="icon">🔀</span> 六、控制流</h2>
+
+    <p>C 的控制流语句与 C++ 基本一致，但有一个重要的历史差异和一些独有特性。</p>
+
+    <h3>6.1 基本控制流（与 C++ 相同）</h3>
+
+<pre><code><span class="cm">// if-else</span>
+<span class="kw">if</span> (x &gt; 0) {
+    <span class="fn">printf</span>(<span class="str">"positive\n"</span>);
+} <span class="kw">else if</span> (x == 0) {
+    <span class="fn">printf</span>(<span class="str">"zero\n"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">printf</span>(<span class="str">"negative\n"</span>);
+}
+
+<span class="cm">// for, while, do-while 与 C++ 完全相同</span>
+<span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; n; i++) { <span class="cm">/* ... */</span> }
+
+<span class="cm">// switch</span>
+<span class="kw">switch</span> (cmd) {
+    <span class="kw">case</span> <span class="num">1</span>: <span class="fn">handle_one</span>(); <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="num">2</span>: <span class="fn">handle_two</span>(); <span class="kw">break</span>;
+    <span class="kw">default</span>: <span class="fn">handle_default</span>(); <span class="kw">break</span>;
+}</code></pre>
+
+    <h3>6.2 关键差异：变量声明位置</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C89/C90</span>
+<pre><code><span class="cm">/* C89: 变量必须在块的开头声明 */</span>
+<span class="type">int</span> i;
+<span class="type">int</span> sum = 0;
+<span class="kw">for</span> (i = 0; i &lt; 10; i++) {
+    sum += i;
+}
+<span class="cm">/* for 循环的初始化中不能声明变量 */</span></code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++ / C99 起</span>
+<pre><code><span class="cm">// C99+: 变量可在任意位置声明</span>
+<span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; 10; i++) {
+    <span class="type">int</span> temp = compute(i);
+    sum += temp;
+}
+<span class="cm">// C99 修复了这个限制</span></code></pre>
+      </div>
+    </div>
+
+    <h3>6.3 C 没有 range-for 和迭代器</h3>
+
+    <p>这是从 C++ 转过来时最容易"怀念"的特性之一。C 中没有 <code>for (auto& x : container)</code>，你只能用下标或指针遍历。</p>
+
+<pre><code><span class="cm">// C++ 的 range-for</span>
+<span class="cm">// for (auto& item : items) { ... }</span>
+
+<span class="cm">// C 中的等价做法</span>
+<span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; count; i++) {
+    Item *item = &amp;items[i];
+    <span class="cm">// 使用 item</span>
+}
+
+<span class="cm">// 或用指针遍历数组</span>
+<span class="kw">for</span> (Item *p = items; p &lt; items + count; p++) {
+    <span class="cm">// 使用 p</span>
+}</code></pre>
+
+    <h3>6.4 goto — C 世界的"必要之恶"</h3>
+
+    <p>C 中 <code>goto</code> 虽然不推荐使用，但在某些场景（如错误处理的统一出口、跳出多层嵌套循环）被广泛接受：</p>
+
+<pre><code><span class="type">int</span> <span class="fn">process_file</span>(<span class="kw">const</span> <span class="type">char</span> *path) {
+    <span class="type">FILE</span> *f = <span class="fn">fopen</span>(path, <span class="str">"r"</span>);
+    <span class="kw">if</span> (!f) <span class="kw">goto</span> err_open;
+
+    <span class="type">char</span> *buf = <span class="fn">malloc</span>(BUFSIZE);
+    <span class="kw">if</span> (!buf) <span class="kw">goto</span> err_buf;
+
+    <span class="cm">// ... 处理逻辑 ...</span>
+    <span class="kw">if</span> (error_occurred) <span class="kw">goto</span> err;
+
+    <span class="fn">free</span>(buf);
+    <span class="fn">fclose</span>(f);
+    <span class="kw">return</span> 0;
+
+err:
+    <span class="fn">free</span>(buf);
+err_buf:
+    <span class="fn">fclose</span>(f);
+err_open:
+    <span class="kw">return</span> -1;
+}</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>在 C++ 中，你使用 RAII 和异常处理来管理资源清理——构造时获取资源，析构时释放。C 没有这些机制，<code>goto</code> 的统一错误出口模式就是 C 世界的"穷人版 RAII"。它虽然不够优雅，但在 C 的约束下是最实用的做法。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 函数 ==================== -->
+  <section id="functions">
+    <h2><span class="icon">🔧</span> 七、函数</h2>
+
+    <h3>7.1 函数基础</h3>
+
+<pre><code><span class="cm">// 函数声明（原型）— C 中建议始终提供</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b);
+
+<span class="cm">// 函数定义</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+    <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// 无返回值</span>
+<span class="type">void</span> <span class="fn">greet</span>(<span class="kw">const</span> <span class="type">char</span> *name) {
+    <span class="fn">printf</span>(<span class="str">"Hello, %s!\n"</span>, name);
+}</code></pre>
+
+    <div class="callout callout-danger">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">C 中的空参数列表陷阱</div>
+        <p>在 C 中，<code>void foo()</code> 表示函数不接受参数，但 <code>void foo()</code>（没有 <code>void</code>）在 C89 中表示"参数未指定"——你可以传任何参数！只有 <code>void foo(void)</code> 才明确表示"不接受参数"。C23 修复了这个问题，<code>()</code> 现在等价于 <code>(void)</code>。但在旧代码中，一定要写 <code>void foo(void)</code>。</p>
+      </div>
+    </div>
+
+    <h3>7.2 C vs C++：函数差异全景</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="cm">// ❌ 无函数重载</span>
+<span class="type">int</span> <span class="fn">abs_int</span>(<span class="type">int</span> x);
+<span class="type">double</span> <span class="fn">abs_double</span>(<span class="type">double</span> x);
+<span class="cm">// 必须用不同名字</span>
+
+<span class="cm">// ❌ 无默认参数</span>
+<span class="type">void</span> <span class="fn">log</span>(<span class="kw">const</span> <span class="type">char</span> *msg,
+          <span class="type">int</span> level); <span class="cm">// level 必须有值</span>
+
+<span class="cm">// ❌ 无引用参数</span>
+<span class="type">void</span> <span class="fn">swap</span>(<span class="type">int</span> *a, <span class="type">int</span> *b) {
+    <span class="type">int</span> t = *a;
+    *a = *b;
+    *b = t;
+}
+
+<span class="cm">// ❌ 无内联保证</span>
+<span class="kw">static inline</span> <span class="type">int</span> <span class="fn">square</span>(<span class="type">int</span> x) {
+    <span class="kw">return</span> x * x; <span class="cm">// 只是建议</span>
+}
+
+<span class="cm">// ✅ 函数指针是核心模式</span>
+<span class="kw">typedef</span> <span class="type">int</span> (*CompareFn)(<span class="kw">const</span> <span class="type">void</span>*,
+                         <span class="kw">const</span> <span class="type">void</span>*);
+<span class="fn">qsort</span>(arr, n, <span class="kw">sizeof</span>(<span class="type">int</span>), cmp_fn);</code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="cm">// ✅ 函数重载</span>
+<span class="type">int</span> <span class="fn">abs</span>(<span class="type">int</span> x);
+<span class="type">double</span> <span class="fn">abs</span>(<span class="type">double</span> x);
+<span class="cm">// 同名即可</span>
+
+<span class="cm">// ✅ 默认参数</span>
+<span class="type">void</span> <span class="fn">log</span>(<span class="kw">const</span> <span class="type">string</span>&amp; msg,
+          <span class="type">int</span> level = 0);
+
+<span class="cm">// ✅ 引用参数</span>
+<span class="type">void</span> <span class="fn">swap</span>(<span class="type">int</span>&amp; a, <span class="type">int</span>&amp; b) {
+    <span class="fn">std::swap</span>(a, b);
+}
+
+<span class="cm">// ✅ inline + constexpr</span>
+<span class="kw">constexpr</span> <span class="type">int</span> <span class="fn">square</span>(<span class="type">int</span> x) {
+    <span class="kw">return</span> x * x;
+}
+
+<span class="cm">// ✅ Lambda + std::function</span>
+<span class="fn">std::sort</span>(arr, arr+n,
+    [](<span class="type">int</span> a, <span class="type">int</span> b){ <span class="kw">return</span> a&lt;b; });</code></pre>
+      </div>
+    </div>
+
+    <h3>7.3 可变参数函数 (Variadic Functions)</h3>
+
+    <p>C 语言原生支持可变参数函数（C++ 也继承了这个能力），这是 <code>printf</code> 系列函数能接受任意数量参数的原理：</p>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stdarg.h&gt;</span>
+
+<span class="type">double</span> <span class="fn">average</span>(<span class="type">int</span> count, ...) {
+    va_list args;
+    <span class="fn">va_start</span>(args, count);
+
+    <span class="type">double</span> sum = 0;
+    <span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; count; i++) {
+        sum += <span class="fn">va_arg</span>(args, <span class="type">double</span>);
+    }
+
+    <span class="fn">va_end</span>(args);
+    <span class="kw">return</span> sum / count;
+}
+
+<span class="cm">// 调用</span>
+<span class="type">double</span> avg = <span class="fn">average</span>(3, 1.0, 2.0, 3.0); <span class="cm">// 2.0</span></code></pre>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">可变参数是不安全的</div>
+        <p>可变参数函数完全没有类型检查。如果你传了 <code>int</code> 但用 <code>va_arg(args, double)</code> 读取，会产生未定义行为。C++ 提供了参数包（parameter pack）作为类型安全的替代方案。在 C 中，约定俗成是通过第一个参数（如 <code>printf</code> 的格式字符串）来指明后续参数的类型和数量。</p>
+      </div>
+    </div>
+
+    <h3>7.4 静态函数与内部链接</h3>
+
+<pre><code><span class="cm">// 文件内部可见（内部链接）</span>
+<span class="kw">static</span> <span class="type">void</span> <span class="fn">helper_function</span>(<span class="type">void</span>) {
+    <span class="cm">// 只在本 .c 文件中可见</span>
+    <span class="cm">// 类似于 C++ 的匿名命名空间</span>
+}
+
+<span class="cm">// 外部可见（外部链接）</span>
+<span class="type">void</span> <span class="fn">public_function</span>(<span class="type">void</span>) {
+    <span class="fn">helper_function</span>(); <span class="cm">// 可以调用</span>
+}</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>C 的 <code>static</code> 函数等价于 C++ 的匿名命名空间（<code>namespace { }</code>）。它们都实现了"文件级私有"的概念——就像你在家里说的话只有家人能听到，而 <code>public</code> 函数则像在广场上演讲。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 数组与字符串 ==================== -->
+  <section id="arrays">
+    <h2><span class="icon">📦</span> 八、数组与字符串</h2>
+
+    <h3>8.1 数组基础</h3>
+
+<pre><code><span class="cm">// 固定大小数组</span>
+<span class="type">int</span> arr[5] = {1, 2, 3, 4, 5};
+<span class="type">int</span> partial[10] = {1, 2, 3}; <span class="cm">// 其余自动为 0</span>
+
+<span class="cm">// C99 变长数组 (VLA)</span>
+<span class="type">int</span> n = <span class="fn">get_size</span>();
+<span class="type">int</span> vla[n]; <span class="cm">// 大小在运行时确定</span>
+<span class="cm">// 注意：VLA 在 C11 中变为可选特性，有些编译器不支持</span>
+
+<span class="cm">// C99 指定初始化器</span>
+<span class="type">int</span> sparse[100] = {[0] = 1, [50] = 2, [99] = 3};
+
+<span class="cm">// 多维数组</span>
+<span class="type">int</span> matrix[3][4] = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12}
+};</code></pre>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">💬</span>
+      <div class="callout-body">
+        <div class="callout-title">数组退化为指针</div>
+        <p>在 C（和 C++）中，数组名在大多数表达式中会"退化"为指向首元素的指针。这意味着 <code>sizeof(arr)</code> 只在数组声明所在的作用域内有效，一旦传给函数，就丢失了大小信息。这就是为什么 C 函数通常需要同时传递数组指针和长度。</p>
+      </div>
+    </div>
+
+    <h3>8.2 字符串 — C 的"永恒话题"</h3>
+
+    <p>C 没有 <code>std::string</code> 类。字符串就是 <strong>以 <code>'\0'</code>（空字符）结尾的字符数组</strong>。这看似简单，却是无数 bug 的根源。</p>
+
+<pre><code><span class="cm">// 字符串字面量（只读）</span>
+<span class="kw">const</span> <span class="type">char</span> *str1 = <span class="str">"Hello"</span>;       <span class="cm">// 指针指向只读区</span>
+<span class="type">char</span> str2[] = <span class="str">"Hello"</span>;              <span class="cm">// 栈上的可修改副本</span>
+<span class="type">char</span> str3[10] = <span class="str">"Hello"</span>;            <span class="cm">// 预留 10 字节</span>
+
+<span class="cm">// str1[0] = 'h';  // ❌ 未定义行为！修改只读区</span>
+str2[0] = <span class="str">'h'</span>;     <span class="cm">// ✅ 可以修改</span></code></pre>
+
+    <h4>常用字符串函数 <code>&lt;string.h&gt;</code></h4>
+    <table>
+      <tr><th>函数</th><th>功能</th><th>注意事项</th></tr>
+      <tr><td><code>strlen(s)</code></td><td>字符串长度</td><td>不包含 <code>'\0'</code>，O(n) 遍历</td></tr>
+      <tr><td><code>strcpy(dst, src)</code></td><td>复制字符串</td><td><span class="tag tag-red">不安全</span> 无边界检查</td></tr>
+      <tr><td><code>strncpy(dst, src, n)</code></td><td>复制最多 n 字节</td><td>可能不加 <code>'\0'</code>！</td></tr>
+      <tr><td><code>strcat(dst, src)</code></td><td>追加字符串</td><td><span class="tag tag-red">不安全</span> 可能溢出</td></tr>
+      <tr><td><code>strncat(dst, src, n)</code></td><td>追加最多 n 字节</td><td>比 strcat 安全</td></tr>
+      <tr><td><code>strcmp(a, b)</code></td><td>比较字符串</td><td>返回 0 表示相等</td></tr>
+      <tr><td><code>strncmp(a, b, n)</code></td><td>比较前 n 字节</td><td>—</td></tr>
+      <tr><td><code>strchr(s, c)</code></td><td>查找字符</td><td>返回指针或 NULL</td></tr>
+      <tr><td><code>strstr(hay, needle)</code></td><td>查找子串</td><td>返回指针或 NULL</td></tr>
+      <tr><td><code>strdup(s)</code></td><td>复制并分配内存</td><td>POSIX 标准，需用 <code>free</code> 释放</td></tr>
+      <tr><td><code>strtok(s, delim)</code></td><td>分割字符串</td><td>有状态，非线程安全</td></tr>
+      <tr><td><code>snprintf(buf,n,fmt,...)</code></td><td>格式化输出到字符串</td><td><span class="tag tag-green">推荐</span> 替代 sprintf</td></tr>
+    </table>
+
+    <div class="callout callout-danger">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">缓冲区溢出 — C 字符串的头号杀手</div>
+        <p><code>strcpy</code>、<code>strcat</code>、<code>sprintf</code> 是缓冲区溢出漏洞的主要来源。现代 C 编程应优先使用带长度限制的安全版本：<code>strncpy</code>（需注意补 <code>'\0'</code>）、<code>strncat</code>、<code>snprintf</code>。许多项目（如 Linux 内核）还使用自定义的安全字符串库。</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>C 字符串就像一条没有护栏的公路——它给你最大的速度（性能），但也意味着一旦"越界"就会出严重事故。<code>std::string</code> 则像一条有护栏和限速的高速公路——稍慢一点，但安全得多。在 C 中，你必须自己当那个"护栏"。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 指针 ==================== -->
+  <section id="pointers">
+    <h2><span class="icon">🎯</span> 九、指针 — C 的灵魂</h2>
+
+    <p>指针是 C 语言的核心和灵魂，也是让很多初学者望而生畏的部分。作为 C++ 开发者，你已经熟悉了指针的基本概念，但 C 中指针的使用方式和场景有一些独特之处。</p>
+
+    <h3>9.1 指针基础回顾</h3>
+
+<pre><code><span class="type">int</span> x = 42;
+<span class="type">int</span> *p = &amp;x;        <span class="cm">// p 指向 x</span>
+<span class="type">int</span> val = *p;        <span class="cm">// val = 42（解引用）</span>
+
+<span class="type">int</span> arr[] = {10, 20, 30};
+<span class="type">int</span> *q = arr;        <span class="cm">// 数组名退化为指针</span>
+<span class="type">int</span> second = *(q+1); <span class="cm">// 20（指针算术）</span>
+<span class="type">int</span> third = q[2];    <span class="cm">// 30（下标等价于指针算术）</span></code></pre>
+
+    <h3>9.2 C 语言中指针的独特点</h3>
+
+    <div class="card">
+      <h4>1. <code>void*</code> 的隐式转换</h4>
+<pre><code><span class="cm">// C: void* 可以隐式转换为任何指针类型</span>
+<span class="type">void</span> *generic = <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">int</span>) * 10);
+<span class="type">int</span> *arr = generic;       <span class="cm">// ✅ C 允许隐式转换</span>
+
+<span class="cm">// C++: 需要显式转换</span>
+<span class="cm">// int* arr = static_cast&lt;int*&gt;(generic);  // C++ 必须</span>
+<span class="cm">// int* arr = (int*)generic;                // C 风格转换</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h4>2. 函数指针 — C 的"多态"机制</h4>
+      <p>没有虚函数的 C 世界，函数指针是实现"运行时多态"的主要手段：</p>
+<pre><code><span class="cm">// 定义函数指针类型</span>
+<span class="kw">typedef</span> <span class="type">void</span> (*EventHandler)(<span class="type">int</span> event_id, <span class="type">void</span> *data);
+
+<span class="cm">// 结构体 + 函数指针 = "面向对象"的雏形</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">const</span> <span class="type">char</span> *name;
+    <span class="type">void</span> (*<span class="fn">draw</span>)(<span class="type">void</span> *self);
+    <span class="type">void</span> (*<span class="fn">destroy</span>)(<span class="type">void</span> *self);
+} Shape;
+
+<span class="type">void</span> <span class="fn">circle_draw</span>(<span class="type">void</span> *self) {
+    <span class="fn">printf</span>(<span class="str">"Drawing a circle\n"</span>);
+}
+
+<span class="type">void</span> <span class="fn">render</span>(Shape *shape) {
+    shape-&gt;<span class="fn">draw</span>(shape); <span class="cm">// 类似 C++ 的 obj->draw()</span>
+}</code></pre>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比：函数指针 vs 虚函数</div>
+      <p>C 的结构体 + 函数指针 = C++ 的类 + 虚函数。Linux 内核中到处都是这种模式：一个结构体里包含数据字段和一堆函数指针，这些函数指针充当"方法"。VFS（虚拟文件系统）层就是一个经典的例子——不同的文件系统通过填充同一组函数指针来实现统一接口。这就是 C 版的"接口/抽象类"。</p>
+    </div>
+
+    <div class="card">
+      <h4>3. 指针与数组的等价性</h4>
+<pre><code><span class="type">int</span> arr[] = {1, 2, 3, 4, 5};
+<span class="type">int</span> *p = arr;
+
+<span class="cm">// 以下完全等价</span>
+arr[2]      <span class="cm">// 下标语法</span>
+*(arr + 2)  <span class="cm">// 指针解引用</span>
+*(p + 2)    <span class="cm">// 用指针变量</span>
+2[arr]      <span class="cm">// 合法！因为 arr[2] 等价于 *(arr+2) 等价于 *(2+arr) 等价于 2[arr]</span>
+
+<span class="cm">// 指针算术</span>
+p++;        <span class="cm">// p 现在指向 arr[1]</span>
+p += 3;     <span class="cm">// p 现在指向 arr[4]</span>
+ptrdiff_t d = &amp;arr[3] - &amp;arr[1]; <span class="cm">// d = 2</span></code></pre>
+    </div>
+
+    <h3>9.3 指针的复杂声明解读</h3>
+
+    <p>C 的指针声明语法可以非常晦涩。掌握"从右向左读"的技巧很重要：</p>
+
+    <table>
+      <tr><th>声明</th><th>解读</th></tr>
+      <tr><td><code>int *p</code></td><td>p 是一个指向 int 的指针</td></tr>
+      <tr><td><code>int **p</code></td><td>p 是一个指向（指向 int 的指针）的指针</td></tr>
+      <tr><td><code>int (*p)[10]</code></td><td>p 是一个指向（含 10 个 int 的数组）的指针</td></tr>
+      <tr><td><code>int *p[10]</code></td><td>p 是一个含 10 个（指向 int 的指针）的数组</td></tr>
+      <tr><td><code>int (*fn)(int, int)</code></td><td>fn 是一个指向函数 <code>(int, int) → int</code> 的指针</td></tr>
+      <tr><td><code>int (*(*fn)(int))(double)</code></td><td>fn 是一个指向函数的指针，该函数接受 int，返回一个指向函数 <code>(double) → int</code> 的指针</td></tr>
+      <tr><td><code>const int *p</code></td><td>p 指向一个 const int（值不可变）</td></tr>
+      <tr><td><code>int * const p</code></td><td>p 是一个 const 指针（指针本身不可变）</td></tr>
+      <tr><td><code>const int * const p</code></td><td>指针和所指的值都不可变</td></tr>
+    </table>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">阅读技巧：从变量名开始，从右向左读</div>
+        <p><code>int (*p)[10]</code>：从 <code>p</code> 开始 → "p 是一个..."→ 向右看是 <code>)</code>，向左看是 <code>*</code> → "指针" → 向右跳过 <code>)</code> → "指向" → 看到 <code>[10]</code> → "含 10 个元素的数组" → 最后是 <code>int</code>。合起来：p 是一个指向含 10 个 int 的数组的指针。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 内存管理 ==================== -->
+  <section id="memory">
+    <h2><span class="icon">💾</span> 十、内存管理</h2>
+
+    <p>内存管理是 C 语言最核心也最危险的部分。没有 RAII，没有智能指针，没有垃圾回收——一切都是你手动控制。</p>
+
+    <h3>10.1 内存分配函数</h3>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="cm">// 分配</span>
+<span class="type">int</span> *arr = <span class="fn">malloc</span>(10 * <span class="kw">sizeof</span>(<span class="type">int</span>));
+<span class="type">int</span> *zeros = <span class="fn">calloc</span>(10, <span class="kw">sizeof</span>(<span class="type">int</span>));
+<span class="cm">// calloc 会将内存初始化为 0</span>
+
+<span class="cm">// 重新分配</span>
+arr = <span class="fn">realloc</span>(arr, 20 * <span class="kw">sizeof</span>(<span class="type">int</span>));
+
+<span class="cm">// 释放</span>
+<span class="fn">free</span>(arr);
+<span class="fn">free</span>(zeros);
+
+<span class="cm">// C11: aligned_alloc</span>
+<span class="type">void</span> *p = <span class="fn">aligned_alloc</span>(64, 256);
+<span class="cm">// 分配 256 字节，64 字节对齐</span></code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="pp">#include</span> <span class="str">&lt;memory&gt;</span>
+
+<span class="cm">// 分配</span>
+<span class="type">int</span> *arr = <span class="kw">new</span> <span class="type">int</span>[10];
+<span class="cm">// 无 calloc 等价物</span>
+
+<span class="cm">// 重新分配：不推荐，通常 new + copy</span>
+<span class="cm">// 或使用 std::vector 自动管理</span>
+
+<span class="cm">// 释放</span>
+<span class="kw">delete</span>[] arr;
+
+<span class="cm">// 推荐：智能指针</span>
+<span class="kw">auto</span> ptr = <span class="fn">std::make_unique</span>&lt;<span class="type">int</span>[]&gt;(10);
+<span class="cm">// 自动释放，无需手动管理</span></code></pre>
+      </div>
+    </div>
+
+    <h3>10.2 常见内存错误</h3>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4 style="color:var(--accent3)">内存泄漏</h4>
+<pre><code><span class="type">void</span> <span class="fn">leak</span>(<span class="type">void</span>) {
+    <span class="type">char</span> *buf = <span class="fn">malloc</span>(1024);
+    <span class="kw">if</span> (error) <span class="kw">return</span>;
+    <span class="cm">// ❌ 忘记 free!</span>
+    <span class="fn">free</span>(buf);
+}</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent3)">野指针 / Use-after-free</h4>
+<pre><code><span class="fn">free</span>(ptr);
+<span class="cm">// ptr 现在是野指针</span>
+*ptr = 42; <span class="cm">// ❌ 未定义行为</span>
+
+<span class="cm">// 好习惯：free 后置 NULL</span>
+<span class="fn">free</span>(ptr);
+ptr = <span class="kw">NULL</span>;</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent3)">双重释放</h4>
+<pre><code><span class="fn">free</span>(ptr);
+<span class="cm">// ...</span>
+<span class="fn">free</span>(ptr); <span class="cm">// ❌ 未定义行为</span>
+
+<span class="cm">// 置 NULL 后 free 是安全的</span>
+ptr = <span class="kw">NULL</span>;
+<span class="fn">free</span>(ptr); <span class="cm">// ✅ free(NULL) 是 no-op</span></code></pre>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent3)">缓冲区溢出</h4>
+<pre><code><span class="type">char</span> *buf = <span class="fn">malloc</span>(10);
+<span class="fn">strcpy</span>(buf, <span class="str">"Hello World!"</span>);
+<span class="cm">// ❌ 写入 13 字节到 10 字节空间</span>
+<span class="cm">// 覆盖相邻内存！</span></code></pre>
+      </div>
+    </div>
+
+    <h3>10.3 内存布局</h3>
+
+<pre><code>┌──────────────────────┐ 高地址
+│    栈 (Stack)         │ ← 局部变量、函数参数
+│         ↓             │    自动分配/释放
+├──────────────────────┤
+│                       │
+│    (空闲区)           │ ← malloc 分配的空间在这里
+│                       │
+├──────────────────────┤
+│         ↑             │
+│    堆 (Heap)          │ ← malloc/calloc/realloc
+│                       │    手动管理
+├──────────────────────┤
+│    BSS 段             │ ← 未初始化的全局/静态变量（自动清零）
+├──────────────────────┤
+│    数据段             │ ← 已初始化的全局/静态变量
+├──────────────────────┤
+│    代码段 (Text)      │ ← 机器指令（只读）
+└──────────────────────┘ 低地址</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>内存布局就像一栋大楼：代码段是底层的机房（只读、不可修改），数据段是一楼的固定储物柜（全局变量），BSS 是空的储物柜（自动清零），堆是中间的开放式办公区（可以自由租退——malloc/free），栈是顶楼的会议室（用完就自动回收）。C++ 的栈上对象会在离开作用域时自动析构，但 C 的栈上只有基本类型和数组，没有析构函数。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 结构体与联合体 ==================== -->
+  <section id="struct">
+    <h2><span class="icon">🏗️</span> 十一、结构体与联合体</h2>
+
+    <h3>11.1 结构体 (struct)</h3>
+
+    <p>结构体是 C 中组织数据的基本方式，也是 C 世界里最接近"类"的概念。</p>
+
+    <div class="card-compare">
+      <div class="col col-c">
+        <span class="col-label c">C 语言</span>
+<pre><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">char</span> name[64];
+    <span class="type">int</span> age;
+    <span class="type">float</span> salary;
+} Employee;
+
+<span class="cm">// 创建和初始化</span>
+Employee emp = {
+    .name = <span class="str">"Alice"</span>,
+    .age = 30,
+    .salary = 50000.0f
+};
+
+<span class="cm">// 访问成员</span>
+<span class="fn">printf</span>(<span class="str">"%s, %d\n"</span>, emp.name, emp.age);
+
+<span class="cm">// 指针访问</span>
+Employee *ptr = &amp;emp;
+ptr-&gt;age = 31;
+
+<span class="cm">// 结构体赋值（浅拷贝）</span>
+Employee emp2 = emp;</code></pre>
+      </div>
+      <div class="col col-cpp">
+        <span class="col-label cpp">C++</span>
+<pre><code><span class="kw">class</span> Employee {
+<span class="kw">public</span>:
+    <span class="type">std::string</span> name;
+    <span class="type">int</span> age;
+    <span class="type">float</span> salary;
+
+    <span class="cm">// 可以有构造函数、方法、</span>
+    <span class="cm">// 访问控制、继承...</span>
+    Employee(<span class="type">string</span> n, <span class="type">int</span> a, <span class="type">float</span> s)
+        : name(n), age(a), salary(s) {}
+
+    <span class="type">void</span> <span class="fn">introduce</span>() {
+        <span class="fn">cout</span> &lt;&lt; name &lt;&lt; <span class="str">", "</span> &lt;&lt; age;
+    }
+};</code></pre>
+      </div>
+    </div>
+
+    <h3>11.2 结构体的高级用法</h3>
+
+    <div class="card">
+      <h4>位域 (Bit Fields)</h4>
+      <p>精确控制每个字段占用的位数，常用于硬件编程和协议解析：</p>
+<pre><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">unsigned</span> <span class="type">int</span> type    : 3;  <span class="cm">// 3 bits</span>
+    <span class="type">unsigned</span> <span class="type">int</span> flags   : 5;  <span class="cm">// 5 bits</span>
+    <span class="type">unsigned</span> <span class="type">int</span> length  : 8;  <span class="cm">// 8 bits</span>
+} PacketHeader;  <span class="cm">// 总共 16 bits = 2 bytes</span>
+
+PacketHeader hdr;
+hdr.type = 5;    <span class="cm">// 只能存 0-7</span>
+hdr.flags = 31;  <span class="cm">// 只能存 0-31</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h4>柔性数组成员 (Flexible Array Member, C99)</h4>
+      <p>结构体的最后一个成员可以是未指定大小的数组：</p>
+<pre><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">int</span> length;
+    <span class="type">char</span> data[];  <span class="cm">// 柔性数组成员</span>
+} Buffer;
+
+<span class="cm">// 分配：sizeof(Buffer) + 额外空间</span>
+Buffer *buf = <span class="fn">malloc</span>(<span class="kw">sizeof</span>(Buffer) + 256);
+buf-&gt;length = 256;
+<span class="fn">memcpy</span>(buf-&gt;data, source, 256);
+
+<span class="fn">free</span>(buf);</code></pre>
+      <p>这种模式在 C++ 中需要用 <code>std::vector</code> 或单独分配缓冲区来实现。</p>
+    </div>
+
+    <h3>11.3 联合体 (union)</h3>
+
+<pre><code><span class="kw">typedef</span> <span class="kw">union</span> {
+    <span class="type">int</span> i;
+    <span class="type">float</span> f;
+    <span class="type">char</span> str[20];
+} Data;
+
+Data d;
+d.i = 42;         <span class="cm">// 此时只有 i 有效</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, d.i);
+d.f = 3.14f;      <span class="cm">// 现在只有 f 有效，i 的值被覆盖</span>
+<span class="cm">// 所有成员共享同一块内存</span>
+<span class="cm">// 大小 = 最大成员的大小</span></code></pre>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">C11 匿名结构体/联合体</div>
+        <p>C11 允许在结构体中嵌套匿名结构体和联合体，这在 C++ 中需要使用 <code>union</code> 关键字或标准库实现：</p>
+<pre><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">int</span> type;
+    <span class="kw">union</span> {      <span class="cm">// 匿名联合体</span>
+        <span class="type">int</span> int_val;
+        <span class="type">double</span> dbl_val;
+        <span class="type">char</span> *str_val;
+    };              <span class="cm">// 没有名字</span>
+} Value;
+
+Value v;
+v.type = 1;
+v.int_val = 42;  <span class="cm">// 直接访问，无需 v.u.int_val</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 预处理器 ==================== -->
+  <section id="preprocessor">
+    <h2><span class="icon">⚙️</span> 十二、预处理器</h2>
+
+    <p>C 的预处理器（preprocessor）比 C++ 更重要——在没有模板、没有 constexpr 的 C 世界里，宏是代码复用和抽象的重要手段。</p>
+
+    <h3>12.1 宏定义</h3>
+
+<pre><code><span class="cm">// 简单常量</span>
+<span class="pp">#define</span> PI 3.14159265358979
+<span class="pp">#define</span> MAX_BUFFER_SIZE 4096
+
+<span class="cm">// 带参数的宏（注意括号！）</span>
+<span class="pp">#define</span> MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+<span class="pp">#define</span> SQUARE(x) ((x) * (x))
+
+<span class="cm">// 多行宏</span>
+<span class="pp">#define</span> SWAP(a, b) <span class="kw">do</span> { \
+    typeof(a) _tmp = (a); \
+    (a) = (b); \
+    (b) = _tmp; \
+} <span class="kw">while</span>(0)
+
+<span class="cm">// 字符串化 # 和 连接 ##</span>
+<span class="pp">#define</span> STR(x) #x           <span class="cm">// STR(hello) → "hello"</span>
+<span class="pp">#define</span> CONCAT(a, b) a##b   <span class="cm">// CONCAT(foo, bar) → foobar</span></code></pre>
+
+    <h3>12.2 条件编译</h3>
+
+<pre><code><span class="cm">// 平台检测</span>
+<span class="pp">#ifdef</span> _WIN32
+    <span class="pp">#define</span> PLATFORM_WINDOWS
+<span class="pp">#elif</span> defined(__linux__)
+    <span class="pp">#define</span> PLATFORM_LINUX
+<span class="pp">#elif</span> defined(__APPLE__)
+    <span class="pp">#define</span> PLATFORM_MACOS
+<span class="pp">#endif</span>
+
+<span class="cm">// 调试开关</span>
+<span class="pp">#ifdef</span> DEBUG
+    <span class="pp">#define</span> LOG(fmt, ...) \
+        fprintf(stderr, "[DEBUG] " fmt "\n", ##__VA_ARGS__)
+<span class="pp">#else</span>
+    <span class="pp">#define</span> LOG(fmt, ...)  <span class="cm">/* 空操作 */</span>
+<span class="pp">#endif</span>
+
+<span class="cm">// 头文件保护（Include Guard）</span>
+<span class="pp">#ifndef</span> MY_HEADER_H
+<span class="pp">#define</span> MY_HEADER_H
+<span class="cm">// 声明放在这里</span>
+<span class="pp">#endif</span>
+<span class="cm">// 或使用 #pragma once（非标准但广泛支持）</span></code></pre>
+
+    <h3>12.3 X-Macro 模式</h3>
+
+    <p>这是 C 中一种强大的宏模式，用一份"数据"生成多种不同的代码：</p>
+
+<pre><code><span class="cm">// 定义一组命令</span>
+<span class="pp">#define</span> COMMANDS \
+    X(OPEN,  "open",  handle_open)  \
+    X(CLOSE, "close", handle_close) \
+    X(READ,  "read",  handle_read)  \
+    X(WRITE, "write", handle_write)
+
+<span class="cm">// 生成枚举</span>
+<span class="pp">#define</span> X(name, str, handler) CMD_##name,
+<span class="kw">enum</span> Command { COMMANDS CMD_COUNT };
+<span class="pp">#undef</span> X
+
+<span class="cm">// 生成处理函数表</span>
+<span class="pp">#define</span> X(name, str, handler) [CMD_##name] = handler,
+<span class="kw">static</span> CommandHandler handlers[] = { COMMANDS };
+<span class="pp">#undef</span> X</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>X-Macro 就像 C++ 的 <code>std::variant</code> + 访问者模式，或者是编译期反射的原始形式。在没有模板元编程的 C 中，宏是唯一的"代码生成器"。这也是为什么 C 程序员需要特别擅长宏编程——它是你手中最重要的复用工具。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 文件 I/O ==================== -->
+  <section id="io">
+    <h2><span class="icon">📁</span> 十三、文件 I/O</h2>
+
+    <h3>13.1 标准 I/O 库 <code>&lt;stdio.h&gt;</code></h3>
+
+<pre><code><span class="cm">// 打开文件</span>
+<span class="type">FILE</span> *f = <span class="fn">fopen</span>(<span class="str">"data.txt"</span>, <span class="str">"r"</span>);
+<span class="kw">if</span> (!f) {
+    <span class="fn">perror</span>(<span class="str">"fopen failed"</span>);
+    <span class="kw">return</span> -1;
+}
+
+<span class="cm">// 读取</span>
+<span class="type">char</span> line[256];
+<span class="kw">while</span> (<span class="fn">fgets</span>(line, <span class="kw">sizeof</span>(line), f)) {
+    <span class="fn">printf</span>(<span class="str">"%s"</span>, line);
+}
+
+<span class="cm">// 写入</span>
+<span class="type">FILE</span> *out = <span class="fn">fopen</span>(<span class="str">"output.txt"</span>, <span class="str">"w"</span>);
+<span class="fn">fprintf</span>(out, <span class="str">"Score: %d\n"</span>, score);
+
+<span class="cm">// 二进制读写</span>
+<span class="type">int</span> data[100];
+<span class="fn">fread</span>(data, <span class="kw">sizeof</span>(<span class="type">int</span>), 100, f);
+<span class="fn">fwrite</span>(data, <span class="kw">sizeof</span>(<span class="type">int</span>), 100, out);
+
+<span class="cm">// 关闭</span>
+<span class="fn">fclose</span>(f);
+<span class="fn">fclose</span>(out);</code></pre>
+
+    <h3>13.2 文件打开模式</h3>
+    <table>
+      <tr><th>模式</th><th>说明</th><th>文件不存在</th></tr>
+      <tr><td><code>"r"</code></td><td>只读（文本）</td><td>失败</td></tr>
+      <tr><td><code>"w"</code></td><td>只写（文本），截断</td><td>创建</td></tr>
+      <tr><td><code>"a"</code></td><td>追加（文本）</td><td>创建</td></tr>
+      <tr><td><code>"r+"</code></td><td>读写</td><td>失败</td></tr>
+      <tr><td><code>"w+"</code></td><td>读写，截断</td><td>创建</td></tr>
+      <tr><td><code>"rb"</code></td><td>只读（二进制）</td><td>失败</td></tr>
+      <tr><td><code>"wb"</code></td><td>只写（二进制）</td><td>创建</td></tr>
+    </table>
+
+    <h3>13.3 printf 格式化大全</h3>
+
+    <table>
+      <tr><th>格式</th><th>类型</th><th>示例</th></tr>
+      <tr><td><code>%d, %i</code></td><td>int</td><td><code>42</code></td></tr>
+      <tr><td><code>%u</code></td><td>unsigned int</td><td><code>42</code></td></tr>
+      <tr><td><code>%ld, %lld</code></td><td>long, long long</td><td><code>123456789</code></td></tr>
+      <tr><td><code>%f, %lf</code></td><td>double (printf中 float 也用 %f)</td><td><code>3.14</code></td></tr>
+      <tr><td><code>%e, %g</code></td><td>科学计数 / 自动</td><td><code>3.14e+00</code></td></tr>
+      <tr><td><code>%c</code></td><td>char</td><td><code>A</code></td></tr>
+      <tr><td><code>%s</code></td><td>字符串</td><td><code>Hello</code></td></tr>
+      <tr><td><code>%p</code></td><td>指针</td><td><code>0x7ffd1234</code></td></tr>
+      <tr><td><code>%x, %X</code></td><td>十六进制</td><td><code>2a, 2A</code></td></tr>
+      <tr><td><code>%o</code></td><td>八进制</td><td><code>52</code></td></tr>
+      <tr><td><code>%zu</code></td><td>size_t</td><td><code>1024</code></td></tr>
+      <tr><td><code>%n</code></td><td>已写字符数</td><td>—</td></tr>
+    </table>
+  </section>
+
+  <!-- ==================== 标准库 ==================== -->
+  <section id="stdlib">
+    <h2><span class="icon">📚</span> 十四、C 标准库概览</h2>
+
+    <p>C 的标准库虽然比 C++ STL 小得多，但每一个头文件都是精华。作为 C++ 开发者，你会发现其中一些你已经用过了。</p>
+
+    <table>
+      <tr><th>头文件</th><th>功能</th><th>核心函数/宏</th></tr>
+      <tr><td><code>&lt;stdio.h&gt;</code></td><td>输入/输出</td><td><code>printf, scanf, fopen, fclose, fgets, fprintf</code></td></tr>
+      <tr><td><code>&lt;stdlib.h&gt;</code></td><td>通用工具</td><td><code>malloc, free, exit, atoi, rand, qsort, bsearch</code></td></tr>
+      <tr><td><code>&lt;string.h&gt;</code></td><td>字符串操作</td><td><code>strlen, strcpy, strcmp, memcpy, memset, memmove</code></td></tr>
+      <tr><td><code>&lt;math.h&gt;</code></td><td>数学函数</td><td><code>sin, cos, sqrt, pow, fabs, ceil, floor</code></td></tr>
+      <tr><td><code>&lt;ctype.h&gt;</code></td><td>字符分类</td><td><code>isalpha, isdigit, isspace, toupper, tolower</code></td></tr>
+      <tr><td><code>&lt;time.h&gt;</code></td><td>时间日期</td><td><code>time, clock, difftime, mktime, strftime</code></td></tr>
+      <tr><td><code>&lt;assert.h&gt;</code></td><td>断言</td><td><code>assert()</code></td></tr>
+      <tr><td><code>&lt;errno.h&gt;</code></td><td>错误码</td><td><code>errno, ENOENT, EINVAL, ENOMEM</code></td></tr>
+      <tr><td><code>&lt;signal.h&gt;</code></td><td>信号处理</td><td><code>signal, raise, SIGINT, SIGTERM, SIGSEGV</code></td></tr>
+      <tr><td><code>&lt;setjmp.h&gt;</code></td><td>非局部跳转</td><td><code>setjmp, longjmp</code></td></tr>
+      <tr><td><code>&lt;stdarg.h&gt;</code></td><td>可变参数</td><td><code>va_list, va_start, va_arg, va_end</code></td></tr>
+      <tr><td><code>&lt;stdbool.h&gt;</code></td><td>布尔类型 (C99)</td><td><code>bool, true, false</code></td></tr>
+      <tr><td><code>&lt;stdint.h&gt;</code></td><td>固定宽度整数 (C99)</td><td><code>int32_t, uint8_t, SIZE_MAX</code></td></tr>
+      <tr><td><code>&lt;stddef.h&gt;</code></td><td>基础定义</td><td><code>NULL, size_t, ptrdiff_t, offsetof</code></td></tr>
+      <tr><td><code>&lt;limits.h&gt;</code></td><td>类型极限</td><td><code>INT_MAX, INT_MIN, CHAR_BIT</code></td></tr>
+      <tr><td><code>&lt;float.h&gt;</code></td><td>浮点极限</td><td><code>DBL_MAX, FLT_EPSILON</code></td></tr>
+      <tr><td><code>&lt;threads.h&gt;</code></td><td>线程 (C11)</td><td><code>thrd_create, mtx_lock, cnd_wait</code></td></tr>
+      <tr><td><code>&lt;stdatomic.h&gt;</code></td><td>原子操作 (C11)</td><td><code>atomic_int, atomic_load, atomic_store</code></td></tr>
+    </table>
+
+    <h3>14.1 qsort — 泛型排序的例子</h3>
+
+    <p><code>qsort</code> 是 C 标准库中"泛型编程"的经典例子——通过 <code>void*</code> 和函数指针实现类型无关的排序：</p>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">compare_ints</span>(<span class="kw">const</span> <span class="type">void</span> *a, <span class="kw">const</span> <span class="type">void</span> *b) {
+    <span class="type">int</span> ia = *(<span class="kw">const</span> <span class="type">int</span> *)a;
+    <span class="type">int</span> ib = *(<span class="kw">const</span> <span class="type">int</span> *)b;
+    <span class="kw">return</span> (ia &gt; ib) - (ia &lt; ib); <span class="cm">// 避免溢出</span>
+}
+
+<span class="type">int</span> arr[] = {5, 2, 8, 1, 9, 3};
+<span class="type">size_t</span> n = <span class="kw">sizeof</span>(arr) / <span class="kw">sizeof</span>(arr[0]);
+
+<span class="fn">qsort</span>(arr, n, <span class="kw">sizeof</span>(<span class="type">int</span>), compare_ints);</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p><code>qsort</code> + 比较函数 ≈ C++ 的 <code>std::sort</code> + lambda/比较器。C 通过 <code>void*</code> 实现类型擦除，C++ 通过模板实现编译期多态。效果相同，但 C++ 的方式类型更安全、编译器能进行更多检查。</p>
+    </div>
+
+    <h3>14.2 setjmp/longjmp — C 的"异常处理"</h3>
+
+    <p>这是 C 中最接近异常处理的机制，允许从深层函数调用中"跳回"到之前保存的位置：</p>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;setjmp.h&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="kw">static</span> jmp_buf jump_buffer;
+
+<span class="type">void</span> <span class="fn">deep_function</span>(<span class="type">void</span>) {
+    <span class="fn">printf</span>(<span class="str">"Deep in the call stack...\n"</span>);
+    <span class="fn">longjmp</span>(jump_buffer, 42); <span class="cm">// 跳回 setjmp 位置，返回 42</span>
+}
+
+<span class="type">int</span> <span class="fn">main</span>(<span class="type">void</span>) {
+    <span class="type">int</span> ret = <span class="fn">setjmp</span>(jump_buffer);
+    <span class="kw">if</span> (ret == 0) {
+        <span class="cm">// 首次从 setjmp 返回</span>
+        <span class="fn">deep_function</span>();
+    } <span class="kw">else</span> {
+        <span class="cm">// 从 longjmp 返回，ret = 42</span>
+        <span class="fn">printf</span>(<span class="str">"Jumped back with value: %d\n"</span>, ret);
+    }
+    <span class="kw">return</span> 0;
+}</code></pre>
+
+    <div class="callout callout-danger">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">setjmp/longjmp 的危险性</div>
+        <p><code>longjmp</code> 不会调用任何局部变量的清理代码（因为 C 没有析构函数，这不像 C++ 那么危险），但它仍然可能绕过资源分配后的清理逻辑。使用时必须格外小心资源管理。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 高级主题 ==================== -->
+  <section id="advanced">
+    <h2><span class="icon">🚀</span> 十五、高级主题</h2>
+
+    <h3>15.1 C11 多线程</h3>
+
+    <p>C11 首次将多线程纳入标准：</p>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;threads.h&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">worker</span>(<span class="type">void</span> *arg) {
+    <span class="type">int</span> id = *(<span class="type">int</span> *)arg;
+    <span class="fn">printf</span>(<span class="str">"Thread %d running\n"</span>, id);
+    <span class="kw">return</span> 0;
+}
+
+<span class="type">int</span> <span class="fn">main</span>(<span class="type">void</span>) {
+    thrd_t threads[4];
+    <span class="type">int</span> ids[] = {0, 1, 2, 3};
+
+    <span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; 4; i++) {
+        <span class="fn">thrd_create</span>(&amp;threads[i], worker, &amp;ids[i]);
+    }
+
+    <span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; 4; i++) {
+        <span class="fn">thrd_join</span>(threads[i], <span class="kw">NULL</span>);
+    }
+    <span class="kw">return</span> 0;
+}
+<span class="cm">// 注意：MSVC 不支持 C11 threads.h，</span>
+<span class="cm">// 实际项目中常用 pthreads 或平台 API</span></code></pre>
+
+    <h3>15.2 原子操作 (C11)</h3>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stdatomic.h&gt;</span>
+
+<span class="kw">atomic_int</span> counter = 0;
+
+<span class="type">void</span> <span class="fn">increment</span>(<span class="type">void</span>) {
+    <span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; 100000; i++) {
+        <span class="fn">atomic_fetch_add</span>(&amp;counter, 1);
+        <span class="cm">// 等价于 C++ 的 counter.fetch_add(1)</span>
+    }
+}
+
+<span class="cm">// 原子变量声明</span>
+<span class="kw">_Atomic</span> <span class="type">int</span> x = 0;
+<span class="kw">_Atomic</span>(<span class="type">int</span> *) ptr = <span class="kw">NULL</span>;
+
+<span class="cm">// 内存序</span>
+<span class="fn">atomic_store_explicit</span>(&amp;x, 42, memory_order_release);
+<span class="type">int</span> val = <span class="fn">atomic_load_explicit</span>(&amp;x, memory_order_acquire);</code></pre>
+
+    <h3>15.3 <code>_Generic</code> — C11 的"泛型"</h3>
+
+    <p>C11 引入了 <code>_Generic</code> 关键字，实现编译期的类型分发（类似简陋的函数重载）：</p>
+
+<pre><code><span class="pp">#define</span> print(x) _Generic((x), \
+    <span class="type">int</span>:    print_int,          \
+    <span class="type">double</span>: print_double,        \
+    <span class="type">char*</span>:  print_string         \
+)(x)
+
+<span class="type">void</span> <span class="fn">print_int</span>(<span class="type">int</span> x)       { <span class="fn">printf</span>(<span class="str">"%d\n"</span>, x); }
+<span class="type">void</span> <span class="fn">print_double</span>(<span class="type">double</span> x) { <span class="fn">printf</span>(<span class="str">"%f\n"</span>, x); }
+<span class="type">void</span> <span class="fn">print_string</span>(<span class="type">char</span> *x)  { <span class="fn">printf</span>(<span class="str">"%s\n"</span>, x); }
+
+<span class="fn">print</span>(42);      <span class="cm">// 调用 print_int</span>
+<span class="fn">print</span>(3.14);    <span class="cm">// 调用 print_double</span>
+<span class="fn">print</span>(<span class="str">"hello"</span>); <span class="cm">// 调用 print_string</span></code></pre>
+
+    <h3>15.4 <code>offsetof</code> 与容器宏</h3>
+
+    <p>Linux 内核中著名的 <code>container_of</code> 宏展示了 C 指针运算的威力：</p>
+
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stddef.h&gt;</span>
+
+<span class="cm">// 通过成员指针获取包含它的结构体指针</span>
+<span class="pp">#define</span> container_of(ptr, type, member) \
+    ((type *)((char *)(ptr) - offsetof(type, member)))
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">int</span> id;
+    <span class="type">char</span> name[32];
+} User;
+
+User u = {.id = 1, .name = <span class="str">"Bob"</span>};
+<span class="type">char</span> *name_ptr = u.name;
+
+<span class="cm">// 从 name 字段的指针反推出 User 的指针</span>
+User *up = <span class="fn">container_of</span>(name_ptr, User, name);
+<span class="cm">// up 现在指向 u</span></code></pre>
+
+    <h3>15.5 链接规范与 ABI</h3>
+
+<pre><code><span class="cm">// extern "C" — 告诉 C++ 编译器使用 C 的链接方式</span>
+<span class="cm">// 这是在 C++ 中使用 C 库的关键</span>
+
+<span class="cm">// 在 C++ 文件中包含 C 头文件时：</span>
+<span class="kw">extern</span> <span class="str">"C"</span> {
+<span class="pp">#include</span> <span class="str">"clib.h"</span>
+}
+
+<span class="cm">// 现代 C 头文件通常会自己处理：</span>
+<span class="pp">#ifdef</span> __cplusplus
+<span class="kw">extern</span> <span class="str">"C"</span> {
+<span class="pp">#endif</span>
+
+<span class="cm">// 函数声明...</span>
+
+<span class="pp">#ifdef</span> __cplusplus
+}
+<span class="pp">#endif</span></code></pre>
+  </section>
+
+  <!-- ==================== 开发环境 ==================== -->
+  <section id="environment">
+    <h2><span class="icon">🛠️</span> 十六、C 语言开发环境搭建</h2>
+
+    <h3>16.1 编译器</h3>
+
+    <div class="grid grid-3">
+      <div class="grid-card">
+        <h4>GCC (GNU C Compiler)</h4>
+        <p>最广泛使用的 C 编译器，开源免费。Linux 上的默认选择。</p>
+        <span class="tag tag-green">免费</span> <span class="tag tag-blue">跨平台</span>
+<pre><code><span class="cm"># 安装</span>
+sudo apt install gcc
+<span class="cm"># 编译</span>
+gcc -std=c11 -Wall main.c -o app</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>Clang (LLVM)</h4>
+        <p>LLVM 项目的 C 编译器，错误信息更友好，macOS 默认选择。</p>
+        <span class="tag tag-green">免费</span> <span class="tag tag-blue">跨平台</span>
+<pre><code><span class="cm"># 安装</span>
+sudo apt install clang
+<span class="cm"># 编译</span>
+clang -std=c11 -Wall main.c -o app</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>MSVC (Visual Studio)</h4>
+        <p>微软编译器，Windows 开发首选。C 标准支持曾落后，近年大幅改善。</p>
+        <span class="tag tag-green">免费(社区版)</span> <span class="tag tag-orange">Windows</span>
+<pre><code><span class="cm">// Visual Studio 中</span>
+<span class="cm">// 创建 C 项目即可</span>
+<span class="cm">// cl.exe /std:c11 main.c</span></code></pre>
+      </div>
+    </div>
+
+    <h3>16.2 构建系统</h3>
+
+    <div class="card">
+      <h4>CMake — 事实上的标准</h4>
+<pre><code><span class="cm"># CMakeLists.txt</span>
+<span class="fn">cmake_minimum_required</span>(VERSION 3.16)
+<span class="fn">project</span>(myapp C)
+
+<span class="cm"># 设置 C 标准</span>
+<span class="fn">set</span>(CMAKE_C_STANDARD 11)
+<span class="fn">set</span>(CMAKE_C_STANDARD_REQUIRED ON)
+
+<span class="cm"># 编译警告</span>
+<span class="kw">if</span>(CMAKE_C_COMPILER_ID MATCHES <span class="str">"GNU|Clang"</span>)
+    <span class="fn">add_compile_options</span>(-Wall -Wextra -Wpedantic)
+<span class="kw">endif</span>()
+
+<span class="cm"># 添加可执行文件</span>
+<span class="fn">add_executable</span>(myapp src/main.c src/utils.c)
+
+<span class="cm"># 链接库</span>
+<span class="fn">target_link_libraries</span>(myapp PRIVATE m)  <span class="cm"># 数学库</span>
+
+<span class="cm"># 构建</span>
+<span class="cm"># mkdir build && cd build</span>
+<span class="cm"># cmake .. && cmake --build .</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h4>Make — 经典构建工具</h4>
+<pre><code><span class="cm"># Makefile</span>
+CC = gcc
+CFLAGS = -std=c11 -Wall -Wextra -O2
+LDFLAGS = -lm
+SRCS = src/main.c src/utils.c
+OBJS = $(SRCS:.c=.o)
+TARGET = myapp
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $&lt; -o $@
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all clean</code></pre>
+    </div>
+
+    <h3>16.3 编辑器/IDE 推荐</h3>
+
+    <table>
+      <tr><th>工具</th><th>特点</th><th>适合场景</th></tr>
+      <tr>
+        <td><strong>VS Code</strong></td>
+        <td>轻量、插件丰富、C/C++ 扩展优秀</td>
+        <td>通用开发，跨平台</td>
+      </tr>
+      <tr>
+        <td><strong>CLion</strong></td>
+        <td>JetBrains 出品，CMake 深度集成，调试强大</td>
+        <td>专业开发，付费</td>
+      </tr>
+      <tr>
+        <td><strong>Visual Studio</strong></td>
+        <td>Windows 最强 IDE，调试器一流</td>
+        <td>Windows 开发</td>
+      </tr>
+      <tr>
+        <td><strong>Vim/Neovim</strong></td>
+        <td>终端编辑器，配合 coc.nvim 或 LSP</td>
+        <td>远程开发、极简主义</td>
+      </tr>
+      <tr>
+        <td><strong>Eclipse CDT</strong></td>
+        <td>老牌 C/C++ IDE，免费</td>
+        <td>大型项目管理</td>
+      </tr>
+    </table>
+
+    <h3>16.4 调试工具</h3>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4>GDB — GNU 调试器</h4>
+<pre><code><span class="cm"># 编译时加 -g</span>
+gcc -g -O0 main.c -o app
+<span class="cm"># 启动调试</span>
+gdb ./app
+(gdb) break main
+(gdb) run
+(gdb) next
+(gdb) print variable
+(gdb) backtrace</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>Valgrind — 内存检测</h4>
+<pre><code><span class="cm"># 检测内存泄漏和错误</span>
+valgrind --leak-check=full \
+         --show-leak-kinds=all \
+         ./app
+
+<span class="cm"># 会报告：</span>
+<span class="cm"># - 内存泄漏的位置</span>
+<span class="cm"># - 未初始化的内存使用</span>
+<span class="cm"># - 越界访问</span>
+<span class="cm"># - 使用已释放的内存</span></code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>AddressSanitizer (ASan)</h4>
+<pre><code><span class="cm"># 编译时启用</span>
+gcc -fsanitize=address -g main.c -o app
+<span class="cm"># 运行时自动检测内存错误</span>
+./app
+<span class="cm"># 比 Valgrind 快，但会增加内存开销</span>
+
+<span class="cm"># 还有 UndefinedBehaviorSanitizer:</span>
+gcc -fsanitize=undefined main.c -o app</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>cppcheck — 静态分析</h4>
+<pre><code><span class="cm"># 不需要运行程序就能发现问题</span>
+cppcheck --enable=all \
+         --inconclusive \
+         src/
+
+<span class="cm"># 能发现：</span>
+<span class="cm"># - 缓冲区溢出</span>
+<span class="cm"># - 空指针解引用</span>
+<span class="cm"># - 资源泄漏</span>
+<span class="cm"># - 风格问题</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 常用工具与框架 ==================== -->
+  <section id="tools">
+    <h2><span class="icon">🧰</span> 十七、常用工具与框架</h2>
+
+    <h3>17.1 测试框架</h3>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4>Unity</h4>
+        <p>最轻量的 C 测试框架，只有 3 个文件。适合嵌入式和小项目。</p>
+<pre><code><span class="pp">#include</span> <span class="str">"unity.h"</span>
+
+<span class="type">void</span> <span class="fn">test_add</span>(<span class="type">void</span>) {
+    <span class="fn">TEST_ASSERT_EQUAL</span>(5, add(2, 3));
+    <span class="fn">TEST_ASSERT_EQUAL</span>(0, add(-1, 1));
+}
+
+<span class="type">int</span> <span class="fn">main</span>(<span class="type">void</span>) {
+    <span class="fn">UNITY_BEGIN</span>();
+    <span class="fn">RUN_TEST</span>(test_add);
+    <span class="kw">return</span> <span class="fn">UNITY_END</span>();
+}</code></pre>
+      </div>
+      <div class="grid-card">
+        <h4>CMocka</h4>
+        <p>功能更全的测试框架，支持 mock 函数和测试夹具。</p>
+<pre><code><span class="pp">#include</span> <span class="str">&lt;stdarg.h&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;cmocka.h&gt;</span>
+
+<span class="type">void</span> <span class="fn">test_str_utils</span>(<span class="type">void</span> **state) {
+    (<span class="type">void</span>)state;
+    <span class="fn">assert_string_equal</span>(<span class="str">"hello"</span>, str_lower(<span class="str">"HELLO"</span>));
+    <span class="fn">assert_int_equal</span>(5, my_strlen(<span class="str">"hello"</span>));
+}
+
+<span class="type">int</span> <span class="fn">main</span>(<span class="type">void</span>) {
+    <span class="kw">const</span> <span class="kw">struct</span> CMUnitTest tests[] = {
+        <span class="fn">cmocka_unit_test</span>(test_str_utils),
+    };
+    <span class="kw">return</span> <span class="fn">cmocka_run_group_tests</span>(tests, 0, NULL, NULL);
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>17.2 常用 C 库</h3>
+
+    <table>
+      <tr><th>库名</th><th>功能</th><th>说明</th></tr>
+      <tr><td><strong>GLib</strong></td><td>通用工具库</td><td>GNOME 基础，提供数据结构、线程、事件循环等</td></tr>
+      <tr><td><strong>cJSON / Jansson</strong></td><td>JSON 解析</td><td>cJSON 极轻量（单文件），Jansson 功能更全</td></tr>
+      <tr><td><strong>SQLite</strong></td><td>嵌入式数据库</td><td>世界上最广泛使用的数据库引擎</td></tr>
+      <tr><td><strong>cURL (libcurl)</strong></td><td>HTTP/网络</td><td>支持多种协议的客户端库</td></tr>
+      <tr><td><strong>OpenSSL / MbedTLS</strong></td><td>加密/TLS</td><td>MbedTLS 更适合嵌入式</td></tr>
+      <tr><td><strong>zlib</strong></td><td>压缩</td><td>gzip/deflate 压缩标准库</td></tr>
+      <tr><td><strong>libuv</strong></td><td>异步 I/O</td><td>Node.js 的底层事件循环库</td></tr>
+      <tr><td><strong>SDL2</strong></td><td>多媒体</td><td>游戏开发、跨平台窗口/音频/输入</td></tr>
+      <tr><td><strong>FreeRTOS</strong></td><td>实时操作系统</td><td>嵌入式 RTOS，广泛用于 IoT 设备</td></tr>
+      <tr><td><strong>libevent / libev</strong></td><td>事件驱动</td><td>高性能事件通知库</td></tr>
+      <tr><td><strong>Nginx / Redis</strong></td><td>参考项目</td><td>优秀的 C 语言开源项目，值得学习其架构</td></tr>
+    </table>
+
+    <h3>17.3 包管理</h3>
+
+    <p>C 没有像 npm、pip、cargo 那样的标准包管理器。以下是主要的依赖管理方式：</p>
+
+    <div class="grid grid-3">
+      <div class="grid-card">
+        <h4>vcpkg (微软)</h4>
+        <p>C/C++ 库管理器，CMake 集成好。支持 Windows/Linux/macOS。</p>
+        <span class="tag tag-blue">跨平台</span>
+      </div>
+      <div class="grid-card">
+        <h4>Conan</h4>
+        <p>去中心化的 C/C++ 包管理器，与 CMake 深度集成。</p>
+        <span class="tag tag-blue">跨平台</span>
+      </div>
+      <div class="grid-card">
+        <h4>系统包管理器</h4>
+        <p>apt (Debian/Ubuntu), yum/dnf (RHEL/Fedora), pacman (Arch), brew (macOS)。</p>
+        <span class="tag tag-green">最常用</span>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>C 的包管理现状就像 90 年代的互联网——没有统一的"应用商店"，每个平台有自己的方式。C++ 也面临同样的问题。这也是为什么很多 C 项目选择将依赖直接嵌入源码（vendoring），或者依赖系统包管理器。</p>
+    </div>
+  </section>
+
+  <!-- ==================== 使用场景 ==================== -->
+  <section id="usecases">
+    <h2><span class="icon">🌍</span> 十八、C 语言使用场景</h2>
+
+    <p>C 语言在以下领域仍然是不可替代的首选语言，甚至在某些领域是唯一选择。</p>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">操作系统内核</h4>
+        <p>Linux、Windows、macOS (XNU)、FreeBSD 的内核都用 C 编写。操作系统需要直接操作硬件、精确控制内存布局、零运行时开销——这些都是 C 的强项。</p>
+        <p><strong>代表项目：</strong>Linux Kernel, FreeBSD, Zephyr RTOS</p>
+        <span class="tag tag-blue">系统编程</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">嵌入式系统</h4>
+        <p>微控制器（MCU）资源极其有限（可能只有几 KB 内存），无法运行 C++ 的运行时库。C 是嵌入式开发的绝对主流。</p>
+        <p><strong>代表平台：</strong>ARM Cortex-M, ESP32, STM32, Arduino (C++ 封装，但底层是 C)</p>
+        <span class="tag tag-green">IoT</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">数据库引擎</h4>
+        <p>高性能数据库通常用 C 实现，追求极致的性能和最小的内存开销。</p>
+        <p><strong>代表项目：</strong>SQLite, PostgreSQL, Redis, Memcached</p>
+        <span class="tag tag-orange">数据存储</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">编译器与解释器</h4>
+        <p>很多编程语言的编译器和运行时都用 C 编写，包括 CPython、Lua、CPython 等。</p>
+        <p><strong>代表项目：</strong>CPython, Lua, TCC (Tiny C Compiler), LuaJIT</p>
+        <span class="tag tag-blue">语言工具</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">网络与协议</h4>
+        <p>网络协议栈、HTTP 服务器、加密库等底层网络软件大量使用 C。</p>
+        <p><strong>代表项目：</strong>Nginx, curl, OpenSSL, libuv, lwIP</p>
+        <span class="tag tag-green">网络</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">图形与多媒体</h4>
+        <p>图形驱动、编解码器、游戏引擎的底层渲染部分。</p>
+        <p><strong>代表项目：</strong>OpenGL 驱动, FFmpeg, SDL2, stb 图像库</p>
+        <span class="tag tag-orange">多媒体</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">其他语言的运行时</h4>
+        <p>很多高级语言的运行时环境用 C 编写。Python 的 CPython 实现就是纯 C，JVM 的核心部分也大量使用 C。</p>
+        <p><strong>代表项目：</strong>CPython, OpenJDK, Ruby MRI, PHP (Zend Engine)</p>
+        <span class="tag tag-blue">运行时</span>
+      </div>
+      <div class="grid-card">
+        <h4 style="color:var(--accent2)">安全与加密</h4>
+        <p>密码学库需要精确控制内存和数据布局，避免侧信道攻击，C 是首选。</p>
+        <p><strong>代表项目：</strong>OpenSSL, libsodium, MbedTLS, BoringSSL</p>
+        <span class="tag tag-red">安全</span>
+      </div>
+    </div>
+
+    <h3>18.1 什么时候选 C，什么时候选 C++？</h3>
+
+    <table>
+      <tr><th>选择 C</th><th>选择 C++</th></tr>
+      <tr>
+        <td>资源极度受限（嵌入式 MCU、内核模块）</td>
+        <td>需要复杂抽象（大型应用、游戏引擎）</td>
+      </tr>
+      <tr>
+        <td>需要提供稳定的 C ABI 接口给其他语言</td>
+        <td>团队熟悉 C++，且项目规模大</td>
+      </tr>
+      <tr>
+        <td>项目简单，不需要 OOP 抽象</td>
+        <td>需要 RAII、智能指针、异常处理</td>
+      </tr>
+      <tr>
+        <td>追求极小的二进制体积和运行时开销</td>
+        <td>需要 STL 容器和算法库</td>
+      </tr>
+      <tr>
+        <td>与现有 C 代码库集成</td>
+        <td>需要泛型编程（模板）</td>
+      </tr>
+      <tr>
+        <td>安全关键系统（DO-178C、MISRA C）</td>
+        <td>需要面向对象设计模式</td>
+      </tr>
+    </table>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">💬</span>
+      <div class="callout-body">
+        <div class="callout-title">实际项目中的混合使用</div>
+        <p>很多项目同时使用 C 和 C++：底层用 C 编写核心库（保证 ABI 稳定性和跨平台），上层用 C++ 编写应用逻辑。例如 Android 的 NDK 允许在 Java/Kotlin 应用中使用 C/C++ 原生库；Python 的 C 扩展也是这种模式。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 最佳实践 ==================== -->
+  <section id="bestpractice">
+    <h2><span class="icon">✨</span> 十九、C 语言最佳实践</h2>
+
+    <h3>19.1 编码规范</h3>
+
+    <div class="card">
+      <h4>项目结构建议</h4>
+<pre><code>myproject/
+├── CMakeLists.txt
+├── README.md
+├── include/          <span class="cm"># 公开头文件</span>
+│   └── mylib.h
+├── src/              <span class="cm"># 源文件</span>
+│   ├── main.c
+│   ├── utils.c
+│   └── utils_internal.h  <span class="cm"># 内部头文件</span>
+├── tests/            <span class="cm"># 测试</span>
+│   └── test_utils.c
+└── examples/         <span class="cm"># 示例代码</span>
+    └── demo.c</code></pre>
+    </div>
+
+    <h3>19.2 安全编码要点</h3>
+
+    <div class="grid grid-2">
+      <div class="grid-card">
+        <h4>内存安全</h4>
+        <ul>
+          <li>每次 <code>malloc</code> 后检查返回值</li>
+          <li><code>free</code> 后将指针置为 <code>NULL</code></li>
+          <li>使用 <code>snprintf</code> 替代 <code>sprintf</code></li>
+          <li>使用 <code>strncpy</code> 替代 <code>strcpy</code>（注意补 <code>'\0'</code>）</li>
+          <li>启用 ASan 进行开发测试</li>
+        </ul>
+      </div>
+      <div class="grid-card">
+        <h4>类型安全</h4>
+        <ul>
+          <li>使用 <code>&lt;stdint.h&gt;</code> 的固定宽度类型</li>
+          <li>使用 <code>&lt;stdbool.h&gt;</code> 的 <code>bool</code> 类型</li>
+          <li>尽可能使用 <code>const</code></li>
+          <li>启用 <code>-Wall -Wextra -Wpedantic</code></li>
+          <li>避免隐式类型转换</li>
+        </ul>
+      </div>
+      <div class="grid-card">
+        <h4>错误处理</h4>
+        <ul>
+          <li>始终检查函数返回值</li>
+          <li>使用 <code>errno</code> 获取详细错误信息</li>
+          <li>统一错误出口模式（<code>goto cleanup</code>）</li>
+          <li>在关键路径使用 <code>assert()</code></li>
+          <li>发布版本用 <code>NDEBUG</code> 移除 assert</li>
+        </ul>
+      </div>
+      <div class="grid-card">
+        <h4>代码组织</h4>
+        <ul>
+          <li>头文件只放声明，不放实现</li>
+          <li>使用 include guard 或 <code>#pragma once</code></li>
+          <li>内部函数和变量用 <code>static</code> 限定</li>
+          <li>公开 API 用 <code>typedef</code> 隐藏实现细节</li>
+          <li>使用不透明指针（opaque pointer）实现封装</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>19.3 不透明指针模式 — C 的"封装"</h3>
+
+    <p>这是 C 中最接近 C++ 私有成员的模式，通过头文件只暴露指针类型，隐藏内部实现：</p>
+
+<pre><code><span class="cm">/* === mylib.h（公开接口）=== */</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> Database Database; <span class="cm">// 不完整类型声明</span>
+
+Database *<span class="fn">db_open</span>(<span class="kw">const</span> <span class="type">char</span> *path);
+<span class="type">void</span>      <span class="fn">db_close</span>(Database *db);
+<span class="type">int</span>       <span class="fn">db_query</span>(Database *db, <span class="kw">const</span> <span class="type">char</span> *sql);
+<span class="cm">// 外部代码无法直接访问 Database 的内部字段！</span>
+
+<span class="cm">/* === mylib.c（内部实现）=== */</span>
+<span class="kw">struct</span> Database {
+    <span class="type">char</span> *path;         <span class="cm">// 外部看不到</span>
+    <span class="type">int</span> connection_fd;  <span class="cm">// 外部看不到</span>
+    <span class="type">int</span> ref_count;      <span class="cm">// 外部看不到</span>
+};
+
+Database *<span class="fn">db_open</span>(<span class="kw">const</span> <span class="type">char</span> *path) {
+    Database *db = <span class="fn">malloc</span>(<span class="kw">sizeof</span>(Database));
+    <span class="cm">/* 初始化... */</span>
+    <span class="kw">return</span> db;
+}</code></pre>
+
+    <div class="analogy">
+      <div class="analogy-title">💡 类比</div>
+      <p>不透明指针 ≈ C++ 的 Pimpl 模式（Pointer to Implementation）或 Java 的接口。它让你可以修改内部实现而不影响外部代码——这是 C 世界里实现"封装"和"信息隐藏"的核心手段。</p>
+    </div>
+
+    <h3>19.4 从 C++ 到 C 的思维转换清单</h3>
+
+    <div class="card">
+      <table>
+        <tr><th>C++ 中你习惯的做法</th><th>C 中的等价做法</th></tr>
+        <tr><td><code>class MyClass</code></td><td><code>struct + 独立函数</code>（不透明指针模式）</td></tr>
+        <tr><td><code>new / delete</code></td><td><code>malloc / free</code></td></tr>
+        <tr><td><code>std::vector</code></td><td>动态数组：<code>malloc + realloc</code></td></tr>
+        <tr><td><code>std::string</code></td><td><code>char[]</code> + <code>&lt;string.h&gt;</code> 函数</td></tr>
+        <tr><td><code>std::map</code></td><td>自己实现哈希表或使用第三方库</td></tr>
+        <tr><td><code>try / catch</code></td><td>返回值 + <code>errno</code> + <code>setjmp/longjmp</code></td></tr>
+        <tr><td><code>namespace</code></td><td>前缀命名约定（如 <code>mylib_init()</code>）</td></tr>
+        <tr><td><code>template</code></td><td><code>void*</code> + 函数指针，或 <code>_Generic</code>，或宏</td></tr>
+        <tr><td><code>virtual / override</code></td><td>结构体中的函数指针表（vtable 模拟）</td></tr>
+        <tr><td><code>RAII</code></td><td>手动 <code>init/cleanup</code> 函数对 + <code>goto cleanup</code></td></tr>
+        <tr><td><code>std::cout / cin</code></td><td><code>printf / scanf</code> 系列</td></tr>
+        <tr><td><code>auto / decltype</code></td><td>显式声明所有类型（C23 有 <code>typeof</code>）</td></tr>
+        <tr><td><code>lambda</code></td><td>独立函数 + 函数指针</td></tr>
+        <tr><td><code>constexpr</code></td><td>宏或 <code>const</code>（C23 新增 <code>constexpr</code>）</td></tr>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">最后的建议</div>
+        <p>学习 C 语言最好的方式就是<strong>阅读优秀的 C 代码</strong>。推荐从这些项目开始：Redis（代码清晰、注释好）、SQLite（工程典范）、cJSON（单文件，容易理解）、xv6（MIT 教学操作系统，代码量小但完整）。同时，用 Valgrind 或 ASan 来练习，它们会帮你建立对内存管理的直觉。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding:40px 0 20px; border-top:1px solid var(--border); margin-top:40px; color:var(--text-muted); font-size:14px;">
+    <p>C 语言完全指南 — 写给 C++ 开发者的学习手册</p>
+    <p style="margin-top:8px; font-size:12px;">覆盖 C89 / C99 / C11 / C23 标准 · 2026 年 6 月</p>
+  </div>
+</main>
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Back to top visibility
+  window.addEventListener('scroll', () => {
+    document.querySelector('.back-top').classList.toggle('show', window.scrollY > 400);
+  });
+
+  // Active nav link
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Close sidebar on mobile nav click
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) {
+        document.querySelector('.sidebar').classList.remove('open');
+      }
+    });
+  });
+</script>
+</body>
+</html>

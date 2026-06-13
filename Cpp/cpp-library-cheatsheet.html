@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ 常用库函数速查表</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-alt: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f6feb33;
+    --green: #3fb950;
+    --orange: #d29922;
+    --pink: #f778ba;
+    --purple: #bc8cff;
+    --red: #ff7b72;
+    --cyan: #79c0ff;
+    --yellow: #e3b341;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 48px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 16px 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  section {
+    margin-bottom: 48px;
+    scroll-margin-top: 80px;
+  }
+
+  section h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+    padding-left: 14px;
+    border-left: 3px solid var(--accent);
+  }
+
+  section h3 {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-left: 17px;
+    font-weight: 400;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  thead th {
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody tr:hover { background: var(--surface-alt); }
+
+  td {
+    padding: 9px 16px;
+    vertical-align: top;
+  }
+
+  td:first-child { white-space: nowrap; }
+
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 0.84rem;
+    color: var(--cyan);
+    background: var(--surface);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+
+  .badge-green { background: #238636; color: #fff; }
+  .badge-purple { background: #8957e5; color: #fff; }
+  .badge-orange { background: #9e6a03; color: #fff; }
+
+  .tip-box {
+    margin-top: 50px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    border-left: 3px solid var(--orange);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .tip-box strong { color: var(--orange); }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 1.6rem; }
+    body { padding: 20px 10px; }
+    td { padding: 7px 10px; font-size: 0.82rem; }
+    code { font-size: 0.78rem; }
+    .nav { gap: 5px; }
+    .nav a { font-size: 0.75rem; padding: 4px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>C++ 常用库函数速查表</h1>
+  <p>涵盖输入输出、容器、算法、并发、C++17/20 等 13 大类常用 API</p>
+</header>
+
+<nav class="nav">
+  <a href="#io">输入/输出</a>
+  <a href="#string">字符串</a>
+  <a href="#container">容器</a>
+  <a href="#algorithm">算法</a>
+  <a href="#math">数学与数值</a>
+  <a href="#chrono">时间与日期</a>
+  <a href="#memory">智能指针</a>
+  <a href="#thread">多线程</a>
+  <a href="#functional">函数式工具</a>
+  <a href="#regex">正则表达式</a>
+  <a href="#exception">异常处理</a>
+  <a href="#traits">类型特性</a>
+  <a href="#modern">C++17/20</a>
+  <a href="#macro">宏与预处理</a>
+</nav>
+
+<!-- ===================== 1. I/O ===================== -->
+<section id="io">
+  <h2>一、输入/输出</h2>
+  <h3>&lt;iostream&gt; / &lt;fstream&gt; / &lt;sstream&gt; / &lt;iomanip&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>头文件</th><th>函数 / 类</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>&lt;iostream&gt;</code></td><td><code>std::cin</code></td><td>标准输入流，从控制台读取数据</td></tr>
+        <tr><td></td><td><code>std::cout</code></td><td>标准输出流，向控制台输出数据</td></tr>
+        <tr><td></td><td><code>std::cerr</code></td><td>标准错误流（无缓冲）</td></tr>
+        <tr><td></td><td><code>std::endl</code></td><td>输出换行符并刷新缓冲区</td></tr>
+        <tr><td></td><td><code>std::getline(cin, s)</code></td><td>读取一行（含空格）到 string</td></tr>
+        <tr><td><code>&lt;fstream&gt;</code></td><td><code>std::ifstream</code></td><td>文件输入流，读取文件</td></tr>
+        <tr><td></td><td><code>std::ofstream</code></td><td>文件输出流，写入文件</td></tr>
+        <tr><td></td><td><code>std::fstream</code></td><td>文件输入/输出流</td></tr>
+        <tr><td></td><td><code>.open(path, mode)</code></td><td>打开文件（mode: <code>ios::in</code>, <code>ios::out</code>, <code>ios::app</code>）</td></tr>
+        <tr><td></td><td><code>.close()</code></td><td>关闭文件</td></tr>
+        <tr><td></td><td><code>.is_open()</code></td><td>判断文件是否成功打开</td></tr>
+        <tr><td><code>&lt;sstream&gt;</code></td><td><code>std::istringstream</code></td><td>从字符串读取（字符串转数值等）</td></tr>
+        <tr><td></td><td><code>std::ostringstream</code></td><td>向字符串写入（格式化拼接）</td></tr>
+        <tr><td></td><td><code>std::stringstream</code></td><td>字符串双向读写</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">格式化操纵符（&lt;iomanip&gt;）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::setw(n)</code></td><td>设置输出宽度为 n</td></tr>
+        <tr><td><code>std::setprecision(n)</code></td><td>设置浮点数精度</td></tr>
+        <tr><td><code>std::fixed</code></td><td>固定小数位数显示</td></tr>
+        <tr><td><code>std::left</code> / <code>std::right</code></td><td>左对齐 / 右对齐</td></tr>
+        <tr><td><code>std::hex</code> / <code>std::oct</code> / <code>std::dec</code></td><td>十六进制 / 八进制 / 十进制输出</td></tr>
+        <tr><td><code>std::setfill(c)</code></td><td>设置填充字符</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 2. String ===================== -->
+<section id="string">
+  <h2>二、字符串处理</h2>
+  <h3>&lt;string&gt; / &lt;cstring&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::string 成员函数</th></tr></thead>
+      <tbody>
+        <tr><td><code>s.length()</code> / <code>s.size()</code></td><td>返回字符串长度</td></tr>
+        <tr><td><code>s.empty()</code></td><td>判断是否为空</td></tr>
+        <tr><td><code>s.substr(pos, len)</code></td><td>提取子串，从 pos 开始取 len 个字符</td></tr>
+        <tr><td><code>s.find(str, pos)</code></td><td>从 pos 查找 str，返回位置或 <code>string::npos</code></td></tr>
+        <tr><td><code>s.rfind(str)</code></td><td>从末尾向前查找</td></tr>
+        <tr><td><code>s.replace(pos, len, str)</code></td><td>替换从 pos 开始的 len 个字符</td></tr>
+        <tr><td><code>s.insert(pos, str)</code></td><td>在 pos 处插入 str</td></tr>
+        <tr><td><code>s.erase(pos, len)</code></td><td>删除从 pos 开始的 len 个字符</td></tr>
+        <tr><td><code>s.append(str)</code> / <code>s += str</code></td><td>追加字符串</td></tr>
+        <tr><td><code>s.c_str()</code></td><td>返回 C 风格字符串（<code>const char*</code>）</td></tr>
+        <tr><td><code>s.compare(str)</code></td><td>比较字符串，类似 strcmp</td></tr>
+        <tr><td><code>s.front()</code> / <code>s.back()</code></td><td>首字符 / 末字符</td></tr>
+        <tr><td><code>s.push_back(c)</code></td><td>末尾追加字符</td></tr>
+        <tr><td><code>s.pop_back()</code></td><td>删除末尾字符</td></tr>
+        <tr><td><code>s.data()</code></td><td>返回底层字符数组指针（C++17 起可写）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">&lt;cstring&gt; C 风格字符串函数</th></tr></thead>
+      <tbody>
+        <tr><td><code>strlen(s)</code></td><td>返回 C 字符串长度（不含 \0）</td></tr>
+        <tr><td><code>strcpy(dst, src)</code></td><td>复制字符串</td></tr>
+        <tr><td><code>strncpy(dst, src, n)</code></td><td>安全复制，最多 n 个字符</td></tr>
+        <tr><td><code>strcat(dst, src)</code></td><td>拼接字符串到 dst 末尾</td></tr>
+        <tr><td><code>strcmp(s1, s2)</code></td><td>比较两个 C 字符串</td></tr>
+        <tr><td><code>strchr(s, c)</code></td><td>查找字符 c 首次出现的位置</td></tr>
+        <tr><td><code>strstr(s1, s2)</code></td><td>查找子串 s2 在 s1 中的位置</td></tr>
+        <tr><td><code>memset(p, val, n)</code></td><td>将内存前 n 字节设为 val</td></tr>
+        <tr><td><code>memcpy(dst, src, n)</code></td><td>复制 n 字节内存</td></tr>
+        <tr><td><code>memcmp(p1, p2, n)</code></td><td>比较 n 字节内存</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">字符串与数值互转</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::stoi(s)</code></td><td>string → int</td></tr>
+        <tr><td><code>std::stol(s)</code></td><td>string → long</td></tr>
+        <tr><td><code>std::stoll(s)</code></td><td>string → long long</td></tr>
+        <tr><td><code>std::stof(s)</code></td><td>string → float</td></tr>
+        <tr><td><code>std::stod(s)</code></td><td>string → double</td></tr>
+        <tr><td><code>std::to_string(val)</code></td><td>数值 → string</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 3. Container ===================== -->
+<section id="container">
+  <h2>三、容器</h2>
+  <h3>&lt;vector&gt; / &lt;list&gt; / &lt;deque&gt; / &lt;stack&gt; / &lt;queue&gt; / &lt;map&gt; / &lt;set&gt; 等</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::vector（动态数组）</th></tr></thead>
+      <tbody>
+        <tr><td><code>v.push_back(val)</code></td><td>尾部插入元素</td></tr>
+        <tr><td><code>v.pop_back()</code></td><td>删除尾部元素</td></tr>
+        <tr><td><code>v.size()</code> / <code>v.empty()</code></td><td>元素个数 / 判空</td></tr>
+        <tr><td><code>v.capacity()</code></td><td>返回当前分配的存储容量</td></tr>
+        <tr><td><code>v.reserve(n)</code></td><td>预分配至少 n 个元素的空间</td></tr>
+        <tr><td><code>v.resize(n)</code></td><td>改变大小为 n</td></tr>
+        <tr><td><code>v.shrink_to_fit()</code></td><td>释放多余容量</td></tr>
+        <tr><td><code>v.front()</code> / <code>v.back()</code></td><td>访问首 / 尾元素</td></tr>
+        <tr><td><code>v[i]</code> / <code>v.at(i)</code></td><td>按下标访问（at 带越界检查）</td></tr>
+        <tr><td><code>v.data()</code></td><td>返回底层数组指针</td></tr>
+        <tr><td><code>v.insert(pos, val)</code></td><td>在迭代器 pos 处插入</td></tr>
+        <tr><td><code>v.erase(pos)</code></td><td>删除迭代器 pos 处元素</td></tr>
+        <tr><td><code>v.clear()</code></td><td>清空所有元素</td></tr>
+        <tr><td><code>v.swap(v2)</code></td><td>与另一 vector 交换内容</td></tr>
+        <tr><td><code>v.emplace_back(args...)</code></td><td>原地构造元素（比 push_back 更高效）</td></tr>
+        <tr><td><code>v.assign(n, val)</code></td><td>用 n 个 val 替换全部内容</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::list（双向链表）</th></tr></thead>
+      <tbody>
+        <tr><td><code>l.push_back(val)</code> / <code>l.push_front(val)</code></td><td>尾部 / 头部插入</td></tr>
+        <tr><td><code>l.pop_back()</code> / <code>l.pop_front()</code></td><td>尾部 / 头部删除</td></tr>
+        <tr><td><code>l.front()</code> / <code>l.back()</code></td><td>访问头部 / 尾部元素</td></tr>
+        <tr><td><code>l.insert(pos, val)</code></td><td>在迭代器 pos 前插入</td></tr>
+        <tr><td><code>l.erase(pos)</code></td><td>删除迭代器 pos 处元素</td></tr>
+        <tr><td><code>l.remove(val)</code></td><td>删除所有等于 val 的元素</td></tr>
+        <tr><td><code>l.sort()</code></td><td>对链表排序</td></tr>
+        <tr><td><code>l.reverse()</code></td><td>反转链表</td></tr>
+        <tr><td><code>l.unique()</code></td><td>去除相邻重复元素</td></tr>
+        <tr><td><code>l.merge(l2)</code></td><td>合并两个有序链表</td></tr>
+        <tr><td><code>l.splice(pos, l2)</code></td><td>将 l2 的元素转移到 pos 处</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::deque（双端队列）</th></tr></thead>
+      <tbody>
+        <tr><td><code>d.push_back(val)</code> / <code>d.push_front(val)</code></td><td>尾部 / 头部插入</td></tr>
+        <tr><td><code>d.pop_back()</code> / <code>d.pop_front()</code></td><td>尾部 / 头部删除</td></tr>
+        <tr><td><code>d[i]</code> / <code>d.at(i)</code></td><td>按下标随机访问</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::stack（栈）</th></tr></thead>
+      <tbody>
+        <tr><td><code>s.push(val)</code></td><td>入栈</td></tr>
+        <tr><td><code>s.pop()</code></td><td>出栈（不返回值）</td></tr>
+        <tr><td><code>s.top()</code></td><td>获取栈顶元素</td></tr>
+        <tr><td><code>s.size()</code> / <code>s.empty()</code></td><td>大小 / 判空</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::queue / std::priority_queue</th></tr></thead>
+      <tbody>
+        <tr><td><code>q.push(val)</code></td><td>入队</td></tr>
+        <tr><td><code>q.pop()</code></td><td>出队（不返回值）</td></tr>
+        <tr><td><code>q.front()</code> / <code>q.back()</code></td><td>访问队首 / 队尾（queue）</td></tr>
+        <tr><td><code>pq.top()</code></td><td>访问优先队列堆顶（最大元素）</td></tr>
+        <tr><td><code>pq.emplace(val)</code></td><td>原地构造并入堆</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::map / std::unordered_map（映射）</th></tr></thead>
+      <tbody>
+        <tr><td><code>m[key]</code></td><td>访问/插入键值对（仅 map）</td></tr>
+        <tr><td><code>m.at(key)</code></td><td>访问，key 不存在抛异常</td></tr>
+        <tr><td><code>m.insert({key, val})</code></td><td>插入键值对</td></tr>
+        <tr><td><code>m.find(key)</code></td><td>查找 key，返回迭代器或 <code>end()</code></td></tr>
+        <tr><td><code>m.count(key)</code></td><td>返回 key 的出现次数</td></tr>
+        <tr><td><code>m.erase(key)</code></td><td>删除 key 对应的元素</td></tr>
+        <tr><td><code>m.lower_bound(key)</code></td><td>第一个 &gt;= key 的迭代器</td></tr>
+        <tr><td><code>m.upper_bound(key)</code></td><td>第一个 &gt; key 的迭代器</td></tr>
+        <tr><td><code>m.equal_range(key)</code></td><td>返回等于 key 的范围</td></tr>
+        <tr><td><code>m.size()</code> / <code>m.empty()</code></td><td>大小 / 判空</td></tr>
+        <tr><td><code>um.bucket_count()</code></td><td>返回桶数量（unordered）</td></tr>
+        <tr><td><code>um.load_factor()</code></td><td>返回负载因子（unordered）</td></tr>
+        <tr><td><code>um.rehash(n)</code></td><td>重新哈希（unordered）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::set / std::unordered_set（集合）</th></tr></thead>
+      <tbody>
+        <tr><td><code>s.insert(val)</code></td><td>插入元素（自动去重）</td></tr>
+        <tr><td><code>s.erase(val)</code></td><td>删除指定元素</td></tr>
+        <tr><td><code>s.find(val)</code></td><td>查找元素</td></tr>
+        <tr><td><code>s.count(val)</code></td><td>判断元素是否存在（0 或 1）</td></tr>
+        <tr><td><code>s.lower_bound(val)</code></td><td>第一个 &gt;= val 的迭代器（仅 set）</td></tr>
+        <tr><td><code>s.upper_bound(val)</code></td><td>第一个 &gt; val 的迭代器（仅 set）</td></tr>
+        <tr><td><code>s.size()</code> / <code>s.empty()</code> / <code>s.clear()</code></td><td>大小 / 判空 / 清空</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::pair / std::tuple</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::make_pair(a, b)</code></td><td>创建 pair</td></tr>
+        <tr><td><code>p.first</code> / <code>p.second</code></td><td>访问 pair 的成员</td></tr>
+        <tr><td><code>std::make_tuple(a, b, c...)</code></td><td>创建 tuple</td></tr>
+        <tr><td><code>std::get&lt;N&gt;(t)</code></td><td>获取 tuple 第 N 个元素</td></tr>
+        <tr><td><code>std::tie(a, b, c) = t</code></td><td>将 tuple 解包到变量</td></tr>
+        <tr><td><code>std::swap(a, b)</code></td><td>交换两个变量</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 4. Algorithm ===================== -->
+<section id="algorithm">
+  <h2>四、算法</h2>
+  <h3>&lt;algorithm&gt; / &lt;numeric&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">排序与重排</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::sort(first, last)</code></td><td>快速排序（不稳定）</td></tr>
+        <tr><td><code>std::stable_sort(first, last)</code></td><td>稳定排序</td></tr>
+        <tr><td><code>std::partial_sort(f, mid, last)</code></td><td>部分排序，前 mid-first 个最小</td></tr>
+        <tr><td><code>std::nth_element(f, nth, last)</code></td><td>将第 n 小元素放到正确位置</td></tr>
+        <tr><td><code>std::reverse(first, last)</code></td><td>反转区间</td></tr>
+        <tr><td><code>std::rotate(first, mid, last)</code></td><td>旋转区间</td></tr>
+        <tr><td><code>std::shuffle(first, last, rng)</code></td><td>随机打乱</td></tr>
+        <tr><td><code>std::next_permutation(f, l)</code></td><td>生成下一个排列</td></tr>
+        <tr><td><code>std::prev_permutation(f, l)</code></td><td>生成上一个排列</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">查找与计数</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::find(first, last, val)</code></td><td>线性查找值</td></tr>
+        <tr><td><code>std::find_if(first, last, pred)</code></td><td>按条件查找</td></tr>
+        <tr><td><code>std::find_if_not(f, l, pred)</code></td><td>查找第一个不满足条件的</td></tr>
+        <tr><td><code>std::count(first, last, val)</code></td><td>计算 val 的出现次数</td></tr>
+        <tr><td><code>std::count_if(first, last, pred)</code></td><td>按条件计数</td></tr>
+        <tr><td><code>std::binary_search(f, l, val)</code></td><td>二分查找（需有序）</td></tr>
+        <tr><td><code>std::lower_bound(f, l, val)</code></td><td>第一个 &gt;= val 的位置</td></tr>
+        <tr><td><code>std::upper_bound(f, l, val)</code></td><td>第一个 &gt; val 的位置</td></tr>
+        <tr><td><code>std::equal_range(f, l, val)</code></td><td>返回等于 val 的范围</td></tr>
+        <tr><td><code>std::search(f1, l1, f2, l2)</code></td><td>查找子序列</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">比较与变换</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::equal(f1, l1, f2)</code></td><td>判断两序列是否相等</td></tr>
+        <tr><td><code>std::for_each(f, l, func)</code></td><td>对每个元素执行 func</td></tr>
+        <tr><td><code>std::transform(f, l, out, func)</code></td><td>对元素做变换，输出到 out</td></tr>
+        <tr><td><code>std::copy(f, l, out)</code></td><td>复制区间</td></tr>
+        <tr><td><code>std::copy_if(f, l, out, pred)</code></td><td>按条件复制</td></tr>
+        <tr><td><code>std::move(f, l, out)</code></td><td>移动区间</td></tr>
+        <tr><td><code>std::fill(f, l, val)</code></td><td>填充区间为 val</td></tr>
+        <tr><td><code>std::replace(f, l, old, new_val)</code></td><td>替换值</td></tr>
+        <tr><td><code>std::remove(f, l, val)</code></td><td>移除值（需配合 erase）</td></tr>
+        <tr><td><code>std::remove_if(f, l, pred)</code></td><td>按条件移除</td></tr>
+        <tr><td><code>std::unique(f, l)</code></td><td>去除相邻重复（需先排序）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">最值与累积</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::min(a, b)</code> / <code>std::max(a, b)</code></td><td>返回较小 / 较大值</td></tr>
+        <tr><td><code>std::min_element(f, l)</code></td><td>返回最小元素的迭代器</td></tr>
+        <tr><td><code>std::max_element(f, l)</code></td><td>返回最大元素的迭代器</td></tr>
+        <tr><td><code>std::minmax(a, b)</code></td><td>返回 pair{最小, 最大}</td></tr>
+        <tr><td><code>std::minmax_element(f, l)</code></td><td>同时返回最小和最大元素的迭代器</td></tr>
+        <tr><td><code>std::clamp(val, lo, hi)</code> <span class="badge badge-green">C++17</span></td><td>将 val 限制在 [lo, hi] 范围内</td></tr>
+        <tr><td><code>std::accumulate(f, l, init)</code></td><td>累加（&lt;numeric&gt;）</td></tr>
+        <tr><td><code>std::inner_product(f1, l1, f2, init)</code></td><td>内积（&lt;numeric&gt;）</td></tr>
+        <tr><td><code>std::partial_sum(f, l, out)</code></td><td>前缀和（&lt;numeric&gt;）</td></tr>
+        <tr><td><code>std::iota(f, l, val)</code></td><td>递增填充（&lt;numeric&gt;）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">集合操作（需有序区间）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::merge(f1, l1, f2, l2, out)</code></td><td>合并两个有序序列</td></tr>
+        <tr><td><code>std::set_union(f1, l1, f2, l2, out)</code></td><td>集合并集</td></tr>
+        <tr><td><code>std::set_intersection(f1, l1, f2, l2, out)</code></td><td>集合交集</td></tr>
+        <tr><td><code>std::set_difference(f1, l1, f2, l2, out)</code></td><td>集合差集</td></tr>
+        <tr><td><code>std::includes(f1, l1, f2, l2)</code></td><td>判断是否为子集</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 5. Math ===================== -->
+<section id="math">
+  <h2>五、数学与数值</h2>
+  <h3>&lt;cmath&gt; / &lt;cstdlib&gt; / &lt;random&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">&lt;cmath&gt; 常用数学函数</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::abs(x)</code></td><td>绝对值</td></tr>
+        <tr><td><code>std::sqrt(x)</code></td><td>平方根</td></tr>
+        <tr><td><code>std::cbrt(x)</code></td><td>立方根</td></tr>
+        <tr><td><code>std::pow(x, y)</code></td><td>x 的 y 次方</td></tr>
+        <tr><td><code>std::exp(x)</code></td><td>e 的 x 次方</td></tr>
+        <tr><td><code>std::log(x)</code></td><td>自然对数</td></tr>
+        <tr><td><code>std::log2(x)</code> / <code>std::log10(x)</code></td><td>以 2 / 10 为底的对数</td></tr>
+        <tr><td><code>std::sin(x)</code> / <code>std::cos(x)</code> / <code>std::tan(x)</code></td><td>三角函数</td></tr>
+        <tr><td><code>std::asin(x)</code> / <code>std::acos(x)</code> / <code>std::atan(x)</code></td><td>反三角函数</td></tr>
+        <tr><td><code>std::atan2(y, x)</code></td><td>四象限反正切</td></tr>
+        <tr><td><code>std::ceil(x)</code></td><td>向上取整</td></tr>
+        <tr><td><code>std::floor(x)</code></td><td>向下取整</td></tr>
+        <tr><td><code>std::round(x)</code></td><td>四舍五入</td></tr>
+        <tr><td><code>std::trunc(x)</code></td><td>截断小数部分</td></tr>
+        <tr><td><code>std::fmod(x, y)</code></td><td>浮点取模</td></tr>
+        <tr><td><code>std::fmax(x, y)</code> / <code>std::fmin(x, y)</code></td><td>浮点最大 / 最小值</td></tr>
+        <tr><td><code>std::hypot(x, y)</code></td><td>计算 sqrt(x²+y²)，避免溢出</td></tr>
+        <tr><td><code>std::isnan(x)</code> / <code>std::isinf(x)</code></td><td>判断 NaN / 无穷</td></tr>
+        <tr><td><code>std::isfinite(x)</code></td><td>判断是否为有限值</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">&lt;cstdlib&gt; 常用函数</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::abs(x)</code></td><td>整数绝对值</td></tr>
+        <tr><td><code>std::div(x, y)</code></td><td>整数除法，返回商和余数</td></tr>
+        <tr><td><code>std::rand()</code></td><td>生成伪随机数</td></tr>
+        <tr><td><code>std::srand(seed)</code></td><td>设置随机数种子</td></tr>
+        <tr><td><code>std::exit(code)</code></td><td>退出程序</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">&lt;random&gt;（C++11 随机数引擎）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::mt19937</code></td><td>梅森旋转引擎</td></tr>
+        <tr><td><code>std::random_device</code></td><td>硬件随机数生成器</td></tr>
+        <tr><td><code>std::uniform_int_distribution&lt;&gt;</code></td><td>均匀整数分布</td></tr>
+        <tr><td><code>std::uniform_real_distribution&lt;&gt;</code></td><td>均匀浮点分布</td></tr>
+        <tr><td><code>std::normal_distribution&lt;&gt;</code></td><td>正态分布</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 6. Chrono ===================== -->
+<section id="chrono">
+  <h2>六、时间与日期</h2>
+  <h3>&lt;chrono&gt; / &lt;thread&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::chrono::steady_clock::now()</code></td><td>获取当前时间点（单调递增）</td></tr>
+        <tr><td><code>std::chrono::system_clock::now()</code></td><td>获取系统当前时间</td></tr>
+        <tr><td><code>std::chrono::duration_cast&lt;ms&gt;(d)</code></td><td>将持续时间转为毫秒</td></tr>
+        <tr><td><code>std::chrono::high_resolution_clock</code></td><td>高精度时钟</td></tr>
+        <tr><td><code>std::chrono::seconds(n)</code></td><td>秒持续时间</td></tr>
+        <tr><td><code>std::chrono::milliseconds(n)</code></td><td>毫秒持续时间</td></tr>
+        <tr><td><code>std::chrono::microseconds(n)</code></td><td>微秒持续时间</td></tr>
+        <tr><td><code>std::this_thread::sleep_for(dur)</code></td><td>当前线程休眠</td></tr>
+        <tr><td><code>std::this_thread::sleep_until(tp)</code></td><td>休眠直到指定时间点</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 7. Memory ===================== -->
+<section id="memory">
+  <h2>七、智能指针与内存管理</h2>
+  <h3>&lt;memory&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::unique_ptr（独占所有权）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::make_unique&lt;T&gt;(args...)</code></td><td>创建 unique_ptr（C++14）</td></tr>
+        <tr><td><code>p.release()</code></td><td>释放所有权，返回裸指针</td></tr>
+        <tr><td><code>p.reset(ptr)</code></td><td>重置为新的指针</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::shared_ptr（共享所有权）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::make_shared&lt;T&gt;(args...)</code></td><td>创建 shared_ptr</td></tr>
+        <tr><td><code>p.use_count()</code></td><td>获取引用计数</td></tr>
+        <tr><td><code>p.reset()</code></td><td>减少引用计数</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">std::weak_ptr（弱引用）</th></tr></thead>
+      <tbody>
+        <tr><td><code>w.lock()</code></td><td>获取 shared_ptr（若对象仍存活）</td></tr>
+        <tr><td><code>w.expired()</code></td><td>判断对象是否已销毁</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 8. Thread ===================== -->
+<section id="thread">
+  <h2>八、多线程与并发</h2>
+  <h3>&lt;thread&gt; / &lt;mutex&gt; / &lt;future&gt; / &lt;atomic&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">线程（&lt;thread&gt;）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::thread(func, args...)</code></td><td>创建并启动线程</td></tr>
+        <tr><td><code>t.join()</code></td><td>等待线程结束</td></tr>
+        <tr><td><code>t.detach()</code></td><td>分离线程</td></tr>
+        <tr><td><code>t.joinable()</code></td><td>判断是否可以 join</td></tr>
+        <tr><td><code>t.get_id()</code></td><td>获取线程 ID</td></tr>
+        <tr><td><code>std::this_thread::get_id()</code></td><td>获取当前线程 ID</td></tr>
+        <tr><td><code>std::this_thread::yield()</code></td><td>让出 CPU 时间片</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">互斥与同步（&lt;mutex&gt; / &lt;condition_variable&gt;）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::mutex</code></td><td>互斥锁</td></tr>
+        <tr><td><code>m.lock()</code> / <code>m.unlock()</code></td><td>加锁 / 解锁</td></tr>
+        <tr><td><code>m.try_lock()</code></td><td>尝试加锁（不阻塞）</td></tr>
+        <tr><td><code>std::lock_guard&lt;std::mutex&gt;</code></td><td>RAII 自动加锁/解锁</td></tr>
+        <tr><td><code>std::unique_lock&lt;std::mutex&gt;</code></td><td>可手动控制的 RAII 锁</td></tr>
+        <tr><td><code>std::scoped_lock(m1, m2...)</code> <span class="badge badge-green">C++17</span></td><td>同时锁多个互斥量</td></tr>
+        <tr><td><code>std::recursive_mutex</code></td><td>可重入互斥锁</td></tr>
+        <tr><td><code>std::condition_variable</code></td><td>条件变量</td></tr>
+        <tr><td><code>cv.wait(lock, pred)</code></td><td>等待条件满足</td></tr>
+        <tr><td><code>cv.notify_one()</code> / <code>cv.notify_all()</code></td><td>唤醒一个 / 所有等待线程</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">异步与未来（&lt;future&gt;）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::async(policy, func, args...)</code></td><td>异步执行函数</td></tr>
+        <tr><td><code>std::future&lt;T&gt;</code></td><td>获取异步结果</td></tr>
+        <tr><td><code>f.get()</code></td><td>阻塞获取结果</td></tr>
+        <tr><td><code>f.wait()</code></td><td>等待结果就绪</td></tr>
+        <tr><td><code>std::promise&lt;T&gt;</code></td><td>设置异步结果值</td></tr>
+        <tr><td><code>p.set_value(val)</code></td><td>设置值</td></tr>
+        <tr><td><code>p.set_exception(eptr)</code></td><td>设置异常</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th colspan="2">原子操作（&lt;atomic&gt;）</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::atomic&lt;T&gt;</code></td><td>原子类型</td></tr>
+        <tr><td><code>a.load()</code> / <code>a.store(val)</code></td><td>原子读取 / 写入</td></tr>
+        <tr><td><code>a.exchange(val)</code></td><td>原子交换</td></tr>
+        <tr><td><code>a.compare_exchange_strong(exp, des)</code></td><td>CAS 操作</td></tr>
+        <tr><td><code>a.fetch_add(n)</code> / <code>a.fetch_sub(n)</code></td><td>原子加法 / 减法</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 9. Functional ===================== -->
+<section id="functional">
+  <h2>九、函数式工具</h2>
+  <h3>&lt;functional&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::function&lt;R(Args...)&gt;</code></td><td>通用函数包装器</td></tr>
+        <tr><td><code>std::bind(func, args...)</code></td><td>绑定函数参数</td></tr>
+        <tr><td><code>std::placeholders::_1, _2...</code></td><td>bind 中的占位符</td></tr>
+        <tr><td><code>std::invoke(func, args...)</code> <span class="badge badge-green">C++17</span></td><td>统一调用</td></tr>
+        <tr><td><code>std::not_fn(f)</code> <span class="badge badge-green">C++17</span></td><td>取反函数对象</td></tr>
+        <tr><td><code>std::less&lt;T&gt;</code> / <code>std::greater&lt;T&gt;</code></td><td>比较函数对象</td></tr>
+        <tr><td><code>std::plus&lt;T&gt;</code> / <code>std::minus&lt;T&gt;</code></td><td>算术函数对象</td></tr>
+        <tr><td><code>std::hash&lt;T&gt;</code></td><td>哈希函数对象</td></tr>
+        <tr><td><code>std::ref(x)</code> / <code>std::cref(x)</code></td><td>创建引用包装器</td></tr>
+        <tr><td><code>std::mem_fn(&amp;Class::method)</code></td><td>将成员函数包装为可调用对象</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 10. Regex ===================== -->
+<section id="regex">
+  <h2>十、正则表达式</h2>
+  <h3>&lt;regex&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::regex</code></td><td>正则表达式对象</td></tr>
+        <tr><td><code>std::smatch</code> / <code>std::cmatch</code></td><td>匹配结果（string / C 字符串）</td></tr>
+        <tr><td><code>std::regex_match(s, m, re)</code></td><td>全串匹配</td></tr>
+        <tr><td><code>std::regex_search(s, m, re)</code></td><td>查找第一个匹配</td></tr>
+        <tr><td><code>std::regex_replace(s, re, fmt)</code></td><td>正则替换</td></tr>
+        <tr><td><code>std::sregex_iterator</code></td><td>遍历所有匹配</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 11. Exception ===================== -->
+<section id="exception">
+  <h2>十一、异常处理</h2>
+  <h3>&lt;stdexcept&gt; / &lt;exception&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>异常类</th><th>触发场景</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::exception</code></td><td>所有标准异常的基类</td></tr>
+        <tr><td><code>std::runtime_error</code></td><td>运行时错误</td></tr>
+        <tr><td><code>std::logic_error</code></td><td>逻辑错误</td></tr>
+        <tr><td><code>std::invalid_argument</code></td><td>无效参数</td></tr>
+        <tr><td><code>std::out_of_range</code></td><td>越界访问</td></tr>
+        <tr><td><code>std::overflow_error</code></td><td>算术溢出</td></tr>
+        <tr><td><code>std::underflow_error</code></td><td>算术下溢</td></tr>
+        <tr><td><code>std::bad_alloc</code></td><td>内存分配失败（new 抛出）</td></tr>
+        <tr><td><code>std::bad_cast</code></td><td>动态类型转换失败</td></tr>
+        <tr><td><code>e.what()</code></td><td>获取异常描述字符串</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 12. Type Traits ===================== -->
+<section id="traits">
+  <h2>十二、类型特性与元编程</h2>
+  <h3>&lt;type_traits&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::is_same&lt;A, B&gt;</code></td><td>判断两类型是否相同</td></tr>
+        <tr><td><code>std::is_integral&lt;T&gt;</code></td><td>是否为整数类型</td></tr>
+        <tr><td><code>std::is_floating_point&lt;T&gt;</code></td><td>是否为浮点类型</td></tr>
+        <tr><td><code>std::is_pointer&lt;T&gt;</code></td><td>是否为指针类型</td></tr>
+        <tr><td><code>std::is_const&lt;T&gt;</code></td><td>是否为 const</td></tr>
+        <tr><td><code>std::remove_const&lt;T&gt;</code></td><td>去除 const</td></tr>
+        <tr><td><code>std::remove_reference&lt;T&gt;</code></td><td>去除引用</td></tr>
+        <tr><td><code>std::decay&lt;T&gt;</code></td><td>退化类型（去引用、cv、数组退化）</td></tr>
+        <tr><td><code>std::enable_if&lt;cond, T&gt;</code></td><td>SFINAE 条件编译</td></tr>
+        <tr><td><code>std::conditional&lt;B, T, F&gt;</code></td><td>编译期条件类型选择</td></tr>
+        <tr><td><code>std::is_convertible&lt;From, To&gt;</code></td><td>判断是否可隐式转换</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 13. Modern C++ ===================== -->
+<section id="modern">
+  <h2>十三、C++17/20 实用工具</h2>
+  <h3>&lt;optional&gt; / &lt;variant&gt; / &lt;any&gt; / &lt;string_view&gt; / &lt;filesystem&gt; / &lt;span&gt; / &lt;bit&gt;</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>头文件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>std::optional&lt;T&gt;</code></td><td><code>&lt;optional&gt;</code></td><td>可选值（可能为空）</td></tr>
+        <tr><td><code>std::variant&lt;Ts...&gt;</code></td><td><code>&lt;variant&gt;</code></td><td>类型安全的联合体</td></tr>
+        <tr><td><code>std::any</code></td><td><code>&lt;any&gt;</code></td><td>可存储任意类型</td></tr>
+        <tr><td><code>std::string_view</code></td><td><code>&lt;string_view&gt;</code></td><td>字符串只读视图（零拷贝）</td></tr>
+        <tr><td><code>std::span&lt;T&gt;</code> <span class="badge badge-purple">C++20</span></td><td><code>&lt;span&gt;</code></td><td>连续序列的只读/写视图</td></tr>
+        <tr><td><code>std::filesystem::path</code></td><td><code>&lt;filesystem&gt;</code></td><td>路径操作</td></tr>
+        <tr><td><code>std::filesystem::exists(p)</code></td><td><code>&lt;filesystem&gt;</code></td><td>判断文件/目录是否存在</td></tr>
+        <tr><td><code>std::filesystem::create_directory(p)</code></td><td><code>&lt;filesystem&gt;</code></td><td>创建目录</td></tr>
+        <tr><td><code>std::filesystem::remove(p)</code></td><td><code>&lt;filesystem&gt;</code></td><td>删除文件/空目录</td></tr>
+        <tr><td><code>std::filesystem::copy(from, to)</code></td><td><code>&lt;filesystem&gt;</code></td><td>复制文件/目录</td></tr>
+        <tr><td><code>std::filesystem::file_size(p)</code></td><td><code>&lt;filesystem&gt;</code></td><td>获取文件大小</td></tr>
+        <tr><td><code>std::filesystem::directory_iterator</code></td><td><code>&lt;filesystem&gt;</code></td><td>遍历目录</td></tr>
+        <tr><td><code>if constexpr (cond)</code></td><td>语言特性</td><td>编译期条件分支</td></tr>
+        <tr><td><code>std::bit_cast&lt;To&gt;(from)</code> <span class="badge badge-purple">C++20</span></td><td><code>&lt;bit&gt;</code></td><td>类型安全的位重解释</td></tr>
+        <tr><td><code>std::countl_zero(x)</code> <span class="badge badge-purple">C++20</span></td><td><code>&lt;bit&gt;</code></td><td>计算前导零个数</td></tr>
+        <tr><td><code>std::bit_ceil(x)</code> <span class="badge badge-purple">C++20</span></td><td><code>&lt;bit&gt;</code></td><td>不小于 x 的最小 2 的幂</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== Appendix ===================== -->
+<section id="macro">
+  <h2>附录：常用宏与预处理</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>宏 / 指令</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>#include &lt;header&gt;</code></td><td>包含头文件</td></tr>
+        <tr><td><code>#define NAME value</code></td><td>定义宏</td></tr>
+        <tr><td><code>#ifdef</code> / <code>#ifndef</code> / <code>#endif</code></td><td>条件编译</td></tr>
+        <tr><td><code>#pragma once</code></td><td>头文件保护（非标准但广泛支持）</td></tr>
+        <tr><td><code>__FILE__</code></td><td>当前文件名</td></tr>
+        <tr><td><code>__LINE__</code></td><td>当前行号</td></tr>
+        <tr><td><code>__func__</code></td><td>当前函数名</td></tr>
+        <tr><td><code>static_assert(cond, msg)</code></td><td>编译期断言</td></tr>
+        <tr><td><code>assert(cond)</code></td><td>运行时断言（&lt;cassert&gt;）</td></tr>
+        <tr><td><code>offsetof(T, member)</code></td><td>成员偏移量（&lt;cstddef&gt;）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="tip-box">
+  <strong>提示：</strong>以上函数按 C++17 标准整理，部分标注了 C++20 新增（紫色标签）。使用时请确保编译器标准标志匹配，如 <code>-std=c++17</code> 或 <code>-std=c++20</code>。
+</div>
+
+<footer>
+  C++ 常用库函数速查表 &mdash; 基于 C++17/20 标准
+</footer>
+
+</div>
+</body>
+</html>

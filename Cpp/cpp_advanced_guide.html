@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ 实战提高 — 深度指导与练习</title>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
+  --fg:#e6edf3;--fg2:#8b949e;--fg3:#6e7681;
+  --accent:#58a6ff;--accent2:#1f6feb;--accent3:#388bfd;
+  --code-bg:#161b22;--code-fg:#e6edf3;
+  --border:#30363d;--border2:#21262d;
+  --tip:#0d2818;--tip-border:#238636;
+  --warn:#2d1f00;--warn-border:#d29922;
+  --example-bg:#131926;--example-border:#388bfd;
+  --exercise-bg:#1a1410;--exercise-border:#d18616;
+  --shadow:0 2px 16px rgba(0,0,0,.35);
+  --sidebar-w:280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Noto Serif SC","Source Han Serif SC","Georgia",serif;line-height:1.85;color:var(--fg);background:var(--bg)}
+
+/* ---- Sidebar ---- */
+.sidebar{
+  position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;z-index:100;padding:28px 0 20px;
+  transition:transform .3s ease;
+}
+.sidebar-header{padding:0 20px 18px;border-bottom:1px solid var(--border)}
+.sidebar-header h2{font-size:1rem;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.sidebar-header p{font-size:.75rem;color:var(--fg3);margin-top:4px}
+.sidebar nav{padding:12px 0}
+.sidebar nav a{
+  display:block;padding:7px 20px;font-size:.85rem;color:var(--fg2);
+  text-decoration:none;border-left:3px solid transparent;
+  transition:all .15s ease;
+}
+.sidebar nav a:hover{color:var(--fg);background:rgba(88,166,255,.06);border-left-color:var(--fg3)}
+.sidebar nav a.active{color:var(--accent);background:rgba(88,166,255,.1);border-left-color:var(--accent);font-weight:600}
+.sidebar nav .nav-chapter{font-weight:600;color:var(--fg);font-size:.88rem;margin-top:10px;padding-top:10px}
+.sidebar nav .nav-section{padding-left:32px;font-size:.8rem}
+
+/* Hamburger */
+.menu-toggle{
+  display:none;position:fixed;top:14px;left:14px;z-index:200;
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  color:var(--fg);font-size:1.4rem;padding:4px 10px;cursor:pointer;
+}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+
+/* ---- Main Content ---- */
+.main{margin-left:var(--sidebar-w);padding:32px 40px 80px;max-width:900px}
+
+h1{font-size:2rem;margin:32px 0 8px;letter-spacing:.04em;color:var(--fg)}
+.subtitle{color:var(--fg2);font-size:1rem;margin-bottom:48px}
+h2{font-size:1.5rem;color:var(--accent);margin:56px 0 20px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+h3{font-size:1.18rem;color:#c9d1d9;margin:36px 0 14px}
+h4{font-size:1.02rem;color:#b0b8c1;margin:24px 0 10px}
+p{margin:10px 0;text-align:justify}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+ul,ol{margin:10px 0 10px 24px}
+li{margin:4px 0}
+code{font-family:"JetBrains Mono","Fira Code","Consolas",monospace;font-size:.88em;background:rgba(110,118,129,.25);padding:2px 6px;border-radius:4px;color:#e6edf3}
+pre{background:var(--code-bg);color:var(--code-fg);padding:20px 24px;border-radius:8px;overflow-x:auto;margin:16px 0;font-size:.85rem;line-height:1.7;border:1px solid var(--border);box-shadow:var(--shadow)}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+.kw{color:#ff7b72}.tp{color:#79c0ff}.fn{color:#7ee787}.cm{color:#8b949e;font-style:italic}.st{color:#a5d6ff}.nu{color:#ffa657}.op{color:#89dceb}.mc{color:#f778ba}
+
+.card{border-radius:8px;padding:20px 24px;margin:20px 0;border:1px solid var(--border);box-shadow:var(--shadow)}
+.example{background:var(--example-bg);border-left:4px solid var(--example-border)}
+.exercise{background:var(--exercise-bg);border-left:4px solid var(--exercise-border)}
+.tip{background:var(--tip);border-left:4px solid var(--tip-border);padding:14px 20px;margin:14px 0;border-radius:6px;color:#b4f1b4}
+.warn{background:var(--warn);border-left:4px solid var(--warn-border);padding:14px 20px;margin:14px 0;border-radius:6px;color:#f0c060}
+.card-title{font-weight:700;font-size:1.05rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--fg)}
+.card-title .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.78rem;color:#fff}
+.badge-eg{background:var(--accent3)}
+.badge-ex{background:#d18616}
+
+details{margin:14px 0}
+details summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0;user-select:none}
+details summary:hover{text-decoration:underline}
+details[open] summary{margin-bottom:10px}
+
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:.92rem}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+th{background:var(--bg3);color:var(--fg)}
+td{color:var(--fg)}
+
+.diagram{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:16px;margin:14px 0;font-family:monospace;font-size:.85rem;white-space:pre;line-height:1.5;overflow-x:auto}
+.toc{display:none}/* hide inline toc, sidebar replaces it */
+
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:48px 0}
+.footer{text-align:center;color:var(--fg3);font-size:.85rem;margin-top:60px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar{width:5px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .menu-toggle{display:block}
+  .overlay.open{display:block}
+  .main{margin-left:0;padding:24px 18px 60px}
+}
+@media print{
+  .sidebar,.menu-toggle{display:none}
+  .main{margin-left:0;max-width:100%;padding:0}
+  pre{white-space:pre-wrap;word-break:break-all}
+  .card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger -->
+<button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+<div class="overlay" id="overlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h2>C++ 实战提高</h2>
+<p>19 道例题 · 10 道练习</p>
+</div>
+<nav id="nav">
+<a href="#ch1" class="nav-chapter">一、指针与内存管理</a>
+<a href="#s1-1" class="nav-section">1.1 指针、引用与生命周期</a>
+<a href="#s1-2" class="nav-section">1.2 智能指针工程实践</a>
+<a href="#s1-3" class="nav-section">1.3 内存布局与对齐</a>
+<a href="#ex1" class="nav-section">练习 1.1 - 1.2</a>
+
+<a href="#ch2" class="nav-chapter">二、面向对象与资源管理</a>
+<a href="#s2-1" class="nav-section">2.1 RAII 与 Rule of Five</a>
+<a href="#s2-2" class="nav-section">2.2 多态的代价与替代</a>
+<a href="#s2-3" class="nav-section">2.3 Pimpl 编译防火墙</a>
+<a href="#ex2" class="nav-section">练习 2.1 - 2.2</a>
+
+<a href="#ch3" class="nav-chapter">三、模板与泛型编程</a>
+<a href="#s3-1" class="nav-section">3.1 模板推导与 CTAD</a>
+<a href="#s3-2" class="nav-section">3.2 特化与偏特化</a>
+<a href="#s3-3" class="nav-section">3.3 SFINAE / if constexpr / Concepts</a>
+<a href="#s3-4" class="nav-section">3.4 可变参数模板</a>
+<a href="#ex3" class="nav-section">练习 3.1 - 3.2</a>
+
+<a href="#ch4" class="nav-chapter">四、现代 C++ 工程实践</a>
+<a href="#s4-1" class="nav-section">4.1 Lambda 与闭包</a>
+<a href="#s4-2" class="nav-section">4.2 并发编程基础</a>
+<a href="#s4-3" class="nav-section">4.3 异常安全</a>
+<a href="#ex4" class="nav-section">练习 4.1 - 4.2</a>
+
+<a href="#ch5" class="nav-chapter">五、STL 深入与算法编程</a>
+<a href="#s5-1" class="nav-section">5.1 容器选择策略</a>
+<a href="#s5-2" class="nav-section">5.2 自定义迭代器</a>
+<a href="#s5-3" class="nav-section">5.3 算法组合与数据管道</a>
+<a href="#ex5" class="nav-section">练习 5.1 - 5.2</a>
+
+<a href="#roadmap" class="nav-chapter">学习路线建议</a>
+</nav>
+</aside>
+
+<!-- Main content -->
+<div class="main">
+
+<h1>C++ 实战提高 — 深度指导与练习</h1>
+<p class="subtitle">从语法熟练到工程精通 · 五大核心主题 · 19 道例题 · 10 道练习</p>
+
+<!-- ============================================================ -->
+<!--  CHAPTER 1                                                     -->
+<!-- ============================================================ -->
+<h2 id="ch1">一、指针与内存管理深入</h2>
+
+<p>指针是 C++ 的灵魂，也是最容易出错的根源。本章不再重复 "指针是一个存储地址的变量" 这种基础内容，而是从<strong>内存模型、值类别、智能指针的工程用法、内存布局</strong>四个维度深入讨论，目标是让你能自信地回答 "这段代码在底层到底发生了什么"。</p>
+
+<h3 id="s1-1">1.1 指针、引用与对象生命周期</h3>
+
+<p>引用在语义上是别名，但在底层实现上通常就是一个常量指针（<code>T* const</code>）。关键区别在于编译器对引用做了更强的约束：<strong>引用必须绑定到有效对象，且不能重新绑定</strong>。但这些约束只在编译期生效，运行时并不会做额外检查，这意味着悬垂引用（dangling reference）在运行时和悬垂指针一样危险。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 1.1</span> 悬垂引用与返回局部变量</div>
+<p>分析下面三段代码的行为，判断哪些是安全的：</p>
+<pre><code><span class="cm">// (A) 返回局部变量的引用</span>
+<span class="kw">const</span> <span class="tp">int</span>&amp; <span class="fn">getRef</span>() {
+    <span class="tp">int</span> x = <span class="nu">42</span>;
+    <span class="kw">return</span> x;  <span class="cm">// 危险！</span>
+}
+
+<span class="cm">// (B) 返回字面量的 const 引用</span>
+<span class="kw">const</span> <span class="tp">int</span>&amp; <span class="fn">getVal</span>() {
+    <span class="kw">return</span> <span class="nu">42</span>;  <span class="cm">// 安全吗？</span>
+}
+
+<span class="cm">// (C) 返回 static 局部变量的引用</span>
+<span class="tp">int</span>&amp; <span class="fn">getStatic</span>() {
+    <span class="kw">static</span> <span class="tp">int</span> x = <span class="nu">42</span>;
+    <span class="kw">return</span> x;  <span class="cm">// 安全</span>
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p><strong>(A)</strong> 经典的未定义行为。局部变量 <code>x</code> 在函数返回后被销毁，引用指向已回收的栈内存。编译器通常会给出 <code>warning: returning reference to local temporary object</code>。</p>
+<p><strong>(B)</strong> 这是一个微妙的问题。<code>return 42;</code> 中 <code>42</code> 是一个 prvalue（纯右值），绑定到 <code>const int&amp;</code> 时会创建一个临时对象。但 C++ 标准规定：<strong>函数返回时临时对象的生命周期不会延长</strong>（只有通过局部变量绑定才会延长），所以这也是悬垂引用，是未定义行为。</p>
+<p><strong>(C)</strong> 完全安全。<code>static</code> 变量的生命周期与程序相同，引用始终有效。但要小心多线程下的初始化竞争——C++11 起保证静态局部变量的线程安全初始化（Meyers' Singleton）。</p>
+</details>
+</div>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 1.2</span> 值类别与 std::move 的真相</div>
+<p>理解值类别（value category）是掌握移动语义的前提。分析以下代码：</p>
+<pre><code><span class="tp">std::string</span> a = <span class="st">"hello"</span>;
+<span class="tp">std::string</span> b = std::<span class="fn">move</span>(a);
+
+<span class="cm">// 此时 a 处于什么状态？a 还是 "hello" 吗？</span>
+<span class="cm">// std::move 到底做了什么？</span>
+
+<span class="tp">std::string</span> c;
+c = std::<span class="fn">move</span>(b);
+
+<span class="cm">// 再看一个常见陷阱：</span>
+<span class="kw">void</span> <span class="fn">process</span>(<span class="tp">std::string</span> s);
+
+<span class="tp">std::string</span> name = <span class="st">"world"</span>;
+<span class="fn">process</span>(std::<span class="fn">move</span>(name));
+std::cout &lt;&lt; name &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 输出什么？</span></code></pre>
+
+<details><summary>查看解析</summary>
+<p><strong>std::move 的本质</strong>：<code>std::move</code> 本身<strong>不移动任何东西</strong>，它只是一个类型转换——将左值转换为右值引用（xvalue），使得后续代码可以选择调用移动构造函数/移动赋值运算符。真正的"移动"发生在移动构造/赋值函数内部。</p>
+<p><code>b = std::move(a)</code> 之后，<code>a</code> 处于<strong>"有效但未指定"（valid but unspecified）</strong>状态。对于 <code>std::string</code>，大多数实现会将 <code>a</code> 置为空字符串，但标准不保证这一点。你唯一能保证的是：<code>a</code> 可以被安全析构，也可以被重新赋值。</p>
+<p><code>process(std::move(name))</code> 之后，<code>name</code> 同样处于有效但未指定状态。<code>std::cout &lt;&lt; name</code> 不会崩溃（析构安全），但输出内容不可预测——可能是空串，也可能是其他内容。这就是为什么移动后的对象应该只用于重新赋值或析构。</p>
+
+<div class="warn">
+<strong>实战要点：</strong>不要在移动后的对象上调用除析构和赋值之外的任何操作，除非你明确知道该类型的移动语义实现细节。
+</div>
+</details>
+</div>
+
+<h3 id="s1-2">1.2 智能指针工程实践</h3>
+
+<p>现代 C++ 中，裸指针（raw pointer）应仅用于<strong>非拥有性观察</strong>（non-owning observation），资源所有权一律由智能指针管理。三种智能指针各有适用场景：</p>
+
+<table>
+<tr><th>智能指针</th><th>所有权模型</th><th>典型场景</th><th>开销</th></tr>
+<tr><td><code>unique_ptr</code></td><td>独占</td><td>工厂函数、Pimpl、容器元素</td><td>零开销（与裸指针相同）</td></tr>
+<tr><td><code>shared_ptr</code></td><td>共享（引用计数）</td><td>观察者模式、缓存、图结构</td><td>控制块 + 原子操作</td></tr>
+<tr><td><code>weak_ptr</code></td><td>非拥有观察</td><td>打破循环引用、缓存失效检测</td><td>与 shared_ptr 共享控制块</td></tr>
+</table>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 1.3</span> shared_ptr 循环引用问题</div>
+<p>下面这段代码有什么问题？如何修复？</p>
+<pre><code><span class="kw">struct</span> <span class="tp">Node</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">std::shared_ptr</span>&lt;<span class="tp">Node</span>&gt; parent;
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::shared_ptr</span>&lt;<span class="tp">Node</span>&gt;&gt; children;
+
+    <span class="fn">~Node</span>() { std::cout &lt;&lt; <span class="st">"~"</span> &lt;&lt; name &lt;&lt; <span class="st">"\n"</span>; }
+};
+
+<span class="kw">auto</span> root = std::make_shared&lt;<span class="tp">Node</span>&gt;(<span class="tp">Node</span>{<span class="st">"root"</span>, <span class="kw">nullptr</span>, {}});
+<span class="kw">auto</span> child = std::make_shared&lt;<span class="tp">Node</span>&gt;(<span class="tp">Node</span>{<span class="st">"child"</span>, root, {}});
+root-&gt;children.push_back(child);
+
+<span class="cm">// 离开作用域后，析构函数会被调用吗？</span></code></pre>
+
+<details><summary>查看解析</summary>
+<p><strong>问题</strong>：形成了循环引用。<code>root</code> 的 <code>children</code> 持有 <code>child</code> 的 <code>shared_ptr</code>，<code>child</code> 的 <code>parent</code> 持有 <code>root</code> 的 <code>shared_ptr</code>。当离开作用域时，两个智能指针的局部变量被销毁，但各自的引用计数仍为 1（互相引用），导致<strong>内存泄漏</strong>——析构函数永远不会被调用。</p>
+
+<p><strong>修复方案</strong>：将 <code>parent</code> 改为 <code>weak_ptr</code>：</p>
+<pre><code><span class="kw">struct</span> <span class="tp">Node</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">std::weak_ptr</span>&lt;<span class="tp">Node</span>&gt; parent;  <span class="cm">// weak_ptr 不参与引用计数</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::shared_ptr</span>&lt;<span class="tp">Node</span>&gt;&gt; children;
+};</code></pre>
+<p>使用时通过 <code>parent.lock()</code> 获取临时的 <code>shared_ptr</code>，如果父节点已被销毁则返回空指针。这既避免了循环引用，又提供了安全的访问方式。</p>
+
+<div class="tip">
+<strong>设计原则：</strong>在树/图结构中，<strong>"拥有"关系用 shared_ptr，"引用"关系用 weak_ptr</strong>。一般来说，父节点拥有子节点（shared_ptr），子节点引用父节点（weak_ptr）。
+</div>
+</details>
+</div>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 1.4</span> 自定义删除器与 unique_ptr 的工程用法</div>
+<p>unique_ptr 不仅管理内存，还能管理任意资源。实现一个安全的文件句柄封装：</p>
+<pre><code><span class="kw">struct</span> <span class="tp">FileCloser</span> {
+    <span class="kw">void</span> <span class="kw">operator</span>()(<span class="tp">FILE</span>* fp) <span class="kw">const</span> {
+        <span class="kw">if</span> (fp) {
+            std::<span class="fn">fclose</span>(fp);
+            std::cout &lt;&lt; <span class="st">"File closed.\n"</span>;
+        }
+    }
+};
+
+<span class="kw">using</span> <span class="tp">UniqueFile</span> = <span class="tp">std::unique_ptr</span>&lt;<span class="tp">FILE</span>, <span class="tp">FileCloser</span>&gt;;
+
+<span class="tp">UniqueFile</span> <span class="fn">openFile</span>(<span class="kw">const</span> <span class="kw">char</span>* path, <span class="kw">const</span> <span class="kw">char</span>* mode) {
+    <span class="tp">FILE</span>* fp = std::<span class="fn">fopen</span>(path, mode);
+    <span class="kw">if</span> (!fp) <span class="kw">throw</span> <span class="tp">std::runtime_error</span>(<span class="st">"Failed to open file"</span>);
+    <span class="kw">return</span> <span class="tp">UniqueFile</span>(fp);
+}
+
+<span class="kw">void</span> <span class="fn">demo</span>() {
+    <span class="kw">auto</span> f = <span class="fn">openFile</span>(<span class="st">"data.txt"</span>, <span class="st">"r"</span>);
+    <span class="cm">// 使用 f.get() 获取 FILE*...</span>
+    <span class="cm">// 离开作用域时自动 fclose</span>
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p><code>unique_ptr</code> 的第二个模板参数是删除器（Deleter）类型。当 <code>unique_ptr</code> 析构或重置时，会调用 <code>Deleter(ptr)</code> 而非 <code>delete ptr</code>。这个模式适用于所有 C 风格资源的封装：文件句柄（<code>FILE*</code>）、网络连接（socket fd）、互斥锁（<code>pthread_mutex_t</code>）、数据库连接等。</p>
+<p>注意：使用自定义删除器的 <code>unique_ptr</code> 不再是零开销——它需要存储删除器对象。如果删除器是空类（如上面的 <code>FileCloser</code>），空基类优化（EBCO）可以保证不增加额外大小。但如果使用 lambda 作为删除器，每个 lambda 类型不同且可能有捕获，会增大 <code>unique_ptr</code> 的体积。在性能敏感场景中优先使用函数对象。</p>
+</details>
+</div>
+
+<h3 id="s1-3">1.3 内存布局与对齐</h3>
+
+<p>理解对象的内存布局对于网络序列化、二进制文件 I/O、与 C 接口交互等场景至关重要。C++ 标准不保证具体的布局方式，但在同一平台上，编译器遵循确定的规则。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 1.5</span> 结构体内存布局分析</div>
+<p>在 64 位系统上，下面结构体各占多少字节？</p>
+<pre><code><span class="kw">struct</span> <span class="tp">A</span> {
+    <span class="kw">char</span>   a;   <span class="cm">// 1 byte</span>
+    <span class="tp">int</span>    b;   <span class="cm">// 4 bytes</span>
+    <span class="kw">char</span>   c;   <span class="cm">// 1 byte</span>
+};
+
+<span class="kw">struct</span> <span class="tp">B</span> {
+    <span class="kw">char</span>   a;   <span class="cm">// 1 byte</span>
+    <span class="kw">char</span>   c;   <span class="cm">// 1 byte</span>
+    <span class="tp">int</span>    b;   <span class="cm">// 4 bytes</span>
+};
+
+<span class="kw">struct</span> <span class="tp">C</span> {
+    <span class="kw">double</span>  x;  <span class="cm">// 8 bytes</span>
+    <span class="tp">int</span>     y;  <span class="cm">// 4 bytes</span>
+    <span class="kw">char</span>    z;  <span class="cm">// 1 byte</span>
+};</code></pre>
+
+<details><summary>查看解析</summary>
+<p>关键规则：<strong>每个成员的起始地址必须是其自身大小（或编译器默认对齐值，取较小者）的整数倍</strong>，且整个结构体的大小必须是最大对齐成员的整数倍。</p>
+
+<p><strong>struct A</strong>（对齐 = 4，由 int 决定）：<code>a</code> 在 offset 0（1 byte），然后 3 bytes 填充，<code>b</code> 在 offset 4（4 bytes），<code>c</code> 在 offset 8（1 byte），然后 3 bytes 尾部填充。<strong>sizeof(A) = 12</strong>。</p>
+
+<p><strong>struct B</strong>（对齐 = 4）：<code>a</code> 在 offset 0（1 byte），<code>c</code> 在 offset 1（1 byte），<code>b</code> 在 offset 4（4 bytes，前面 2 bytes 填充）。<strong>sizeof(B) = 8</strong>。仅仅调整成员顺序，就节省了 4 字节。</p>
+
+<p><strong>struct C</strong>（对齐 = 8，由 double 决定）：<code>x</code> 在 offset 0（8 bytes），<code>y</code> 在 offset 8（4 bytes），<code>z</code> 在 offset 12（1 byte），然后 3 bytes 尾部填充。<strong>sizeof(C) = 16</strong>。</p>
+
+<div class="tip">
+<strong>实战技巧：</strong>始终按成员大小从大到小排列，可以最小化填充浪费。在需要精确控制布局的场景（如网络协议、GPU buffer），使用 <code>#pragma pack(push, 1)</code> 或 <code>[[gnu::packed]]</code>，但要注意：packed 结构体的未对齐访问在某些架构上会导致崩溃或性能损失。
+</div>
+</details>
+</div>
+
+<div class="card exercise" id="ex1">
+<div class="card-title"><span class="badge badge-ex">练习 1.1</span> 智能指针工厂</div>
+<p>设计一个资源管理器类 <code>ResourceManager</code>，要求：</p>
+<ol>
+<li>内部维护一个 <code>std::map&lt;std::string, std::shared_ptr&lt;Resource&gt;&gt;</code> 缓存</li>
+<li><code>get(name)</code> 方法：如果缓存中有则返回 shared_ptr，否则创建新的 Resource 并缓存</li>
+<li><code>getWeak(name)</code> 方法：返回 weak_ptr，允许调用者检测资源是否仍被管理</li>
+<li>提供 <code>cleanup()</code> 方法，移除缓存中引用计数为 1 的资源（即只有缓存自身持有）</li>
+</ol>
+
+<details><summary>查看提示</summary>
+<p>注意 <code>shared_ptr::use_count()</code> 方法可以获取当前引用计数。如果 <code>use_count() == 1</code>，说明只有缓存自身持有，可以安全移除。另外考虑线程安全——如果多个线程同时调用 <code>get()</code>，需要加锁保护。</p>
+</details>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">class</span> <span class="tp">Resource</span> {
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">Resource</span>(<span class="tp">std::string</span> n) : name(std::<span class="fn">move</span>(n)) {}
+    <span class="tp">std::string</span> name;
+};
+
+<span class="kw">class</span> <span class="tp">ResourceManager</span> {
+    <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">std::shared_ptr</span>&lt;<span class="tp">Resource</span>&gt;&gt; cache_;
+    <span class="tp">std::mutex</span> mtx_;
+
+<span class="kw">public</span>:
+    <span class="tp">std::shared_ptr</span>&lt;<span class="tp">Resource</span>&gt; <span class="fn">get</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; name) {
+        <span class="tp">std::lock_guard</span> lock(mtx_);
+        <span class="kw">auto</span> it = cache_.<span class="fn">find</span>(name);
+        <span class="kw">if</span> (it != cache_.<span class="fn">end</span>()) <span class="kw">return</span> it-&gt;second;
+        <span class="kw">auto</span> res = std::make_shared&lt;<span class="tp">Resource</span>&gt;(name);
+        cache_[name] = res;
+        <span class="kw">return</span> res;
+    }
+
+    <span class="tp">std::weak_ptr</span>&lt;<span class="tp">Resource</span>&gt; <span class="fn">getWeak</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; name) {
+        <span class="tp">std::lock_guard</span> lock(mtx_);
+        <span class="kw">auto</span> it = cache_.<span class="fn">find</span>(name);
+        <span class="kw">if</span> (it != cache_.<span class="fn">end</span>()) <span class="kw">return</span> it-&gt;second;
+        <span class="kw">return</span> {};
+    }
+
+    <span class="kw">void</span> <span class="fn">cleanup</span>() {
+        <span class="tp">std::lock_guard</span> lock(mtx_);
+        <span class="kw">for</span> (<span class="kw">auto</span> it = cache_.<span class="fn">begin</span>(); it != cache_.<span class="fn">end</span>(); ) {
+            <span class="kw">if</span> (it-&gt;second.<span class="fn">use_count</span>() == <span class="nu">1</span>)
+                it = cache_.<span class="fn">erase</span>(it);
+            <span class="kw">else</span>
+                ++it;
+        }
+    }
+};</code></pre>
+</details>
+</div>
+
+<div class="card exercise">
+<div class="card-title"><span class="badge badge-ex">练习 1.2</span> 移动语义实战</div>
+<p>实现一个 <code>Matrix</code> 类，支持：</p>
+<ol>
+<li>动态分配二维数组（用一维 <code>double*</code> 模拟）</li>
+<li>正确实现拷贝构造和移动构造</li>
+<li>在移动构造中，确保源对象处于有效空状态</li>
+<li>用 <code>std::chrono</code> 对比拷贝 vs 移动 1000x1000 矩阵的耗时</li>
+</ol>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">class</span> <span class="tp">Matrix</span> {
+    <span class="tp">size_t</span> rows_, cols_;
+    <span class="kw">double</span>* data_;
+
+<span class="kw">public</span>:
+    <span class="fn">Matrix</span>(<span class="tp">size_t</span> r, <span class="tp">size_t</span> c)
+        : rows_(r), cols_(c), data_(<span class="kw">new</span> <span class="kw">double</span>[r * c]{}) {}
+
+    <span class="cm">// 拷贝构造</span>
+    <span class="fn">Matrix</span>(<span class="kw">const</span> <span class="tp">Matrix</span>&amp; o)
+        : rows_(o.rows_), cols_(o.cols_),
+          data_(<span class="kw">new</span> <span class="kw">double</span>[o.rows_ * o.cols_]) {
+        std::<span class="fn">copy</span>(o.data_, o.data_ + rows_ * cols_, data_);
+    }
+
+    <span class="cm">// 移动构造</span>
+    <span class="fn">Matrix</span>(<span class="tp">Matrix</span>&amp;&amp; o) <span class="kw">noexcept</span>
+        : rows_(o.rows_), cols_(o.cols_), data_(o.data_) {
+        o.rows_ = o.cols_ = <span class="nu">0</span>;
+        o.data_ = <span class="kw">nullptr</span>;
+    }
+
+    <span class="fn">~Matrix</span>() { <span class="kw">delete</span>[] data_; }
+
+    <span class="cm">// 移动赋值、拷贝赋值省略，用 copy-swap 实现...</span>
+};</code></pre>
+<p>性能测试中，移动构造的耗时应接近 0（仅交换几个指针），而拷贝构造需要分配内存并复制约 8MB 数据，差异通常在数百倍以上。</p>
+</details>
+</div>
+
+<div class="sep"></div>
+
+<!-- ============================================================ -->
+<!--  CHAPTER 2                                                     -->
+<!-- ============================================================ -->
+<h2 id="ch2">二、面向对象与资源管理</h2>
+
+<p>本章聚焦于 C++ 面向对象设计中最容易出错、也最影响程序健壮性的问题：如何正确管理资源、如何设计可维护的类层次、以及现代 C++ 中静态多态和编译防火墙等高级技巧。</p>
+
+<h3 id="s2-1">2.1 RAII 与 Rule of Five / Rule of Zero</h3>
+
+<p><strong>RAII</strong>（Resource Acquisition Is Initialization）是 C++ 资源管理的基石：将资源的获取与对象的构造绑定，释放与析构绑定，利用栈对象的自动析构保证资源不泄漏。所有智能指针、锁、文件流都是 RAII 的体现。</p>
+
+<p>当你管理的类拥有需要手动释放的资源时，必须考虑 <strong>Rule of Five</strong>：如果自定义了析构函数、拷贝构造、拷贝赋值、移动构造、移动赋值中的任何一个，通常五个都需要自定义。而 <strong>Rule of Zero</strong> 则建议：尽量让类不管理裸资源，通过组合智能指针和标准容器，让编译器自动生成的特殊成员函数就足够。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 2.1</span> Rule of Five 完整实现</div>
+<p>实现一个管理动态缓冲区的 <code>Buffer</code> 类，正确实现全部五个特殊成员函数：</p>
+<pre><code><span class="kw">class</span> <span class="tp">Buffer</span> {
+    <span class="kw">char</span>*  data_;
+    <span class="tp">size_t</span> size_;
+
+<span class="kw">public</span>:
+    <span class="cm">// 构造函数</span>
+    <span class="kw">explicit</span> <span class="fn">Buffer</span>(<span class="tp">size_t</span> n)
+        : data_(<span class="kw">new</span> <span class="kw">char</span>[n]{}) , size_(n) {}
+
+    <span class="cm">// 1. 析构函数</span>
+    <span class="fn">~Buffer</span>() { <span class="kw">delete</span>[] data_; }
+
+    <span class="cm">// 2. 拷贝构造函数</span>
+    <span class="fn">Buffer</span>(<span class="kw">const</span> <span class="tp">Buffer</span>&amp; o)
+        : data_(<span class="kw">new</span> <span class="kw">char</span>[o.size_]), size_(o.size_) {
+        std::<span class="fn">memcpy</span>(data_, o.data_, size_);
+    }
+
+    <span class="cm">// 3. 拷贝赋值运算符（copy-swap 惯用法）</span>
+    <span class="tp">Buffer</span>&amp; <span class="kw">operator</span>=(<span class="tp">Buffer</span> o) {  <span class="cm">// 注意：按值传递</span>
+        <span class="fn">swap</span>(*<span class="kw">this</span>, o);
+        <span class="kw">return</span> *<span class="kw">this</span>;
+    }
+
+    <span class="cm">// 4. 移动构造函数</span>
+    <span class="fn">Buffer</span>(<span class="tp">Buffer</span>&amp;&amp; o) <span class="kw">noexcept</span>
+        : data_(o.data_), size_(o.size_) {
+        o.data_ = <span class="kw">nullptr</span>;
+        o.size_ = <span class="nu">0</span>;
+    }
+
+    <span class="cm">// 5. 移动赋值运算符</span>
+    <span class="tp">Buffer</span>&amp; <span class="kw">operator</span>=(<span class="tp">Buffer</span>&amp;&amp; o) <span class="kw">noexcept</span> {
+        <span class="kw">if</span> (<span class="kw">this</span> != &amp;o) {
+            <span class="kw">delete</span>[] data_;
+            data_ = o.data_;
+            size_ = o.size_;
+            o.data_ = <span class="kw">nullptr</span>;
+            o.size_ = <span class="nu">0</span>;
+        }
+        <span class="kw">return</span> *<span class="kw">this</span>;
+    }
+
+    <span class="kw">friend</span> <span class="kw">void</span> <span class="fn">swap</span>(<span class="tp">Buffer</span>&amp; a, <span class="tp">Buffer</span>&amp; b) <span class="kw">noexcept</span> {
+        <span class="kw">using</span> std::swap;
+        <span class="fn">swap</span>(a.data_, b.data_);
+        <span class="fn">swap</span>(a.size_, b.size_);
+    }
+};</code></pre>
+
+<details><summary>查看解析</summary>
+<p>注意几个关键设计选择：</p>
+<p><strong>Copy-swap 惯用法</strong>：拷贝赋值通过按值传递参数（触发拷贝构造或移动构造），然后与参数交换。这样拷贝构造、移动构造、拷贝赋值、移动赋值可以合并为一个 <code>operator=(Buffer)</code>，但代价是损失了移动赋值的自赋值保护和部分性能。</p>
+<p><strong>noexcept 的重要性</strong>：移动操作标记 <code>noexcept</code> 是<strong>必须的</strong>。STL 容器（如 <code>std::vector</code>）在重新分配时会优先使用移动操作，但只有当移动操作是 <code>noexcept</code> 时才使用——否则为了保证强异常安全，会退回到拷贝。一个没有 <code>noexcept</code> 的移动构造会导致 <code>vector::push_back</code> 慢数十倍。</p>
+
+<div class="tip">
+<strong>Rule of Zero 实践：</strong>如果将 <code>char*</code> 替换为 <code>std::vector&lt;char&gt;</code> 或 <code>std::unique_ptr&lt;char[]&gt;</code>，就完全不需要手写任何一个特殊成员函数——编译器自动生成的就是正确的。这就是 Rule of Zero 的核心思想：<strong>最好的资源管理代码是你不需要写的代码</strong>。
+</div>
+</details>
+</div>
+
+<h3 id="s2-2">2.2 多态的代价与替代方案</h3>
+
+<p>虚函数实现了运行时多态，但带来了三个代价：每次调用通过虚表（vtable）间接寻址（通常增加 1-3 个时钟周期）、对象体积增加一个 vptr（8 bytes on 64-bit）、编译器无法内联优化。在性能敏感场景中，有两条替代路线：<strong>CRTP（静态多态）</strong>和 <strong>std::variant（值语义多态）</strong>。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 2.2</span> CRTP — 编译期多态</div>
+<p>用 CRTP（Curiously Recurring Template Pattern）实现无需虚函数的接口模式：</p>
+<pre><code><span class="cm">// 静态"接口"——通过模板参数调用派生类方法</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">Derived</span>&gt;
+<span class="kw">class</span> <span class="tp">Shape</span> {
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">area</span>() <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="kw">static_cast</span>&lt;<span class="kw">const</span> <span class="tp">Derived</span>&amp;&gt;(*<span class="kw">this</span>).<span class="fn">areaImpl</span>();
+    }
+    <span class="kw">void</span> <span class="fn">draw</span>() <span class="kw">const</span> {
+        <span class="kw">static_cast</span>&lt;<span class="kw">const</span> <span class="tp">Derived</span>&amp;&gt;(*<span class="kw">this</span>).<span class="fn">drawImpl</span>();
+    }
+};
+
+<span class="kw">class</span> <span class="tp">Circle</span> : <span class="kw">public</span> <span class="tp">Shape</span>&lt;<span class="tp">Circle</span>&gt; {
+    <span class="kw">double</span> r_;
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">Circle</span>(<span class="kw">double</span> r) : r_(r) {}
+    <span class="kw">double</span> <span class="fn">areaImpl</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="nu">3.14159265</span> * r_ * r_; }
+    <span class="kw">void</span> <span class="fn">drawImpl</span>() <span class="kw">const</span> { std::cout &lt;&lt; <span class="st">"Drawing circle\n"</span>; }
+};
+
+<span class="kw">class</span> <span class="tp">Rect</span> : <span class="kw">public</span> <span class="tp">Shape</span>&lt;<span class="tp">Rect</span>&gt; {
+    <span class="kw">double</span> w_, h_;
+<span class="kw">public</span>:
+    <span class="fn">Rect</span>(<span class="kw">double</span> w, <span class="kw">double</span> h) : w_(w), h_(h) {}
+    <span class="kw">double</span> <span class="fn">areaImpl</span>() <span class="kw">const</span> { <span class="kw">return</span> w_ * h_; }
+    <span class="kw">void</span> <span class="fn">drawImpl</span>() <span class="kw">const</span> { std::cout &lt;&lt; <span class="st">"Drawing rect\n"</span>; }
+};
+
+<span class="cm">// 使用：模板函数而非虚函数调用</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">void</span> <span class="fn">printArea</span>(<span class="kw">const</span> <span class="tp">Shape</span>&lt;<span class="tp">T</span>&gt;&amp; s) {
+    std::cout &lt;&lt; <span class="st">"Area: "</span> &lt;&lt; s.<span class="fn">area</span>() &lt;&lt; <span class="st">"\n"</span>;
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p>CRTP 的核心思想：基类是模板类，派生类将自身作为模板参数传给基类。基类通过 <code>static_cast</code> 将 <code>this</code> 转换为派生类引用，直接调用派生类的方法。所有调用在编译期确定，没有虚表开销，编译器可以内联。</p>
+<p><strong>局限性</strong>：CRTP 无法在运行时将不同派生类存入同一容器（因为 <code>Shape&lt;Circle&gt;</code> 和 <code>Shape&lt;Rect&gt;</code> 是不同类型）。解决方案通常是将 CRTP 与类型擦除（type erasure）或 <code>std::variant</code> 结合使用。</p>
+
+<table>
+<tr><th>方案</th><th>运行时开销</th><th>异构容器</th><th>代码复杂度</th></tr>
+<tr><td>虚函数</td><td>vtable 间接调用</td><td>天然支持</td><td>低</td></tr>
+<tr><td>CRTP</td><td>零（可内联）</td><td>不支持</td><td>中</td></tr>
+<tr><td>std::variant</td><td>栈上访问（无堆分配）</td><td>封闭类型集</td><td>中</td></tr>
+</table>
+</details>
+</div>
+
+<h3 id="s2-3">2.3 Pimpl 惯用法（编译防火墙）</h3>
+
+<p>Pimpl（Pointer to Implementation）将类的实现细节隐藏在一个指针后面，头文件中不再需要包含实现相关的头文件。这有两个核心好处：<strong>减少编译依赖</strong>（修改实现不需要重新编译使用者）和<strong>保持 ABI 稳定</strong>（增加私有成员不影响类的二进制布局）。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 2.3</span> Pimpl 实现编译防火墙</div>
+<pre><code><span class="cm">// ===== Widget.h（头文件）=====</span>
+<span class="kw">class</span> <span class="tp">Widget</span> {
+<span class="kw">public</span>:
+    <span class="fn">Widget</span>();
+    <span class="fn">~Widget</span>();                          <span class="cm">// 必须在 .cpp 中定义</span>
+    <span class="fn">Widget</span>(<span class="tp">Widget</span>&amp;&amp;) <span class="kw">noexcept</span>;         <span class="cm">// 必须在 .cpp 中定义</span>
+    <span class="tp">Widget</span>&amp; <span class="kw">operator</span>=(<span class="tp">Widget</span>&amp;&amp;);       <span class="cm">// 必须在 .cpp 中定义</span>
+
+    <span class="kw">void</span> <span class="fn">doWork</span>();
+
+<span class="kw">private</span>:
+    <span class="kw">struct</span> <span class="tp">Impl</span>;                       <span class="cm">// 前向声明</span>
+    <span class="tp">std::unique_ptr</span>&lt;<span class="tp">Impl</span>&gt; pImpl_;     <span class="cm">// 唯一的数据成员</span>
+};
+
+<span class="cm">// ===== Widget.cpp（实现文件）=====</span>
+<span class="kw">struct</span> <span class="tp">Widget::Impl</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">std::vector</span>&lt;<span class="kw">int</span>&gt; data;
+    <span class="cm">// 可以随意增删成员，不影响 Widget.h 的使用者</span>
+};
+
+<span class="tp">Widget</span>::<span class="fn">Widget</span>() : pImpl_(std::make_unique&lt;<span class="tp">Impl</span>&gt;()) {}
+<span class="tp">Widget</span>::<span class="fn">~Widget</span>() = <span class="kw">default</span>;
+<span class="tp">Widget</span>::<span class="fn">Widget</span>(<span class="tp">Widget</span>&amp;&amp;) <span class="kw">noexcept</span> = <span class="kw">default</span>;
+<span class="tp">Widget</span>&amp; <span class="tp">Widget</span>::<span class="kw">operator</span>=(<span class="tp">Widget</span>&amp;&amp;) = <span class="kw">default</span>;
+
+<span class="kw">void</span> <span class="tp">Widget</span>::<span class="fn">doWork</span>() {
+    pImpl_-&gt;data.<span class="fn">push_back</span>(<span class="nu">42</span>);
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p>关键点：析构函数、移动构造、移动赋值都<strong>必须在 .cpp 中定义</strong>（即使只是 <code>= default</code>）。原因是 <code>unique_ptr</code> 的析构需要看到 <code>Impl</code> 的完整定义，而头文件中只有前向声明。如果在头文件中 <code>= default</code>，编译器会在头文件上下文中实例化析构，此时 <code>Impl</code> 是不完整类型，导致编译错误。</p>
+<p>注意 Pimpl 不支持拷贝——<code>unique_ptr</code> 不可拷贝。如果需要拷贝，需要手动实现深拷贝（在 .cpp 中 new 一个新的 Impl 副本）。</p>
+</details>
+</div>
+
+<div class="card exercise" id="ex2">
+<div class="card-title"><span class="badge badge-ex">练习 2.1</span> RAII 线程安全计数器</div>
+<p>实现一个 <code>ScopedCounter</code> 类，满足：</p>
+<ol>
+<li>构造时原子地将一个全局计数器加 1</li>
+<li>析构时原子地将计数器减 1</li>
+<li>提供静态方法 <code>current()</code> 查询当前计数</li>
+<li>写一个测试：启动 10 个线程，每个线程创建 1000 个 <code>ScopedCounter</code> 对象（放入 vector），验证在全部线程结束后计数为 0</li>
+</ol>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">class</span> <span class="tp">ScopedCounter</span> {
+    <span class="kw">static</span> <span class="kw">inline</span> <span class="tp">std::atomic</span>&lt;<span class="kw">int</span>&gt; count_{<span class="nu">0</span>};
+<span class="kw">public</span>:
+    <span class="fn">ScopedCounter</span>()  { count_.<span class="fn">fetch_add</span>(<span class="nu">1</span>, <span class="tp">std::memory_order_relaxed</span>); }
+    <span class="fn">~ScopedCounter</span>() { count_.<span class="fn">fetch_sub</span>(<span class="nu">1</span>, <span class="tp">std::memory_order_relaxed</span>); }
+    <span class="fn">ScopedCounter</span>(<span class="kw">const</span> <span class="tp">ScopedCounter</span>&amp; o) { count_.<span class="fn">fetch_add</span>(<span class="nu">1</span>); }
+    <span class="fn">ScopedCounter</span>(<span class="tp">ScopedCounter</span>&amp;&amp; o) <span class="kw">noexcept</span> { <span class="cm">/* 不增计数 */</span> }
+
+    <span class="kw">static</span> <span class="kw">int</span> <span class="fn">current</span>() { <span class="kw">return</span> count_.<span class="fn">load</span>(); }
+};</code></pre>
+<p>注意拷贝构造也要增加计数——每个对象析构时都会减 1，所以拷贝时需要加 1 来保持平衡。移动构造则不需要，因为源对象的析构仍会减 1。</p>
+</details>
+</div>
+
+<div class="card exercise">
+<div class="card-title"><span class="badge badge-ex">练习 2.2</span> 用 std::variant 实现 JSON 值</div>
+<p>实现一个简化的 JSON 值类型，支持 null、bool、int、double、string、array、object。使用 <code>std::variant</code> 和 <code>std::visit</code> 实现类型安全的访问。</p>
+
+<details><summary>查看提示</summary>
+<p><code>std::variant</code> 不能直接递归（类型不完整），需要通过 <code>std::unique_ptr</code> 或 <code>std::vector</code> 间接引用自身类型。C++17 中可以用 <code>std::unique_ptr</code> 包装递归类型。</p>
+</details>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">struct</span> <span class="tp">Json</span>;
+<span class="kw">using</span> <span class="tp">JsonArray</span>  = <span class="tp">std::vector</span>&lt;<span class="tp">Json</span>&gt;;
+<span class="kw">using</span> <span class="tp">JsonObject</span> = <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">Json</span>&gt;;
+
+<span class="kw">struct</span> <span class="tp">Json</span> {
+    <span class="tp">std::variant</span>&lt;
+        <span class="tp">std::monostate</span>,  <span class="cm">// null</span>
+        <span class="kw">bool</span>,
+        <span class="kw">int64_t</span>,
+        <span class="kw">double</span>,
+        <span class="tp">std::string</span>,
+        <span class="tp">JsonArray</span>,
+        <span class="tp">JsonObject</span>
+    &gt; data;
+
+    <span class="kw">bool</span> <span class="fn">isNull</span>() <span class="kw">const</span> {
+        <span class="kw">return</span> std::holds_alternative&lt;<span class="tp">std::monostate</span>&gt;(data);
+    }
+
+    <span class="kw">void</span> <span class="fn">print</span>(<span class="kw">int</span> indent = <span class="nu">0</span>) <span class="kw">const</span> {
+        std::<span class="fn">visit</span>([indent](<span class="kw">auto</span>&amp;&amp; val) {
+            <span class="kw">using</span> <span class="tp">T</span> = std::decay_t&lt;<span class="kw">decltype</span>(val)&gt;;
+            <span class="kw">if</span> <span class="kw">constexpr</span> (std::is_same_v&lt;<span class="tp">T</span>, <span class="tp">std::monostate</span>&gt;)
+                std::cout &lt;&lt; <span class="st">"null"</span>;
+            <span class="kw">else if</span> <span class="kw">constexpr</span> (std::is_same_v&lt;<span class="tp">T</span>, <span class="kw">bool</span>&gt;)
+                std::cout &lt;&lt; (val ? <span class="st">"true"</span> : <span class="st">"false"</span>);
+            <span class="kw">else if</span> <span class="kw">constexpr</span> (std::is_same_v&lt;<span class="tp">T</span>, <span class="tp">std::string</span>&gt;)
+                std::cout &lt;&lt; <span class="st">"\""</span> &lt;&lt; val &lt;&lt; <span class="st">"\""</span>;
+            <span class="kw">else</span>
+                std::cout &lt;&lt; val;
+        }, data);
+    }
+};</code></pre>
+</details>
+</div>
+
+<div class="sep"></div>
+
+<!-- ============================================================ -->
+<!--  CHAPTER 3                                                     -->
+<!-- ============================================================ -->
+<h2 id="ch3">三、模板与泛型编程</h2>
+
+<p>模板是 C++ 最强大的抽象工具，也是最难调试的特性之一。本章从实用的角度出发，覆盖模板参数推导、特化、SFINAE、Concepts（C++20）、可变参数模板和类型萃取六大主题。</p>
+
+<h3 id="s3-1">3.1 模板参数推导与 CTAD</h3>
+
+<p>C++17 引入了类模板参数推导（CTAD），允许像函数模板一样自动推导类模板的参数。但 CTAD 并非万能——有时需要自定义推导指引（deduction guide）。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 3.1</span> CTAD 与自定义推导指引</div>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">struct</span> <span class="tp">Pair</span> {
+    <span class="tp">T</span> first, second;
+    <span class="fn">Pair</span>(<span class="tp">T</span> a, <span class="tp">T</span> b) : first(a), second(b) {}
+};
+
+<span class="cm">// CTAD 自动推导</span>
+<span class="tp">Pair</span> p1(<span class="nu">3</span>, <span class="nu">4</span>);           <span class="cm">// Pair&lt;int&gt; ✓</span>
+<span class="tp">Pair</span> p2(<span class="nu">3.14</span>, <span class="nu">2.72</span>);    <span class="cm">// Pair&lt;double&gt; ✓</span>
+
+<span class="cm">// 问题：不同类型参数</span>
+<span class="cm">// Pair p3(3, 4.5);     // 编译错误！T 无法同时是 int 和 double</span>
+
+<span class="cm">// 解决方案：自定义推导指引</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span> <span class="tp">U</span>&gt;
+<span class="fn">Pair</span>(<span class="tp">T</span>, <span class="tp">U</span>) -&gt; <span class="tp">Pair</span>&lt;<span class="tp">std::common_type_t</span>&lt;<span class="tp">T</span>, <span class="tp">U</span>&gt;&gt;;
+
+<span class="tp">Pair</span> p3(<span class="nu">3</span>, <span class="nu">4.5</span>);         <span class="cm">// Pair&lt;double&gt; ✓ 通过 common_type 推导</span></code></pre>
+
+<details><summary>查看解析</summary>
+<p>推导指引（deduction guide）是告诉编译器"当看到这样的构造时，应该推导出这样的模板参数"的规则。语法是 <code>TemplateName(params) -&gt; DeducedType;</code>。<code>std::common_type_t</code> 是标准库提供的类型萃取，返回能容纳所有参数的"最宽"类型。</p>
+<p>标准库中大量使用了推导指引。例如 <code>std::vector v = {1, 2, 3};</code> 能工作就是因为有内置的推导指引。</p>
+</details>
+</div>
+
+<h3 id="s3-2">3.2 特化与偏特化</h3>
+
+<p>模板特化允许为特定类型提供不同的实现，偏特化（partial specialization）允许为类型族提供定制版本。这是实现类型相关优化的基础。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 3.2</span> 向量点积的类型优化</div>
+<pre><code><span class="cm">// 通用模板：逐元素相乘再求和</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">T</span> <span class="fn">dot</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt;&amp; a, <span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt;&amp; b) {
+    <span class="kw">assert</span>(a.<span class="fn">size</span>() == b.<span class="fn">size</span>());
+    <span class="tp">T</span> result{};
+    <span class="kw">for</span> (<span class="tp">size_t</span> i = <span class="nu">0</span>; i &lt; a.<span class="fn">size</span>(); ++i)
+        result += a[i] * b[i];
+    <span class="kw">return</span> result;
+}
+
+<span class="cm">// 全特化：为 bool 向量优化（位运算 + popcount）</span>
+<span class="kw">template</span>&lt;&gt;
+<span class="kw">bool</span> <span class="fn">dot</span>&lt;<span class="kw">bool</span>&gt;(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="kw">bool</span>&gt;&amp; a, <span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="kw">bool</span>&gt;&amp; b) {
+    <span class="kw">assert</span>(a.<span class="fn">size</span>() == b.<span class="fn">size</span>());
+    <span class="kw">int</span> result = <span class="nu">0</span>;
+    <span class="kw">for</span> (<span class="tp">size_t</span> i = <span class="nu">0</span>; i &lt; a.<span class="fn">size</span>(); ++i)
+        result ^= (a[i] &amp; b[i]);  <span class="cm">// XOR 累积</span>
+    <span class="kw">return</span> <span class="kw">static_cast</span>&lt;<span class="kw">bool</span>&gt;(result);
+}
+
+<span class="cm">// 偏特化示例：为 pair 类型定制比较</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">struct</span> <span class="tp">Equal</span> {
+    <span class="kw">bool</span> <span class="kw">operator</span>()(<span class="kw">const</span> <span class="tp">T</span>&amp; a, <span class="kw">const</span> <span class="tp">T</span>&amp; b) { <span class="kw">return</span> a == b; }
+};
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">A</span>, <span class="kw">typename</span> <span class="tp">B</span>&gt;
+<span class="kw">struct</span> <span class="tp">Equal</span>&lt;<span class="tp">std::pair</span>&lt;<span class="tp">A</span>, <span class="tp">B</span>&gt;&gt; {
+    <span class="kw">bool</span> <span class="kw">operator</span>()(<span class="kw">const</span> <span class="tp">std::pair</span>&lt;<span class="tp">A</span>,<span class="tp">B</span>&gt;&amp; x, <span class="kw">const</span> <span class="tp">std::pair</span>&lt;<span class="tp">A</span>,<span class="tp">B</span>&gt;&amp; y) {
+        <span class="kw">return</span> <span class="tp">Equal</span>&lt;<span class="tp">A</span>&gt;{}(x.first, y.first)
+            &amp;&amp; <span class="tp">Equal</span>&lt;<span class="tp">B</span>&gt;{}(x.second, y.second);
+    }
+};</code></pre>
+
+<details><summary>查看解析</summary>
+<p><strong>全特化</strong>（<code>template&lt;&gt;</code>）为某个具体类型完全替换实现；<strong>偏特化</strong>为匹配某个模式的所有类型提供定制版本。编译器在实例化时按以下优先级选择：完全匹配 &gt; 偏特化 &gt; 通用模板。</p>
+<p>偏特化常用于实现类型萃取（type traits）。标准库中的 <code>std::is_pointer</code>、<code>std::is_array</code> 等就是通过偏特化实现的。</p>
+</details>
+</div>
+
+<h3 id="s3-3">3.3 SFINAE、if constexpr 与 Concepts</h3>
+
+<p>这三种机制解决同一个问题：如何根据类型特征选择不同实现。它们代表了 C++ 的三代技术方案。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 3.3</span> 三种时代的序列化器</div>
+<p>实现一个 <code>serialize</code> 函数，对算术类型直接转字符串，对容器类型递归序列化元素：</p>
+
+<p><strong>方案一：SFINAE（C++11/14）</strong></p>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">auto</span> <span class="fn">serialize</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; val)
+    -&gt; std::enable_if_t&lt;std::is_arithmetic_v&lt;<span class="tp">T</span>&gt;, <span class="tp">std::string</span>&gt;
+{
+    <span class="kw">return</span> std::to_string(val);
+}
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">auto</span> <span class="fn">serialize</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; container)
+    -&gt; std::enable_if_t&lt;!std::is_arithmetic_v&lt;<span class="tp">T</span>&gt;, <span class="tp">std::string</span>&gt;
+{
+    <span class="tp">std::string</span> result = <span class="st">"["</span>;
+    <span class="kw">bool</span> first = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span>&amp; elem : container) {
+        <span class="kw">if</span> (!first) result += <span class="st">", "</span>;
+        result += <span class="fn">serialize</span>(elem);
+        first = <span class="kw">false</span>;
+    }
+    <span class="kw">return</span> result + <span class="st">"]"</span>;
+}</code></pre>
+
+<p><strong>方案二：if constexpr（C++17）</strong></p>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">std::string</span> <span class="fn">serialize</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; val) {
+    <span class="kw">if</span> <span class="kw">constexpr</span> (std::is_arithmetic_v&lt;<span class="tp">T</span>&gt;) {
+        <span class="kw">return</span> std::to_string(val);
+    } <span class="kw">else</span> {
+        <span class="tp">std::string</span> result = <span class="st">"["</span>;
+        <span class="kw">bool</span> first = <span class="kw">true</span>;
+        <span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span>&amp; elem : val) {
+            <span class="kw">if</span> (!first) result += <span class="st">", "</span>;
+            result += <span class="fn">serialize</span>(elem);
+            first = <span class="kw">false</span>;
+        }
+        <span class="kw">return</span> result + <span class="st">"]"</span>;
+    }
+}</code></pre>
+
+<p><strong>方案三：Concepts（C++20）</strong></p>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">concept</span> <span class="tp">Arithmetic</span> = std::is_arithmetic_v&lt;<span class="tp">T</span>&gt;;
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">concept</span> <span class="tp">Range</span> = <span class="kw">requires</span>(<span class="tp">T</span> t) {
+    { t.<span class="fn">begin</span>() } -&gt; std::input_iterator;
+    { t.<span class="fn">end</span>() };
+};
+
+<span class="tp">std::string</span> <span class="fn">serialize</span>(<span class="kw">const</span> <span class="tp">Arithmetic</span> <span class="kw">auto</span>&amp; val) {
+    <span class="kw">return</span> std::to_string(val);
+}
+
+<span class="tp">std::string</span> <span class="fn">serialize</span>(<span class="kw">const</span> <span class="tp">Range</span> <span class="kw">auto</span>&amp; container) {
+    <span class="tp">std::string</span> result = <span class="st">"["</span>;
+    <span class="kw">bool</span> first = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span>&amp; elem : container) {
+        <span class="kw">if</span> (!first) result += <span class="st">", "</span>;
+        result += <span class="fn">serialize</span>(elem);
+        first = <span class="kw">false</span>;
+    }
+    <span class="kw">return</span> result + <span class="st">"]"</span>;
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p>三种方案的对比：</p>
+<table>
+<tr><th>方案</th><th>可读性</th><th>错误信息</th><th>编译期开销</th><th>推荐</th></tr>
+<tr><td>SFINAE</td><td>差（语法晦涩）</td><td>难以理解</td><td>高（多轮重载决议）</td><td>仅维护旧代码</td></tr>
+<tr><td>if constexpr</td><td>好</td><td>中等</td><td>低</td><td>C++17 项目首选</td></tr>
+<tr><td>Concepts</td><td>最好</td><td>清晰直观</td><td>低</td><td>C++20+ 项目首选</td></tr>
+</table>
+<p>Concepts 的最大优势是<strong>错误信息</strong>：当传入不满足约束的类型时，编译器会直接告诉你"类型 X 不满足 Range 概念"，而非给出几百行的模板实例化错误。</p>
+</details>
+</div>
+
+<h3 id="s3-4">3.4 可变参数模板</h3>
+
+<p>可变参数模板（variadic template）让模板接受任意数量、任意类型的参数。它是 <code>std::tuple</code>、<code>std::make_unique</code>、<code>std::apply</code> 等标准库组件的基础。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 3.4</span> 类型安全的日志系统</div>
+<pre><code><span class="cm">// 基础情形：无参数</span>
+<span class="kw">void</span> <span class="fn">log</span>() {
+    std::cout &lt;&lt; <span class="st">"\n"</span>;
+}
+
+<span class="cm">// 递归展开（C++11/14 风格）</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span>... <span class="tp">Args</span>&gt;
+<span class="kw">void</span> <span class="fn">log</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; first, <span class="kw">const</span> <span class="tp">Args</span>&amp;... rest) {
+    std::cout &lt;&lt; first;
+    <span class="kw">if</span> <span class="kw">constexpr</span> (<span class="kw">sizeof</span>...(rest) &gt; <span class="nu">0</span>)
+        std::cout &lt;&lt; <span class="st">" | "</span>;
+    <span class="fn">log</span>(rest...);
+}
+
+<span class="cm">// C++17 折叠表达式（更简洁）</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... <span class="tp">Args</span>&gt;
+<span class="kw">void</span> <span class="fn">log2</span>(<span class="kw">const</span> <span class="tp">Args</span>&amp;... args) {
+    ((std::cout &lt;&lt; args &lt;&lt; <span class="st">" | "</span>), ...);
+    std::cout &lt;&lt; <span class="st">"\n"</span>;
+}
+
+<span class="cm">// 使用</span>
+<span class="fn">log</span>(<span class="st">"Error"</span>, <span class="nu">404</span>, <span class="st">"Not Found"</span>, <span class="nu">3.14</span>);
+<span class="cm">// 输出: Error | 404 | Not Found | 3.14</span></code></pre>
+
+<details><summary>查看解析</summary>
+<p><code>sizeof...(Args)</code> 获取参数包的大小。<code>Args&amp;...</code> 中的 <code>...</code> 是包展开（pack expansion）。C++17 的折叠表达式 <code>((expr), ...)</code> 将逗号运算符应用到参数包的每个元素，是最简洁的展开方式。</p>
+<p><code>std::forward&lt;Args&gt;(args)...</code>（完美转发）在实际工程中通常与可变参数模板配合使用，确保参数按原始的值类别传递。</p>
+</details>
+</div>
+
+<div class="card exercise" id="ex3">
+<div class="card-title"><span class="badge badge-ex">练习 3.1</span> 实现 compile-time 类型安全的 printf</div>
+<p>实现 <code>safePrint</code> 函数模板，要求：</p>
+<ol>
+<li>第一个参数是格式字符串，包含 <code>{}</code> 占位符</li>
+<li>后续参数填充占位符，参数数量必须与占位符数量一致（编译期检查）</li>
+<li>使用 C++17 <code>if constexpr</code> 对字符串类型自动加引号</li>
+</ol>
+<p>示例调用：<code>safePrint("name={}, age={}", "Alice", 30);</code> 输出 <code>name="Alice", age=30</code></p>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">void</span> <span class="fn">printValue</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; val) {
+    <span class="kw">if</span> <span class="kw">constexpr</span> (std::is_same_v&lt;std::decay_t&lt;<span class="tp">T</span>&gt;, <span class="kw">const</span> <span class="kw">char</span>*&gt;
+               || std::is_same_v&lt;std::decay_t&lt;<span class="tp">T</span>&gt;, <span class="tp">std::string</span>&gt;) {
+        std::cout &lt;&lt; <span class="st">"\""</span> &lt;&lt; val &lt;&lt; <span class="st">"\""</span>;
+    } <span class="kw">else</span> {
+        std::cout &lt;&lt; val;
+    }
+}
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... <span class="tp">Args</span>&gt;
+<span class="kw">void</span> <span class="fn">safePrint</span>(<span class="kw">const</span> <span class="kw">char</span>* fmt, <span class="kw">const</span> <span class="tp">Args</span>&amp;... args) {
+    <span class="kw">constexpr</span> <span class="tp">size_t</span> expected = <span class="cm">/* 编译期计算 {} 数量 */</span> <span class="nu">0</span>;
+    <span class="kw">static_assert</span>(<span class="kw">sizeof</span>...(args) == expected,
+        <span class="st">"Argument count mismatch"</span>);
+
+    <span class="kw">const</span> <span class="kw">char</span>* p = fmt;
+    <span class="kw">auto</span> printNext = [&amp;p](<span class="kw">const</span> <span class="kw">auto</span>&amp; val) {
+        <span class="kw">while</span> (*p) {
+            <span class="kw">if</span> (*p == <span class="st">'{'</span> &amp;&amp; *(p+<span class="nu">1</span>) == <span class="st">'}'</span>) {
+                <span class="fn">printValue</span>(val);
+                p += <span class="nu">2</span>;
+                <span class="kw">return</span>;
+            }
+            std::cout &lt;&lt; *p++;
+        }
+    };
+    (printNext(args), ...);
+    std::cout &lt;&lt; p;  <span class="cm">// 输出剩余格式字符</span>
+}</code></pre>
+<p>实际工程中，编译期计算 <code>{}</code> 数量可以用 <code>consteval</code> 函数（C++20）或 <code>constexpr</code> 函数遍历格式字符串实现。</p>
+</details>
+</div>
+
+<div class="card exercise">
+<div class="card-title"><span class="badge badge-ex">练习 3.2</span> 实现 is_container 类型萃取</div>
+<p>实现 <code>is_container&lt;T&gt;</code>，当 <code>T</code> 具有 <code>begin()</code>、<code>end()</code> 和 <code>size()</code> 方法时为 <code>true</code>，否则为 <code>false</code>。要求使用 C++17 的 <code>std::void_t</code> 技术。</p>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="cm">// 主模板：默认 false</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span> = <span class="kw">void</span>&gt;
+<span class="kw">struct</span> <span class="tp">is_container</span> : std::false_type {};
+
+<span class="cm">// 偏特化：当 T 满足条件时启用</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">struct</span> <span class="tp">is_container</span>&lt;<span class="tp">T</span>, std::void_t&lt;
+    <span class="kw">decltype</span>(std::declval&lt;<span class="tp">T</span>&gt;().<span class="fn">begin</span>()),
+    <span class="kw">decltype</span>(std::declval&lt;<span class="tp">T</span>&gt;().<span class="fn">end</span>()),
+    <span class="kw">decltype</span>(std::declval&lt;<span class="tp">T</span>&gt;().<span class="fn">size</span>())
+&gt;&gt; : std::true_type {};
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">inline</span> <span class="kw">constexpr</span> <span class="kw">bool</span> is_container_v = is_container&lt;<span class="tp">T</span>&gt;::value;
+
+<span class="cm">// 验证</span>
+<span class="kw">static_assert</span>(is_container_v&lt;<span class="tp">std::vector</span>&lt;<span class="kw">int</span>&gt;&gt;);
+<span class="kw">static_assert</span>(!is_container_v&lt;<span class="kw">int</span>&gt;);
+<span class="kw">static_assert</span>(is_container_v&lt;<span class="tp">std::string</span>&gt;);</code></pre>
+<p>原理：<code>std::void_t</code> 将任意类型的列表映射为 <code>void</code>。如果 <code>T</code> 没有 <code>begin()</code>，则 <code>decltype</code> 表达式非法，SFINAE 规则让编译器丢弃这个偏特化，退回主模板（<code>false_type</code>）。</p>
+</details>
+</div>
+
+<div class="sep"></div>
+
+<!-- ============================================================ -->
+<!--  CHAPTER 4                                                     -->
+<!-- ============================================================ -->
+<h2 id="ch4">四、现代 C++ 工程实践</h2>
+
+<p>本章涵盖将 C++ 用于真实项目时必须掌握的工程技能：Lambda 的高级用法、并发编程、异常安全。</p>
+
+<h3 id="s4-1">4.1 Lambda 深入与闭包</h3>
+
+<p>Lambda 是 C++11 引入的匿名函数对象，但它的底层机制——闭包（closure）——有很多值得注意的细节。每个 lambda 表达式都有唯一的、编译器生成的类类型，捕获的变量成为该类的数据成员。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 4.1</span> Lambda 捕获陷阱</div>
+<p>以下代码的输出是什么？为什么？</p>
+<pre><code><span class="kw">int</span> x = <span class="nu">10</span>;
+
+<span class="kw">auto</span> byRef  = [&amp;x] { <span class="kw">return</span> x; };
+<span class="kw">auto</span> byVal  = [x]  { <span class="kw">return</span> x; };
+<span class="kw">auto</span> byInit = [y = x] { <span class="kw">return</span> y; };
+
+x = <span class="nu">20</span>;
+
+std::cout &lt;&lt; byRef()  &lt;&lt; <span class="st">" "</span>
+          &lt;&lt; byVal()  &lt;&lt; <span class="st">" "</span>
+          &lt;&lt; byInit() &lt;&lt; <span class="st">"\n"</span>;</code></pre>
+
+<details><summary>查看解析</summary>
+<p>输出：<code>20 10 10</code>。</p>
+<p><code>[&amp;x]</code> 按引用捕获——闭包存储的是 <code>x</code> 的引用，所以访问到修改后的值 20。<code>[x]</code> 按值捕获——闭包在创建时拷贝了 <code>x</code>（值为 10），后续修改不影响。<code>[y = x]</code> 是 C++14 的 init-capture，等价于 <code>[y = x]</code>——在闭包创建时用 <code>x</code> 初始化一个名为 <code>y</code> 的成员，值为 10。</p>
+
+<div class="warn">
+<strong>经典陷阱：</strong>在 lambda 中捕获 <code>this</code> 指针时，如果对象被移动或销毁，lambda 中的 <code>this</code> 就成为悬垂指针。C++20 引入了 <code>[=, this]</code> 显式捕获 this 指针，<code>[*this]</code> 则拷贝整个对象——后者更安全但可能有性能开销。
+</div>
+</details>
+</div>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 4.2</span> 高阶函数：函数组合</div>
+<p>实现 <code>compose(f, g)</code>，返回一个新函数 <code>h</code> 使得 <code>h(x) = f(g(x))</code>：</p>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">F</span>, <span class="kw">typename</span> <span class="tp">G</span>&gt;
+<span class="kw">auto</span> <span class="fn">compose</span>(<span class="tp">F</span> f, <span class="tp">G</span> g) {
+    <span class="kw">return</span> [f = std::<span class="fn">move</span>(f), g = std::<span class="fn">move</span>(g)](<span class="kw">auto</span>&amp;&amp;... args) {
+        <span class="kw">return</span> f(g(std::forward&lt;<span class="kw">decltype</span>(args)&gt;(args)...));
+    };
+}
+
+<span class="cm">// 使用</span>
+<span class="kw">auto</span> doubleIt = [](<span class="kw">int</span> x) { <span class="kw">return</span> x * <span class="nu">2</span>; };
+<span class="kw">auto</span> addOne   = [](<span class="kw">int</span> x) { <span class="kw">return</span> x + <span class="nu">1</span>; };
+
+<span class="kw">auto</span> doubleAndAdd = <span class="fn">compose</span>(addOne, doubleIt);
+std::cout &lt;&lt; doubleAndAdd(<span class="nu">5</span>);  <span class="cm">// doubleIt(5)=10, addOne(10)=11</span></code></pre>
+
+<details><summary>查看解析</summary>
+<p>几个关键技巧：</p>
+<ol>
+<li><strong>init-capture 配合 move</strong>：用 <code>f = std::move(f)</code> 将传入的函数对象移动进闭包，避免不必要的拷贝。</li>
+<li><strong>泛型 lambda</strong>：参数使用 <code>auto&amp;&amp;</code>（C++14 起），使返回的函数对象可以接受任意类型的参数。</li>
+<li><strong>完美转发</strong>：<code>std::forward&lt;decltype(args)&gt;(args)...</code> 将参数按原始值类别转发给 <code>g</code>，同时用 <code>...</code> 展开参数包。</li>
+</ol>
+</details>
+</div>
+
+<h3 id="s4-2">4.2 并发编程基础</h3>
+
+<p>C++11 起标准库提供了线程、互斥锁、条件变量和原子操作。并发编程最容易犯的错误是数据竞争（data race）和死锁（deadlock）。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 4.3</span> 线程安全的生产者-消费者</div>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">class</span> <span class="tp">ThreadSafeQueue</span> {
+    <span class="tp">std::queue</span>&lt;<span class="tp">T</span>&gt; q_;
+    <span class="tp">std::mutex</span> mtx_;
+    <span class="tp">std::condition_variable</span> cv_;
+
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">push</span>(<span class="tp">T</span> val) {
+        {
+            <span class="tp">std::lock_guard</span> lock(mtx_);
+            q_.<span class="fn">push</span>(std::<span class="fn">move</span>(val));
+        }
+        cv_.<span class="fn">notify_one</span>();
+    }
+
+    <span class="tp">T</span> <span class="fn">pop</span>() {
+        <span class="tp">std::unique_lock</span> lock(mtx_);
+        cv_.<span class="fn">wait</span>(lock, [&amp;] { <span class="kw">return</span> !q_.<span class="fn">empty</span>(); });
+        <span class="tp">T</span> val = std::<span class="fn">move</span>(q_.<span class="fn">front</span>());
+        q_.<span class="fn">pop</span>();
+        <span class="kw">return</span> val;
+    }
+
+    <span class="kw">bool</span> <span class="fn">tryPop</span>(<span class="tp">T</span>&amp; val, <span class="tp">std::chrono::milliseconds</span> timeout) {
+        <span class="tp">std::unique_lock</span> lock(mtx_);
+        <span class="kw">if</span> (!cv_.<span class="fn">wait_for</span>(lock, timeout, [&amp;]{ <span class="kw">return</span> !q_.<span class="fn">empty</span>(); }))
+            <span class="kw">return</span> <span class="kw">false</span>;
+        val = std::<span class="fn">move</span>(q_.<span class="fn">front</span>());
+        q_.<span class="fn">pop</span>();
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+};</code></pre>
+
+<details><summary>查看解析</summary>
+<p>关键设计点：</p>
+<p><strong>条件变量的 wait 必须配合谓词</strong>：<code>cv_.wait(lock, predicate)</code> 等价于 <code>while (!predicate()) cv_.wait(lock);</code>，这防止了虚假唤醒（spurious wakeup）——操作系统可能在条件未满足时唤醒等待线程。</p>
+<p><strong>lock_guard vs unique_lock</strong>：<code>lock_guard</code> 是简单的 RAII 加锁/解锁，<code>unique_lock</code> 支持延迟锁定、手动解锁和与条件变量配合。条件变量的 <code>wait</code> 需要 <code>unique_lock</code> 因为它需要在等待期间释放锁。</p>
+<p><strong>push 中的花括号</strong>：<code>notify_one</code> 在锁释放后调用，避免被通知的线程在获取锁时阻塞（"hurry up and wait" 问题）。</p>
+</details>
+</div>
+
+<h3 id="s4-3">4.3 异常安全</h3>
+
+<p>异常安全的三个保证级别：<strong>基本保证</strong>（对象有效，值不确定）、<strong>强保证</strong>（操作要么完全成功，要么对象回到操作前状态）、<strong>不抛出保证</strong>（<code>noexcept</code>）。实现强保证的经典技术是 copy-and-swap。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 4.4</span> 异常安全的批量更新</div>
+<pre><code><span class="kw">class</span> <span class="tp">Database</span> {
+    <span class="tp">std::vector</span>&lt;<span class="tp">Record</span>&gt; records_;
+
+<span class="kw">public</span>:
+    <span class="cm">// 强异常安全保证的批量更新</span>
+    <span class="kw">void</span> <span class="fn">batchUpdate</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">Record</span>&gt;&amp; updates) {
+        <span class="cm">// 第一步：在副本上操作（不影响当前状态）</span>
+        <span class="kw">auto</span> temp = records_;  <span class="cm">// 拷贝——如果内存不足，这里抛出，原数据不变</span>
+
+        <span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span>&amp; update : updates) {
+            <span class="kw">auto</span> it = std::find_if(temp.<span class="fn">begin</span>(), temp.<span class="fn">end</span>(),
+                [&amp;](<span class="kw">const</span> <span class="tp">Record</span>&amp; r) { <span class="kw">return</span> r.id == update.id; });
+            <span class="kw">if</span> (it != temp.<span class="fn">end</span>())
+                *it = update;  <span class="cm">// Record 的赋值应该是 noexcept 的</span>
+            <span class="kw">else</span>
+                temp.<span class="fn">push_back</span>(update);
+        }
+
+        <span class="cm">// 第二步：noexcept swap（不可能失败）</span>
+        std::swap(records_, temp);
+        <span class="cm">// 如果上面任何一步抛出异常，records_ 保持不变</span>
+    }
+};</code></pre>
+
+<details><summary>查看解析</summary>
+<p>这是典型的"做事、提交"两阶段模式：先在副本上执行所有可能失败的操作，全部成功后通过 noexcept 的 swap 原子性地提交。如果任何步骤抛出异常，原始数据完全不受影响。这个模式广泛应用于数据库事务、配置更新、批量数据处理等场景。</p>
+</details>
+</div>
+
+<div class="card exercise" id="ex4">
+<div class="card-title"><span class="badge badge-ex">练习 4.1</span> 实现 Future-like 异步管道</div>
+<p>实现 <code>then</code> 函数，将一个 <code>std::future&lt;T&gt;</code> 和一个回调 <code>std::function&lt;U(T)&gt;</code> 组合，返回 <code>std::future&lt;U&gt;</code>：</p>
+<pre><code><span class="cm">// 期望用法：</span>
+<span class="kw">auto</span> result = <span class="fn">then</span>(
+    std::async([] { <span class="kw">return</span> <span class="nu">42</span>; }),
+    [](<span class="kw">int</span> x) { <span class="kw">return</span> std::to_string(x); }
+);
+std::cout &lt;&lt; result.<span class="fn">get</span>();  <span class="cm">// "42"</span></code></pre>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span> <span class="tp">F</span>&gt;
+<span class="kw">auto</span> <span class="fn">then</span>(<span class="tp">std::future</span>&lt;<span class="tp">T</span>&gt; fut, <span class="tp">F</span> func)
+    -&gt; <span class="tp">std::future</span>&lt;std::invoke_result_t&lt;<span class="tp">F</span>, <span class="tp">T</span>&gt;&gt;
+{
+    <span class="kw">using</span> <span class="tp">ResultType</span> = std::invoke_result_t&lt;<span class="tp">F</span>, <span class="tp">T</span>&gt;;
+    <span class="kw">return</span> std::async(std::launch::async,
+        [fut = std::<span class="fn">move</span>(fut),
+         func = std::<span class="fn">move</span>(func)]() <span class="kw">mutable</span> -&gt; <span class="tp">ResultType</span> {
+            <span class="kw">return</span> func(fut.<span class="fn">get</span>());  <span class="cm">// 等待前一个 future，然后应用 func</span>
+        });
+}</code></pre>
+<p>注意 <code>mutable</code>：因为 <code>fut.get()</code> 不是 const 操作（它会修改 future 的内部状态），而 lambda 默认是 const <code>operator()</code>。</p>
+</details>
+</div>
+
+<div class="card exercise">
+<div class="card-title"><span class="badge badge-ex">练习 4.2</span> 实现 SpinLock</div>
+<p>用 <code>std::atomic_flag</code> 实现一个简单的自旋锁，满足 Lockable 概念（可以配合 <code>std::lock_guard</code> 使用）。</p>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">class</span> <span class="tp">SpinLock</span> {
+    <span class="tp">std::atomic_flag</span> flag_ = ATOMIC_FLAG_INIT;
+
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">lock</span>() {
+        <span class="kw">while</span> (flag_.test_and_set(<span class="tp">std::memory_order_acquire</span>)) {
+            <span class="cm">// 自旋等待。可以加入 _mm_pause() 或 std::this_thread::yield()</span>
+            <span class="cm">// 减少总线争用</span>
+        }
+    }
+
+    <span class="kw">void</span> <span class="fn">unlock</span>() {
+        flag_.clear(<span class="tp">std::memory_order_release</span>);
+    }
+};
+
+<span class="cm">// 使用</span>
+<span class="tp">SpinLock</span> sl;
+{
+    <span class="tp">std::lock_guard</span> lock(sl);  <span class="cm">// lock_guard 适配任意 Lockable</span>
+    <span class="cm">// critical section</span>
+}</code></pre>
+<p>自旋锁适合临界区极短（微秒级）的场景。如果临界区较长，<code>std::mutex</code>（会让线程挂起等待）更高效。混合策略是先自旋几次，如果获取不到就切换为 mutex。</p>
+</details>
+</div>
+
+<div class="sep"></div>
+
+<!-- ============================================================ -->
+<!--  CHAPTER 5                                                     -->
+<!-- ============================================================ -->
+<h2 id="ch5">五、STL 深入与算法编程</h2>
+
+<p>STL 是 C++ 标准库的核心，掌握容器的性能特征、算法的组合使用、以及自定义迭代器的编写，是从"会写 C++"到"写得好 C++"的关键跨越。</p>
+
+<h3 id="s5-1">5.1 容器选择策略</h3>
+
+<p>选择正确的容器是性能优化的第一步。常见容器的复杂度特征：</p>
+
+<table>
+<tr><th>容器</th><th>随机访问</th><th>头部插入</th><th>尾部插入</th><th>查找</th><th>内存特征</th></tr>
+<tr><td><code>vector</code></td><td>O(1)</td><td>O(n)</td><td>均摊 O(1)</td><td>O(n)/O(log n)</td><td>连续，cache 友好</td></tr>
+<tr><td><code>deque</code></td><td>O(1)</td><td>O(1)</td><td>O(1)</td><td>O(n)/O(log n)</td><td>分段连续</td></tr>
+<tr><td><code>list</code></td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>分散，cache 不友好</td></tr>
+<tr><td><code>unordered_map</code></td><td>N/A</td><td>N/A</td><td>N/A</td><td>均摊 O(1)</td><td>哈希表</td></tr>
+<tr><td><code>map</code></td><td>N/A</td><td>N/A</td><td>N/A</td><td>O(log n)</td><td>红黑树</td></tr>
+</table>
+
+<div class="warn">
+<strong>经验法则：</strong>除非有充分理由，否则默认使用 <code>vector</code>。即使需要在中间插入/删除，对于中小规模（&lt; 1000 元素），<code>vector</code> 的 <code>insert/erase</code>（O(n)）由于 CPU cache 优势，通常比 <code>list</code> 的 O(1) 操作更快。这已被 Chandler Carruth 在 CppCon 2014 的演讲中用 benchmark 证实。
+</div>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 5.1</span> 容器性能基准测试</div>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">Container</span>&gt;
+<span class="kw">auto</span> <span class="fn">benchmark</span>(<span class="tp">Container</span>&amp; c, <span class="kw">int</span> n) {
+    <span class="kw">auto</span> start = std::chrono::high_resolution_clock::now();
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nu">0</span>; i &lt; n; ++i)
+        c.<span class="fn">push_back</span>(i);
+
+    <span class="cm">// 遍历求和</span>
+    <span class="kw">long long</span> sum = <span class="nu">0</span>;
+    <span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span>&amp; v : c)
+        sum += v;
+
+    <span class="cm">// 排序</span>
+    std::sort(c.<span class="fn">begin</span>(), c.<span class="fn">end</span>());
+
+    <span class="kw">auto</span> end = std::chrono::high_resolution_clock::now();
+    <span class="kw">return</span> std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(end - start).count();
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">constexpr</span> <span class="kw">int</span> N = <span class="nu">100000</span>;
+    std::cout &lt;&lt; <span class="st">"vector: "</span> &lt;&lt; <span class="fn">benchmark</span>(<span class="tp">std::vector</span>&lt;<span class="kw">int</span>&gt;{}, N) &lt;&lt; <span class="st">"us\n"</span>;
+    std::cout &lt;&lt; <span class="st">"deque:  "</span> &lt;&lt; <span class="fn">benchmark</span>(<span class="tp">std::deque</span>&lt;<span class="kw">int</span>&gt;{}, N)  &lt;&lt; <span class="st">"us\n"</span>;
+    std::cout &lt;&lt; <span class="st">"list:   "</span> &lt;&lt; <span class="fn">benchmark</span>(<span class="tp">std::list</span>&lt;<span class="kw">int</span>&gt;{}, N)   &lt;&lt; <span class="st">"us\n"</span>;
+    <span class="cm">// list 无法直接用 std::sort，需要改用 list::sort()</span>
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p>在典型 64 位系统上，N=100000 的结果大致为：vector ~2ms，deque ~5ms，list ~15ms+。差距主要来自：</p>
+<ol>
+<li><strong>内存分配</strong>：list 每个元素单独 new，100000 次堆分配开销巨大；vector 只需几次 realloc。</li>
+<li><strong>Cache 局部性</strong>：vector 的元素在内存中连续，CPU 预取器可以高效工作；list 的节点散布在堆上，每次访问都可能 cache miss。</li>
+<li><strong>std::sort</strong> 要求随机访问迭代器，list 只提供双向迭代器，不能直接使用。</li>
+</ol>
+</details>
+</div>
+
+<h3 id="s5-2">5.2 自定义迭代器</h3>
+
+<p>自定义迭代器让你的数据类型无缝融入 STL 算法生态。C++20 的 <code>std::iterator</code> 已被弃用，推荐直接定义五个迭代器类型别名。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 5.2</span> Fibonacci 范围迭代器</div>
+<p>实现一个可以生成 Fibonacci 数列的范围（range），支持 range-for 循环：</p>
+<pre><code><span class="kw">class</span> <span class="tp">FibRange</span> {
+<span class="kw">public</span>:
+    <span class="kw">class</span> <span class="tp">Iterator</span> {
+        <span class="kw">long long</span> a_ = <span class="nu">0</span>, b_ = <span class="nu">1</span>;
+        <span class="kw">int</span> idx_ = <span class="nu">0</span>, max_;
+
+    <span class="kw">public</span>:
+        <span class="kw">using</span> iterator_category = std::input_iterator_tag;
+        <span class="kw">using</span> value_type        = <span class="kw">long long</span>;
+        <span class="kw">using</span> difference_type   = std::ptrdiff_t;
+        <span class="kw">using</span> pointer           = <span class="kw">const</span> <span class="kw">long long</span>*;
+        <span class="kw">using</span> reference         = <span class="kw">long long</span>;
+
+        <span class="fn">Iterator</span>(<span class="kw">int</span> start, <span class="kw">int</span> maxIdx) : idx_(start), max_(maxIdx) {}
+
+        <span class="kw">long long</span> <span class="kw">operator</span>*() <span class="kw">const</span> { <span class="kw">return</span> a_; }
+
+        <span class="tp">Iterator</span>&amp; <span class="kw">operator</span>++() {
+            <span class="kw">auto</span> next = a_ + b_;
+            a_ = b_;
+            b_ = next;
+            ++idx_;
+            <span class="kw">return</span> *<span class="kw">this</span>;
+        }
+
+        <span class="tp">Iterator</span> <span class="kw">operator</span>++(<span class="kw">int</span>) {
+            <span class="kw">auto</span> tmp = *<span class="kw">this</span>;
+            ++(*<span class="kw">this</span>);
+            <span class="kw">return</span> tmp;
+        }
+
+        <span class="kw">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">Iterator</span>&amp; o) <span class="kw">const</span> {
+            <span class="kw">return</span> idx_ == o.idx_;
+        }
+        <span class="kw">bool</span> <span class="kw">operator</span>!=(<span class="kw">const</span> <span class="tp">Iterator</span>&amp; o) <span class="kw">const</span> {
+            <span class="kw">return</span> idx_ != o.idx_;
+        }
+    };
+
+    <span class="kw">explicit</span> <span class="fn">FibRange</span>(<span class="kw">int</span> count) : count_(count) {}
+
+    <span class="tp">Iterator</span> <span class="fn">begin</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="tp">Iterator</span>(<span class="nu">0</span>, count_); }
+    <span class="tp">Iterator</span> <span class="fn">end</span>()   <span class="kw">const</span> { <span class="kw">return</span> <span class="tp">Iterator</span>(count_, count_); }
+
+<span class="kw">private</span>:
+    <span class="kw">int</span> count_;
+};
+
+<span class="cm">// 使用：直接配合 range-for 和 STL 算法</span>
+<span class="kw">for</span> (<span class="kw">auto</span> v : <span class="tp">FibRange</span>(<span class="nu">10</span>))
+    std::cout &lt;&lt; v &lt;&lt; <span class="st">" "</span>;
+<span class="cm">// 输出: 0 1 1 2 3 5 8 13 21 34</span>
+
+<span class="cm">// 配合算法</span>
+<span class="kw">auto</span> sum = std::accumulate(
+    <span class="tp">FibRange</span>(<span class="nu">10</span>).<span class="fn">begin</span>(),
+    <span class="tp">FibRange</span>(<span class="nu">10</span>).<span class="fn">end</span>(),
+    <span class="nu">0LL</span>);</code></pre>
+
+<details><summary>查看解析</summary>
+<p>自定义迭代器需要满足的关键要求：</p>
+<ol>
+<li>定义五个类型别名（C++20 起可以只定义 <code>value_type</code> 和 <code>difference_type</code>，其余由 concepts 自动推导）。</li>
+<li><code>operator*</code> 返回当前值。<code>operator++</code> 推进到下一个元素。</li>
+<li><code>operator==</code> 和 <code>operator!=</code> 用于与 end 迭代器比较。</li>
+<li>容器的 <code>begin()</code> 和 <code>end()</code> 返回迭代器。</li>
+</ol>
+<p>这里使用 <code>input_iterator_tag</code> 因为 Fibonacci 序列是前向生成的，不支持随机访问。如果只需要生成序列，C++20 的 <code>std::views::iota</code> + <code>std::views::transform</code> 可能更简洁。</p>
+</details>
+</div>
+
+<h3 id="s5-3">5.3 算法组合与数据管道</h3>
+
+<p>STL 算法的真正威力在于组合——将多个算法串联形成数据处理管道，类似函数式编程中的 map-filter-reduce。</p>
+
+<div class="card example">
+<div class="card-title"><span class="badge badge-eg">例题 5.3</span> 学生成绩分析管道</div>
+<pre><code><span class="kw">struct</span> <span class="tp">Student</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">std::vector</span>&lt;<span class="kw">double</span>&gt; scores;
+};
+
+<span class="kw">void</span> <span class="fn">analyze</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">Student</span>&gt;&amp; students) {
+    <span class="cm">// 1. 计算每个学生的平均分</span>
+    <span class="kw">auto</span> averages = std::<span class="fn">vector</span>&lt;std::pair&lt;<span class="tp">std::string</span>, <span class="kw">double</span>&gt;&gt;{};
+    std::transform(students.<span class="fn">begin</span>(), students.<span class="fn">end</span>(),
+        std::back_inserter(averages),
+        [](<span class="kw">const</span> <span class="tp">Student</span>&amp; s) {
+            <span class="kw">double</span> sum = std::accumulate(
+                s.scores.<span class="fn">begin</span>(), s.scores.<span class="fn">end</span>(), <span class="nu">0.0</span>);
+            <span class="kw">return</span> std::make_pair(s.name,
+                sum / s.scores.<span class="fn">size</span>());
+        });
+
+    <span class="cm">// 2. 按平均分降序排列</span>
+    std::sort(averages.<span class="fn">begin</span>(), averages.<span class="fn">end</span>(),
+        [](<span class="kw">const</span> <span class="kw">auto</span>&amp; a, <span class="kw">const</span> <span class="kw">auto</span>&amp; b) {
+            <span class="kw">return</span> a.second &gt; b.second;
+        });
+
+    <span class="cm">// 3. 过滤出及格的学生（平均分 &gt;= 60）</span>
+    <span class="kw">auto</span> passEnd = std::partition(averages.<span class="fn">begin</span>(), averages.<span class="fn">end</span>(),
+        [](<span class="kw">const</span> <span class="kw">auto</span>&amp; p) { <span class="kw">return</span> p.second &gt;= <span class="nu">60.0</span>; });
+
+    <span class="cm">// 4. 输出结果</span>
+    std::cout &lt;&lt; <span class="st">"Passed students (by rank):\n"</span>;
+    std::for_each(averages.<span class="fn">begin</span>(), passEnd,
+        [](<span class="kw">const</span> <span class="kw">auto</span>&amp; p) {
+            std::cout &lt;&lt; <span class="st">"  "</span> &lt;&lt; p.first
+                      &lt;&lt; <span class="st">": "</span> &lt;&lt; p.second &lt;&lt; <span class="st">"\n"</span>;
+        });
+
+    <span class="cm">// 5. 统计信息</span>
+    <span class="kw">auto</span> [minIt, maxIt] = std::minmax_element(
+        averages.<span class="fn">begin</span>(), averages.<span class="fn">end</span>(),
+        [](<span class="kw">const</span> <span class="kw">auto</span>&amp; a, <span class="kw">const</span> <span class="kw">auto</span>&amp; b) {
+            <span class="kw">return</span> a.second &lt; b.second;
+        });
+    std::cout &lt;&lt; <span class="st">"Lowest: "</span> &lt;&lt; minIt-&gt;second
+              &lt;&lt; <span class="st">", Highest: "</span> &lt;&lt; maxIt-&gt;second &lt;&lt; <span class="st">"\n"</span>;
+}</code></pre>
+
+<details><summary>查看解析</summary>
+<p>这个例子展示了 STL 管道编程的核心模式：</p>
+<ol>
+<li><strong>transform</strong>（map）：将输入数据转换为另一种形式。</li>
+<li><strong>sort</strong>：排序。</li>
+<li><strong>partition</strong>（filter）：将满足条件的元素移到前面。比 <code>remove_if</code> 更灵活，因为它保留了所有元素。</li>
+<li><strong>for_each</strong>：对范围内的元素执行操作。</li>
+<li><strong>minmax_element</strong>：一次性找到最小和最大值。</li>
+</ol>
+<p>C++20 的 <code>std::ranges</code> 和 <code>std::views</code> 让这个模式更优雅——可以通过 <code>|</code> 运算符链式组合，且支持惰性求值（lazy evaluation），避免创建中间容器。</p>
+</details>
+</div>
+
+<div class="card exercise" id="ex5">
+<div class="card-title"><span class="badge badge-ex">练习 5.1</span> 实现 sorted_unique 视图</div>
+<p>实现一个算法 <code>sortedUnique</code>，接受一个 <code>vector&lt;T&gt;</code>，返回一个新的 <code>vector&lt;T&gt;</code>，其中元素已排序且去重。要求：</p>
+<ol>
+<li>使用 STL 算法组合（不手写循环）</li>
+<li>分析时间复杂度</li>
+<li>对比用 <code>std::set</code> 实现的版本，讨论性能差异</li>
+</ol>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt; <span class="fn">sortedUnique</span>(<span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt; v) {
+    std::sort(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());
+    <span class="kw">auto</span> last = std::unique(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());
+    v.<span class="fn">erase</span>(last, v.<span class="fn">end</span>());
+    <span class="kw">return</span> v;
+}</code></pre>
+<p>时间复杂度：O(n log n)（排序主导）。<code>std::set</code> 版本需要对每个元素做 O(log n) 的插入，且每次插入都是堆分配。vector 版本排序后 contiguous memory 的 cache 性能远优于 set 的红黑树节点。实测中，对于 10 万元素，vector 版本通常快 5-10 倍。</p>
+</details>
+</div>
+
+<div class="card exercise">
+<div class="card-title"><span class="badge badge-ex">练习 5.2</span> 实现 Matrix 迭代器</div>
+<p>为之前的 <code>Matrix</code> 类添加行迭代器 <code>RowIterator</code>，使得可以这样遍历矩阵的每一行：</p>
+<pre><code><span class="kw">for</span> (<span class="kw">auto</span> it = mat.<span class="fn">rowBegin</span>(); it != mat.<span class="fn">rowEnd</span>(); ++it) {
+    <span class="cm">// *it 返回一个 span 或 pair 指向该行数据</span>
+    <span class="kw">for</span> (<span class="kw">double</span> val : *it)
+        std::cout &lt;&lt; val &lt;&lt; <span class="st">" "</span>;
+    std::cout &lt;&lt; <span class="st">"\n"</span>;
+}</code></pre>
+
+<details><summary>查看提示</summary>
+<p><code>RowIterator</code> 存储一个指向行首的指针和列数。<code>operator*</code> 返回一个 <code>std::span&lt;double&gt;</code>（C++20）或 <code>std::pair&lt;double*, double*&gt;</code>（C++17），使得 range-for 可以遍历该行的元素。</p>
+</details>
+
+<details><summary>查看参考解答</summary>
+<pre><code><span class="kw">class</span> <span class="tp">Matrix</span> {
+    <span class="tp">size_t</span> rows_, cols_;
+    <span class="kw">double</span>* data_;
+
+<span class="kw">public</span>:
+    <span class="kw">class</span> <span class="tp">RowIterator</span> {
+        <span class="kw">double</span>* row_;
+        <span class="tp">size_t</span> cols_;
+    <span class="kw">public</span>:
+        <span class="kw">using</span> iterator_category = std::random_access_iterator_tag;
+        <span class="kw">using</span> value_type = std::span&lt;<span class="kw">double</span>&gt;;
+        <span class="kw">using</span> difference_type = std::ptrdiff_t;
+
+        <span class="fn">RowIterator</span>(<span class="kw">double</span>* r, <span class="tp">size_t</span> c) : row_(r), cols_(c) {}
+        std::span&lt;<span class="kw">double</span>&gt; <span class="kw">operator</span>*() <span class="kw">const</span> {
+            <span class="kw">return</span> {row_, cols_};
+        }
+        <span class="tp">RowIterator</span>&amp; <span class="kw">operator</span>++()    { row_ += cols_; <span class="kw">return</span> *<span class="kw">this</span>; }
+        <span class="tp">RowIterator</span>  <span class="kw">operator</span>++(<span class="kw">int</span>)  { <span class="kw">auto</span> t=*<span class="kw">this</span>; ++*<span class="kw">this</span>; <span class="kw">return</span> t; }
+        <span class="kw">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">RowIterator</span>&amp; o) <span class="kw">const</span> { <span class="kw">return</span> row_ == o.row_; }
+        <span class="kw">bool</span> <span class="kw">operator</span>!=(<span class="kw">const</span> <span class="tp">RowIterator</span>&amp; o) <span class="kw">const</span> { <span class="kw">return</span> row_ != o.row_; }
+    };
+
+    <span class="tp">RowIterator</span> <span class="fn">rowBegin</span>() { <span class="kw">return</span> {data_, cols_}; }
+    <span class="tp">RowIterator</span> <span class="fn">rowEnd</span>()   { <span class="kw">return</span> {data_ + rows_ * cols_, cols_}; }
+};</code></pre>
+</details>
+</div>
+
+<div class="sep"></div>
+
+<h2 id="roadmap">学习路线建议</h2>
+
+<p>本文档覆盖了从"会用语法"到"能写工程"之间的核心知识。建议的学习顺序：</p>
+
+<p><strong>第一步（1-2 周）</strong>：完成第一章和第二章的练习，重点理解移动语义和 RAII。这两个概念贯穿 C++ 的方方面面，是后续所有内容的基础。</p>
+
+<p><strong>第二步（1-2 周）</strong>：学习第三章模板基础（特化 + if constexpr），完成 is_container 练习。不需要一开始就精通 SFINAE 和可变参数模板，但理解基本原理很重要。</p>
+
+<p><strong>第三步（1 周）</strong>：第四章并发编程，重点理解数据竞争和锁的使用。在自己的项目中尝试引入多线程。</p>
+
+<p><strong>第四步（持续）</strong>：第五章 STL 算法，在实际编程中刻意练习用 STL 算法替代手写循环。</p>
+
+<p>推荐的进阶阅读：Scott Meyers《Effective Modern C++》、Nicolai Josuttis《C++17 The Complete Guide》、CppCon 会议录像（YouTube 免费）。</p>
+
+<div class="footer">
+<p>C++ 实战提高指导文档 · 2026 年 6 月</p>
+<p>基于 C++17/20 标准 · 共 19 道例题 · 10 道练习</p>
+</div>
+
+</div><!-- /.main -->
+
+<script>
+// Scroll spy: highlight current section in sidebar
+(function() {
+  const nav = document.getElementById('nav');
+  const links = nav.querySelectorAll('a');
+  const sections = [];
+  links.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({ el, link });
+  });
+
+  function update() {
+    let current = null;
+    const scrollY = window.scrollY + 120;
+    for (const s of sections) {
+      if (s.el.offsetTop <= scrollY) current = s;
+    }
+    links.forEach(l => l.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+// Mobile menu toggle
+(function() {
+  const btn = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  function toggle() {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  }
+  btn.addEventListener('click', toggle);
+  overlay.addEventListener('click', toggle);
+  // Close sidebar on nav click (mobile)
+  sidebar.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 900) toggle();
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

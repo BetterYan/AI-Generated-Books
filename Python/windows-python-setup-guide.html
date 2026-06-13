@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows Python 深度学习环境安装指南</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --fg: #1f2328;
+    --muted: #656d76;
+    --border: #d0d7de;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --card-bg: #ffffff;
+    --code-bg: #1e1e1e;
+    --code-fg: #d4d4d4;
+    --success: #1a7f37;
+    --warn: #9a6700;
+    --danger: #cf222e;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.7;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    color: #fff;
+    padding: 64px 24px 48px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 12px; font-size: 2.4rem; letter-spacing: -0.5px; }
+  header p { margin: 0; color: #8b949e; font-size: 1.1rem; max-width: 680px; margin-left: auto; margin-right: auto; }
+  .badge {
+    display: inline-block;
+    background: rgba(37,99,235,0.15);
+    color: #58a6ff;
+    border: 1px solid rgba(88,166,255,0.3);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    margin: 4px;
+  }
+
+  /* Nav */
+  nav {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 50;
+    padding: 12px 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  nav a {
+    display: inline-block;
+    padding: 6px 14px;
+    margin-right: 6px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--fg);
+    transition: background 0.2s;
+  }
+  nav a:hover { background: var(--accent-light); text-decoration: none; }
+
+  /* Layout */
+  .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 1.6rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+    margin-top: 48px;
+    margin-bottom: 20px;
+  }
+  h3 { font-size: 1.2rem; margin-top: 32px; margin-bottom: 12px; color: var(--fg); }
+  h4 { font-size: 1rem; margin-top: 24px; margin-bottom: 8px; color: var(--muted); }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card-highlight {
+    border-left: 4px solid var(--accent);
+  }
+  .card-warn {
+    border-left: 4px solid var(--warn);
+    background: #fff8c5;
+  }
+  .card-success {
+    border-left: 4px solid var(--success);
+    background: #dafbe1;
+  }
+  .card-danger {
+    border-left: 4px solid var(--danger);
+    background: #ffebe9;
+  }
+
+  /* Code */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    background: rgba(175,184,193,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  pre code { background: none; padding: 0; }
+
+  /* Step number */
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+  th { background: var(--accent-light); font-weight: 600; }
+  tr:nth-child(even) { background: #f9fafb; }
+
+  /* Story timeline */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--border);
+  }
+  .story-item { position: relative; margin-bottom: 28px; }
+  .story-item::before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .story-year { font-size: 0.8rem; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
+  .story-title { font-weight: 700; font-size: 1.05rem; margin: 4px 0; }
+  .story-desc { color: var(--muted); font-size: 0.95rem; }
+
+  /* Quick ref grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.7rem; }
+  }
+
+  /* Comparison */
+  .compare-yes { color: var(--success); font-weight: 700; }
+  .compare-no { color: var(--danger); font-weight: 700; }
+  .compare-mid { color: var(--warn); font-weight: 700; }
+
+  /* File tree */
+  .file-tree {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.9rem;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+  .file-tree div { display: block; }
+  .file-tree .dir { color: #58a6ff; }
+  .file-tree .file { color: #d4d4d4; }
+  .file-tree .comment { color: #6a9955; }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Windows Python 深度学习环境安装指南</h1>
+  <p>从环境搭建到生产部署的完整工程实践手册 —— 不止于安装，更关注如何正确做事</p>
+  <div style="margin-top:18px;">
+    <span class="badge">PyTorch</span>
+    <span class="badge">ONNX</span>
+    <span class="badge">YOLO</span>
+    <span class="badge">CUDA</span>
+    <span class="badge">TensorRT</span>
+    <span class="badge">Windows 10/11</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">概览</a>
+  <a href="#step1">Python</a>
+  <a href="#step2">包管理工具</a>
+  <a href="#step3">工程规范</a>
+  <a href="#step4">框架选型</a>
+  <a href="#step5">PyTorch</a>
+  <a href="#step6">ONNX</a>
+  <a href="#step7">YOLO</a>
+  <a href="#step8">工作流</a>
+  <a href="#step9">部署优化</a>
+  <a href="#step10">实战案例</a>
+  <a href="#step11">优秀实践</a>
+  <a href="#stories">背景故事</a>
+  <a href="#troubleshoot">排错</a>
+  <a href="#cheatsheet">速查表</a>
+</nav>
+
+<div class="container">
+
+<section id="overview">
+  <h2>为什么要用这套环境？</h2>
+  <div class="card card-highlight">
+    <p>你的核心需求可以归纳为三类：</p>
+    <ul>
+      <li><strong>模型转换</strong>：用 PyTorch 训练或加载模型，导出为 ONNX 格式，供其他框架或边缘设备部署。</li>
+      <li><strong>模型验证</strong>：下载社区预训练权重，快速跑通推理，确认模型能力是否符合预期。</li>
+      <li><strong>原型验证</strong>：用 YOLO 系列做目标检测原型，验证数据、调参、评估指标。</li>
+    </ul>
+    <p>这份指南不追求"最全"，而是追求<strong>"最顺 + 最对"</strong>——每一步都给出 Windows 下最稳的安装路径、被业界认可的工程实践，以及出问题时最常见的排查方法。</p>
+  </div>
+
+  <h3>文档定位：安装教程 → 工程手册</h3>
+  <p>市面上的 Python 安装教程多如牛毛，但大多停留在"能跑起来"的层面。真正参与过生产级深度学习项目的人都知道，<strong>环境管理、代码质量、版本控制、部署优化</strong>才是决定项目能否长期维护的关键。本文档从"安装"延伸到"工程化"，覆盖以下维度：</p>
+  <div class="grid-3">
+    <div class="card">
+      <strong>工具链现代化</strong>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:0.95rem;">uv / Poetry 替代裸 pip，ruff / pre-commit 保障代码质量，pyproject.toml 统一配置。</p>
+    </div>
+    <div class="card">
+      <strong>框架选型有据</strong>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:0.95rem;">PyTorch vs TensorFlow vs JAX，不是"谁火用谁"，而是根据场景、团队、部署目标做理性选择。</p>
+    </div>
+    <div class="card">
+      <strong>部署不再踩坑</strong>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:0.95rem;">TensorRT、OpenVINO、量化、服务化，从"模型能跑"到"线上能扛"。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STEP 1 ===================== -->
+<section id="step1">
+  <h2><span class="step-num">1</span>安装 Python</h2>
+
+  <h3>1.1 下载官方 Python</h3>
+  <p>推荐从 <a href="https://www.python.org/downloads/windows/" target="_blank">python.org</a> 下载最新稳定版（当前建议 <strong>3.11.x</strong>）。</p>
+  <div class="card card-warn">
+    <strong>为什么不是 3.12？</strong> 部分 PyTorch 的预览功能或第三方库对 3.12 的适配可能滞后。3.11 在性能与兼容性之间是目前的甜点版本。如果你的目标库已明确支持 3.12，也可以上。
+  </div>
+
+  <h4>安装时务必勾选：</h4>
+  <ul>
+    <li><strong>Add python.exe to PATH</strong>（添加到环境变量）</li>
+    <li><strong>Use admin privileges when installing py.exe</strong></li>
+    <li><strong>Disable path length limit</strong>（Windows 长路径支持，避免后续深度学习库解压报错）</li>
+  </ul>
+  <p>安装完成后，打开 PowerShell 或 CMD 验证：</p>
+  <pre><code>python --version
+pip --version</code></pre>
+
+  <h3>1.2 多版本管理（进阶）：pyenv-win</h3>
+  <p>如果你需要在 3.10 / 3.11 / 3.12 之间切换（比如不同项目依赖不同版本），<strong>pyenv-win</strong> 是 Windows 下最干净的多版本管理方案。</p>
+  <pre><code># 通过 winget 安装（Windows 10 1809+ 自带）
+winget install pyenv-win
+
+# 重启终端后
+pyenv install 3.11.9
+pyenv install 3.12.4
+pyenv global 3.11.9
+
+# 在项目目录下锁定版本
+pyenv local 3.12.4</code></pre>
+  <div class="card">
+    <strong>pyenv vs 官方安装包？</strong><br>
+    官方安装包适合"一台机器一个版本"的简单场景；pyenv 适合开发者需要频繁切换版本、或同时维护多个遗留项目的场景。初学者先用官方安装包即可，遇到版本冲突再上 pyenv。
+  </div>
+
+  <h3>1.3 确认 pip 和基本工具</h3>
+  <pre><code>python -m pip install --upgrade pip setuptools wheel</code></pre>
+  <p>这三个是基础中的基础：<code>setuptools</code> 负责包的构建，<code>wheel</code> 让安装预编译包时速度翻倍。</p>
+</section>
+
+<!-- ===================== STEP 2 ===================== -->
+<section id="step2">
+  <h2><span class="step-num">2</span>现代 Python 包管理工具</h2>
+
+  <p>如果你还在用裸 <code>pip install</code> 管理项目依赖，是时候升级了。现代 Python 包管理工具解决了 pip 的核心痛点：<strong>没有可靠的依赖锁定</strong>、<strong>虚拟环境管理繁琐</strong>、<strong>缺乏可复现的构建声明</strong>。</p>
+
+  <h3>2.1 工具对比：uv vs Poetry vs PDM vs Conda</h3>
+  <table>
+    <tr>
+      <th>工具</th>
+      <th>核心优势</th>
+      <th>适用场景</th>
+      <th>学习曲线</th>
+    </tr>
+    <tr>
+      <td><strong>uv</strong></td>
+      <td> Rust 编写，速度极快（比 pip 快 10~100 倍）；兼容 pip 命令；内置虚拟环境管理</td>
+      <td>追求极致速度、CI/CD 场景、替代 pip 的零成本升级</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td><strong>Poetry</strong></td>
+      <td>依赖锁定严格（poetry.lock）；语义版本约束清晰；发布到 PyPI 一站式</td>
+      <td>中大型项目、团队协作、需要严格可复现构建</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td><strong>PDM</strong></td>
+      <td>PEP 582 本地包目录支持；与标准工具链兼容最好；插件生态丰富</td>
+      <td>喜欢标准规范、需要灵活扩展的开发者</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td><strong>Conda</strong></td>
+      <td>非 Python 依赖管理（CUDA、MKL、OpenCV C++ 等）；科学计算生态成熟</td>
+      <td>数据科学、需要管理 CUDA/cuDNN 版本、Anaconda 用户</td>
+      <td>中</td>
+    </tr>
+  </table>
+
+  <div class="card card-success">
+    <strong>推荐选择</strong>：
+    <ul>
+      <li><strong>个人快速项目 / CI 场景</strong> → <code>uv</code>（2024~2025 年社区增长最快，Astral 出品，Ruff 同门）</li>
+      <li><strong>团队协作 / 需要严格锁定</strong> → <code>Poetry</code>（生态最成熟，文档最完善）</li>
+      <li><strong>数据科学 / CUDA 版本管理</strong> → <code>Conda</code> 或 <code>micromamba</code>（Conda 的 C++ 依赖管理能力目前仍不可替代）</li>
+    </ul>
+  </div>
+
+  <h3>2.2 uv 实战（推荐入门）</h3>
+  <pre><code># 安装 uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# 创建虚拟环境 + 安装包（一步完成，速度极快）
+uv venv myenv
+uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+
+# 导出精确锁定文件
+uv pip compile pyproject.toml -o requirements.lock
+uv pip sync requirements.lock
+
+# uv 的 venv 激活方式与标准 venv 相同
+myenv\Scripts\Activate.ps1</code></pre>
+
+  <h3>2.3 Poetry 实战（团队推荐）</h3>
+  <pre><code># 安装 Poetry（安装到用户目录，不影响系统 Python）
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+
+# 在项目根目录初始化
+poetry init
+
+# 添加依赖（自动解析兼容版本并写入 pyproject.toml）
+poetry add torch torchvision --source pytorch-cuda
+poetry add ultralytics opencv-python
+
+# 安装锁定依赖（所有团队成员拿到同一份 poetry.lock）
+poetry install
+
+# 进入 Poetry 管理的虚拟环境
+poetry shell
+
+# 运行命令而不进入 shell
+poetry run python train.py</code></pre>
+
+  <h3>2.4 Conda / Miniconda（数据科学场景）</h3>
+  <pre><code># 推荐安装 Miniconda（精简版，无臃肿预装包）
+# 官网：https://docs.conda.io/en/latest/miniconda.html
+
+# 创建隔离环境，同时指定 Python 和 CUDA 工具包版本
+conda create -n dl python=3.11 pytorch torchvision cuda-toolkit=12.1 -c pytorch -c nvidia
+conda activate dl
+
+# 导出环境（包含非 Python 依赖）
+conda env export > environment.yml
+conda env create -f environment.yml</code></pre>
+  <div class="card card-warn">
+    <strong>conda 与 pip 混用的坑</strong><br>
+    同一个环境里，优先用 conda 安装底层依赖（numpy、CUDA、MKL），再用 pip 安装上层 Python 包。不要反过来——pip 安装的包可能覆盖 conda 管理的共享库，导致不可预知的冲突。
+  </div>
+
+  <h3>2.5 pyproject.toml：现代 Python 项目的统一入口</h3>
+  <p>无论用 Poetry、PDM 还是 setuptools，<code>pyproject.toml</code> 都已成为 Python 项目的标准配置文件。它替代了传统的 <code>setup.py</code>、<code>requirements.txt</code>、<code>setup.cfg</code>，把所有配置集中在一处。</p>
+  <pre><code>[project]
+name = "my-dl-project"
+version = "0.1.0"
+description = "PyTorch model training and deployment pipeline"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "onnx>=1.15.0",
+    "onnxruntime-gpu>=1.16.0",
+    "ultralytics>=8.0.0",
+    "opencv-python>=4.8.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy", "pre-commit"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true</code></pre>
+</section>
+
+<!-- ===================== STEP 3 ===================== -->
+<section id="step3">
+  <h2><span class="step-num">3</span>项目工程规范</h2>
+
+  <p>写深度学习代码不等于"在 Jupyter Notebook 里调参"。一旦项目进入团队协作或生产阶段，目录结构、代码风格、版本控制、自动化检查就都变得至关重要。</p>
+
+  <h3>3.1 推荐目录结构（src layout）</h3>
+  <p>Python 社区有两个主流项目布局：<strong>flat layout</strong>（源码在根目录）和 <strong>src layout</strong>（源码在 <code>src/</code> 下）。深度学习项目强烈推荐 <strong>src layout</strong>，因为它能避免测试时误导入未安装的开发版本，也更适合 Docker 构建。</p>
+
+  <div class="file-tree">
+    <div class="dir">my-dl-project/</div>
+    <div class="dir">├── src/</div>
+    <div class="dir">│   └── my_project/</div>
+    <div class="file">│       ├── __init__.py</div>
+    <div class="file">│       ├── data/           <span class="comment"># 数据加载、预处理、增强</span></div>
+    <div class="file">│       │   ├── __init__.py</div>
+    <div class="file">│       │   └── dataset.py</div>
+    <div class="file">│       ├── models/         <span class="comment"># 模型定义、自定义层</span></div>
+    <div class="file">│       │   ├── __init__.py</div>
+    <div class="file">│       │   └── classifier.py</div>
+    <div class="file">│       ├── training/       <span class="comment"># 训练循环、优化器、学习率调度</span></div>
+    <div class="file">│       │   ├── __init__.py</div>
+    <div class="file">│       │   └── trainer.py</div>
+    <div class="file">│       ├── export/         <span class="comment"># ONNX / TorchScript 导出逻辑</span></div>
+    <div class="file">│       │   └── onnx_export.py</div>
+    <div class="file">│       ├── inference/      <span class="comment"># 推理封装、预处理/后处理</span></div>
+    <div class="file">│       │   └── predictor.py</div>
+    <div class="file">│       └── utils/          <span class="comment"># 日志、配置加载、通用工具</span></div>
+    <div class="file">│           └── logger.py</div>
+    <div class="dir">├── configs/              <span class="comment"># Hydra / YAML 配置文件</span></div>
+    <div class="file">│   ├── train.yaml</div>
+    <div class="dir">│   └── model/</div>
+    <div class="file">│       └── resnet50.yaml</div>
+    <div class="dir">├── notebooks/            <span class="comment"># 探索性分析（不存大文件）</span></div>
+    <div class="file">│   └── eda.ipynb</div>
+    <div class="dir">├── scripts/              <span class="comment"># 一次性脚本（训练、导出、评估）</span></div>
+    <div class="file">│   ├── train.py</div>
+    <div class="file">│   ├── export_onnx.py</div>
+    <div class="file">│   └── evaluate.py</div>
+    <div class="dir">├── tests/                <span class="comment"># pytest 测试用例</span></div>
+    <div class="file">│   ├── test_dataset.py</div>
+    <div class="file">│   └── test_model.py</div>
+    <div class="dir">├── docker/               <span class="comment"># Dockerfile 及相关配置</span></div>
+    <div class="file">│   └── Dockerfile</div>
+    <div class="file">├── pyproject.toml        <span class="comment"># 项目元数据 + 工具配置</span></div>
+    <div class="file">├── README.md</div>
+    <div class="file">├── .gitignore</div>
+    <div class="file">├── .pre-commit-config.yaml</div>
+    <div class="dir">└── data/                 <span class="comment"># 数据目录（gitignore，不提交）</span></div>
+    <div class="dir">    ├── raw/</div>
+    <div class="dir">    ├── processed/</div>
+    <div class="dir">    └── external/</div>
+  </div>
+
+  <div class="card card-warn">
+    <strong>为什么要把源码放在 src/ 下？</strong><br>
+    在 flat layout 中，<code>import my_project</code> 会直接导入当前目录下的文件夹，即使你还没有 <code>pip install -e .</code> 安装它。这会导致"测试通过了但安装后却报错"的诡异问题。src layout 强迫你必须先安装才能导入，提前暴露安装问题。
+  </div>
+
+  <h3>3.2 Git 工作流与 .gitignore</h3>
+  <pre><code># .gitignore 关键条目（深度学习项目特别版）
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# 虚拟环境
+venv/
+.env/
+
+# 数据与模型权重（绝不要提交到 Git）
+data/
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.safetensors
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+
+# 实验输出
+outputs/
+wandb/
+mlruns/
+*.log</code></pre>
+
+  <h3>3.3 代码质量工具链</h3>
+  <p>以下工具构成了现代 Python 项目的"安检系统"，建议在 <strong>每次提交前</strong> 自动运行。</p>
+
+  <table>
+    <tr><th>工具</th><th>作用</th><th>替代了谁</th></tr>
+    <tr><td><strong>ruff</strong></td><td>超高速 linter 和 formatter（Rust 编写）</td><td>flake8 + black + isort + pydocstyle</td></tr>
+    <tr><td><strong>mypy</strong></td><td>静态类型检查，提前捕获类型错误</td><td>—（新增能力）</td></tr>
+    <tr><td><strong>pytest</strong></td><td>单元测试和集成测试框架</td><td>unittest</td></tr>
+    <tr><td><strong>pre-commit</strong></td><td>Git 提交前自动运行检查钩子</td><td>手动运行/CI 事后发现</td></tr>
+  </table>
+
+  <h4>安装与配置</h4>
+  <pre><code># 安装工具链
+pip install ruff mypy pytest pre-commit
+
+# 初始化 pre-commit 钩子
+pre-commit install
+
+# ruff 一键格式化 + 检查
+ruff check . --fix
+ruff format .
+
+# mypy 类型检查
+mypy src/
+
+# pytest 运行测试
+pytest tests/ -v</code></pre>
+
+  <h4>.pre-commit-config.yaml 示例</h4>
+  <pre><code>repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests]</code></pre>
+
+  <h3>3.4 类型注解：深度学习的安全网</h3>
+  <p>Python 是动态类型语言，但深度学习代码中张量形状（shape）的错误是最常见、最难调试的 bug 之一。<strong>类型注解 + mypy</strong> 虽然不能检查张量 shape，但能提前捕获大量接口层面的错误。</p>
+  <pre><code>from pathlib import Path
+from typing import Callable
+import torch
+from torch.utils.data import DataLoader, Dataset
+
+class ImageClassifier(torch.nn.Module):
+    def __init__(self, num_classes: int, backbone: str = "resnet50") -> None:
+        super().__init__()
+        self.num_classes = num_classes
+        # ...
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # mypy 会检查返回值类型是否一致
+        return self.head(self.backbone(x))
+
+def train_epoch(
+    model: torch.nn.Module,
+    dataloader: DataLoader,
+    optimizer: torch.optim.Optimizer,
+    loss_fn: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+    device: torch.device,
+) -> float:
+    # 类型注解让接口意图一目了然
+    ...</code></pre>
+</section>
+
+<!-- ===================== STEP 4 ===================== -->
+<section id="step4">
+  <h2><span class="step-num">4</span>深度学习框架选型指南</h2>
+
+  <p>选框架不是选信仰，而是根据<strong>项目阶段、团队背景、部署目标</strong>做理性决策。2024~2025 年的框架格局已相对清晰，但仍各有优劣。</p>
+
+  <h3>4.1 三大主流框架全景对比</h3>
+  <table>
+    <tr>
+      <th>维度</th>
+      <th>PyTorch 2.x</th>
+      <th>TensorFlow 2.x + Keras</th>
+      <th>JAX + Flax/Haiku</th>
+    </tr>
+    <tr>
+      <td><strong>开发范式</strong></td>
+      <td>动态图（eager），调试直观，类似 Python</td>
+      <td>动态 + 静态图混合，Keras API 高阶封装</td>
+      <td>纯函数式，向量化映射（vmap/pmap），函数变换</td>
+    </tr>
+    <tr>
+      <td><strong>学习曲线</strong></td>
+      <td class="compare-yes">平缓，文档友好</td>
+      <td class="compare-mid">中等，Keras 简单但底层复杂</td>
+      <td class="compare-no">陡峭，函数式思维需适应</td>
+    </tr>
+    <tr>
+      <td><strong>调试体验</strong></td>
+      <td class="compare-yes">极佳，pdb 原生支持</td>
+      <td class="compare-mid">可接受，tf.function 调试较痛苦</td>
+      <td class="compare-mid">一般，JIT 编译错误信息晦涩</td>
+    </tr>
+    <tr>
+      <td><strong>研究生态</strong></td>
+      <td class="compare-yes">最强，论文复现首选</td>
+      <td class="compare-mid">较强，工业界模型多</td>
+      <td class="compare-mid">增长快，Google DeepMind 主力</td>
+    </tr>
+    <tr>
+      <td><strong>生产部署</strong></td>
+      <td class="compare-mid">TorchScript / torch.export / ONNX</td>
+      <td class="compare-yes">TF SavedModel / TF Lite / TF Serving 成熟</td>
+      <td class="compare-no">较弱，主要面向研究</td>
+    </tr>
+    <tr>
+      <td><strong>移动端/边缘</strong></td>
+      <td class="compare-mid">PyTorch Mobile（一般），需转 ONNX/TF Lite</td>
+      <td class="compare-yes">TF Lite 业界标准</td>
+      <td class="compare-no">基本不支持</td>
+    </tr>
+    <tr>
+      <td><strong>性能优化</strong></td>
+      <td class="compare-yes">torch.compile（2.0+）极大提升训练推理速度</td>
+      <td class="compare-yes">XLA / Grappler 优化成熟</td>
+      <td class="compare-yes">XLA 编译优化极强</td>
+    </tr>
+    <tr>
+      <td><strong>Windows 支持</strong></td>
+      <td class="compare-yes">一等公民，官方 wheel 完善</td>
+      <td class="compare-yes">官方支持</td>
+      <td class="compare-no">Linux 为主，Windows 支持弱</td>
+    </tr>
+  </table>
+
+  <h3>4.2 选型决策树</h3>
+  <div class="card card-highlight">
+    <ul>
+      <li><strong>你是深度学习初学者</strong> → PyTorch（教程最多、社区最大、调试最友好）</li>
+      <li><strong>你要复现最新论文</strong> → PyTorch（95%+ 的论文开源代码是 PyTorch）</li>
+      <li><strong>你要部署到 Android/iOS 嵌入式设备</strong> → TensorFlow + TF Lite（移动端生态最强）</li>
+      <li><strong>你在 Google Cloud / TPU 上训练</strong> → JAX 或 TensorFlow（TPU 对 PyTorch 支持仍不如 TF/JAX）</li>
+      <li><strong>你需要大规模分布式训练（千张 GPU）</strong> → PyTorch + FSDP，或 JAX + pmap（两者都很强）</li>
+      <li><strong>你在 Windows 上做开发</strong> → <strong>PyTorch</strong>（JAX 在 Windows 上支持极差，TensorFlow 安装较臃肿）</li>
+    </ul>
+  </div>
+
+  <h3>4.3 PyTorch 2.x 核心新特性</h3>
+  <p>PyTorch 2.0 不是小版本更新，它引入了 <strong>torch.compile</strong>，通过图编译技术在不改动模型代码的情况下大幅提升性能。</p>
+  <pre><code>import torch
+
+model = MyModel().cuda()
+optimizer = torch.optim.Adam(model.parameters())
+
+# 用 torch.compile 包裹模型，自动图优化
+model = torch.compile(model, mode="default")
+# mode 可选："default"（推荐）、"reduce-overhead"（推理）、"max-autotune"（极致性能）
+
+# 训练代码完全不变
+for data, target in dataloader:
+    optimizer.zero_grad()
+    output = model(data)
+    loss = criterion(output, target)
+    loss.backward()
+    optimizer.step()</code></pre>
+  <div class="card">
+    <strong>torch.compile 实际收益</strong>：在 A100 / RTX 4090 上，典型 CV 模型训练速度提升 <strong>30%~70%</strong>，且无需改模型代码。Windows 下同样可用，但 Linux 上的 CUDA graph 支持更完整。
+  </div>
+
+  <h3>4.4 其他值得关注的框架/库</h3>
+  <table>
+    <tr><th>库名</th><th>定位</th><th>何时使用</th></tr>
+    <tr><td><strong>Lightning</strong></td><td>PyTorch 高阶封装，抽离训练循环样板代码</td><td>不想写重复的训练循环、需要多 GPU/TPU 自动支持</td></tr>
+    <tr><td><strong>Hugging Face Transformers</strong></td><td>预训练 NLP/CV/多模态模型库</td><td>需要 BERT、ViT、SAM 等现成模型</td></tr>
+    <tr><td><strong>timm</strong></td><td>PyTorch 图像模型库（Ross Wightman 维护）</td><td>需要 SOTA 图像分类 backbone、预训练权重</td></tr>
+    <tr><td><strong>MMDetection / detectron2</strong></td><td>目标检测框架</td><td>目标检测/实例分割生产项目</td></tr>
+    <tr><td><strong>ONNX</strong></td><td>跨框架中间格式</td><td>模型需要在不同框架/硬件间迁移</td></tr>
+  </table>
+</section>
+
+<!-- ===================== STEP 5 ===================== -->
+<section id="step5">
+  <h2><span class="step-num">5</span>安装 PyTorch</h2>
+
+  <p>PyTorch 是整个工具链的核心。安装方式取决于你是否有 NVIDIA 独立显卡。</p>
+
+  <h3>5.1 检查你的硬件</h3>
+  <p>打开任务管理器 → 性能 → GPU，如果有 NVIDIA GPU，记住型号，然后去 <a href="https://developer.nvidia.com/cuda-gpus" target="_blank">CUDA GPU 列表</a> 确认是否支持 CUDA。</p>
+
+  <h3>5.2 有 NVIDIA 显卡（推荐 GPU 版）</h3>
+  <p>先安装 <strong>NVIDIA 显卡驱动</strong>（GeForce Experience 或官网驱动即可），确保驱动较新。PyTorch 2.x 通常需要 CUDA 11.8 或 12.x。</p>
+  <p>去 <a href="https://pytorch.org/get-started/locally/" target="_blank">pytorch.org</a> 选择对应配置，生成命令。以下是目前最常用的两条：</p>
+
+  <pre><code># CUDA 12.4（较新的 40/50 系显卡推荐）
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# CUDA 11.8（兼容性更广，30/20 系也适用）
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118</code></pre>
+
+  <h3>5.3 只有核显 / 纯 CPU</h3>
+  <pre><code>pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu</code></pre>
+
+  <h3>5.4 验证安装</h3>
+  <pre><code>python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU only')"</code></pre>
+  <p>如果输出 <code>True</code> 和显卡名称，恭喜，GPU 加速就绪。</p>
+
+  <div class="card">
+    <strong>torchvision / torchaudio 是干什么的？</strong><br>
+    <code>torchvision</code> 提供图像预处理、常见模型（ResNet、MobileNet 等）和数据集工具；<code>torchaudio</code> 处理音频。如果你只做图像/模型转换，torchaudio 可以省略，但一起装也没坏处。
+  </div>
+
+  <h3>5.5 推荐配套安装：timm 和 Hugging Face Hub</h3>
+  <pre><code># timm：PyTorch 图像模型库，提供 900+ 预训练模型
+pip install timm
+
+# Hugging Face Hub：下载社区预训练模型
+pip install huggingface_hub</code></pre>
+</section>
+
+<!-- ===================== STEP 6 ===================== -->
+<section id="step6">
+  <h2><span class="step-num">6</span>安装 ONNX 工具链</h2>
+
+  <p>ONNX（Open Neural Network Exchange）是模型跨框架迁移的桥梁。PyTorch 原生支持导出 ONNX，但你需要 surrounding tools 来验证、简化、优化导出的模型。</p>
+
+  <h3>6.1 核心包</h3>
+  <pre><code>pip install onnx onnxruntime onnxscript</code></pre>
+
+  <table>
+    <tr><th>包名</th><th>作用</th></tr>
+    <tr><td><code>onnx</code></td><td>ONNX 格式定义和基础工具，读写 .onnx 文件</td></tr>
+    <tr><td><code>onnxruntime</code></td><td>微软开发的高性能推理引擎，支持 CPU/GPU，验证模型是否可正常推理</td></tr>
+    <tr><td><code>onnxscript</code></td><td>用 Python 直接编写/转换 ONNX 图，调试时很有用</td></tr>
+  </table>
+
+  <h3>6.2 GPU 推理加速（可选）</h3>
+  <p>如果你要在本机用 GPU 跑 ONNX 推理，安装 GPU 版 Runtime：</p>
+  <pre><code>pip install onnxruntime-gpu</code></pre>
+  <div class="card card-warn">
+    <strong>注意</strong>：<code>onnxruntime</code> 和 <code>onnxruntime-gpu</code> 不要同时安装，会冲突。如果已经装了 CPU 版，先卸载再装 GPU 版。
+  </div>
+
+  <h3>6.3 快速验证 ONNX 导出</h3>
+  <pre><code>import torch
+import onnx
+
+# 创建一个 dummy 模型
+class DummyModel(torch.nn.Module):
+    def forward(self, x):
+        return x * 2
+
+model = DummyModel()
+dummy_input = torch.randn(1, 3, 224, 224)
+
+# 导出
+torch.onnx.export(
+    model, dummy_input, "dummy.onnx",
+    input_names=["input"], output_names=["output"],
+    opset_version=17
+)
+
+# 验证
+onnx_model = onnx.load("dummy.onnx")
+onnx.checker.check_model(onnx_model)
+print("ONNX 模型验证通过！")
+
+# 用 onnxruntime 跑推理
+import onnxruntime as ort
+session = ort.InferenceSession("dummy.onnx")
+outputs = session.run(None, {"input": dummy_input.numpy()})
+print(outputs[0].shape)</code></pre>
+
+  <h3>6.4 ONNX 转换进阶工具（按需安装）</h3>
+  <pre><code># 模型简化（去除冗余节点，减小体积）
+pip install onnxsim
+
+# 图优化工具
+pip install onnxoptimizer</code></pre>
+
+  <h3>6.5 ONNX Runtime 执行提供者（Execution Providers）</h3>
+  <p>ONNX Runtime 的强大之处在于支持多种后端（Execution Provider），同一模型可以在不同硬件上加速运行：</p>
+  <table>
+    <tr><th>执行提供者</th><th>适用硬件</th><th>说明</th></tr>
+    <tr><td><code>CUDAExecutionProvider</code></td><td>NVIDIA GPU</td><td>NVIDIA GPU 推理，需 onnxruntime-gpu</td></tr>
+    <tr><td><code>TensorrtExecutionProvider</code></td><td>NVIDIA GPU</td><td>NVIDIA TensorRT 加速，性能最佳</td></tr>
+    <tr><td><code>DmlExecutionProvider</code></td><td>Windows DirectML</td><td>支持 NVIDIA/AMD/Intel GPU，Windows 友好</td></tr>
+    <tr><td><code>OpenVINOExecutionProvider</code></td><td>Intel CPU/GPU/NPU</td><td>Intel 硬件最优，需 openvino</td></tr>
+    <tr><td><code>CPUExecutionProvider</code></td><td>通用 CPU</td><td>默认回退，无额外依赖</td></tr>
+  </table>
+  <pre><code>import onnxruntime as ort
+
+# 显式指定 CUDA 后端
+providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+session = ort.InferenceSession("model.onnx", providers=providers)
+
+# 查看当前可用的 providers
+print(ort.get_available_providers())</code></pre>
+</section>
+
+<!-- ===================== STEP 7 ===================== -->
+<section id="step7">
+  <h2><span class="step-num">7</span>安装 YOLO 系列</h2>
+
+  <p>YOLO（You Only Look Once）是目标检测领域最具影响力的系列之一。当前社区主流是 Ultralytics 维护的 YOLOv8/v11，API 极其简洁。</p>
+
+  <h3>7.1 安装 Ultralytics</h3>
+  <pre><code>pip install ultralytics</code></pre>
+
+  <h3>7.2 验证 YOLO 推理</h3>
+  <pre><code>from ultralytics import YOLO
+
+# 自动下载 yolov8n.pt 权重到当前目录
+model = YOLO("yolov8n.pt")
+
+# 对一张图片做推理（可替换成你自己的图片路径）
+results = model("https://ultralytics.com/images/bus.jpg")
+results[0].show()</code></pre>
+  <p>第一次运行会自动下载权重文件（约 6MB），保存在当前目录。</p>
+
+  <h3>7.3 YOLO 导出 ONNX</h3>
+  <p>这是你最可能用到的功能——把 YOLO 模型导出为 ONNX：</p>
+  <pre><code>model = YOLO("yolov8n.pt")
+model.export(format="onnx")  # 生成 yolov8n.onnx</code></pre>
+
+  <h3>7.4 你可能还需要 OpenCV</h3>
+  <pre><code>pip install opencv-python</code></pre>
+  <p>YOLO 的结果可视化、摄像头取流、图片预处理都离不开 OpenCV。</p>
+
+  <div class="card card-warn">
+    <strong>opencv-python-headless 的区别</strong><br>
+    如果你只在服务器/无 GUI 环境运行，装 <code>opencv-python-headless</code>（没有 GUI 依赖，体积更小）。本地 Windows 开发建议装带 GUI 的 <code>opencv-python</code>。
+  </div>
+</section>
+
+<!-- ===================== STEP 8 ===================== -->
+<section id="step8">
+  <h2><span class="step-num">8</span>模型下载与验证工作流</h2>
+
+  <p>以下是你日常会用到的典型工作流，建议收藏本节。</p>
+
+  <h3>8.1 从 Hugging Face 下载模型</h3>
+  <p>Hugging Face 是当前最大的预训练模型社区。安装其 Python 客户端：</p>
+  <pre><code>pip install huggingface_hub</code></pre>
+  <p>下载单个文件：</p>
+  <pre><code>from huggingface_hub import hf_hub_download
+
+model_path = hf_hub_download(
+    repo_id="microsoft/resnet-50",
+    filename="model.onnx"
+)
+print(model_path)</code></pre>
+
+  <h3>8.2 从 PyTorch Hub 加载</h3>
+  <pre><code>import torch
+
+# 加载 torchvision 内置模型
+model = torch.hub.load("pytorch/vision:v0.17.0", "resnet50", weights="IMAGENET1K_V2")
+model.eval()
+
+# 导出 ONNX
+dummy = torch.randn(1, 3, 224, 224)
+torch.onnx.export(model, dummy, "resnet50.onnx", opset_version=17)</code></pre>
+
+  <h3>8.3 模型能力快速验证清单</h3>
+  <div class="card">
+    <ol>
+      <li><strong>加载是否成功</strong>：模型文件能否正常加载，权重维度是否匹配。</li>
+      <li><strong>前向推理是否通过</strong>：给定 dummy input，能否跑出结果且不报错。</li>
+      <li><strong>输出形状是否符合预期</strong>：分类模型通常是 <code>(batch, num_classes)</code>，检测模型是 <code>(batch, num_boxes, 6)</code> 等。</li>
+      <li><strong>ONNX 导出是否成功</strong>：用 <code>onnx.checker</code> 验证图结构完整性。</li>
+      <li><strong>ONNX Runtime 能否推理</strong>：确保导出后的模型在推理引擎上跑得通。</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== STEP 9 ===================== -->
+<section id="step9">
+  <h2><span class="step-num">9</span>生产级部署与优化</h2>
+
+  <p>模型训练完成只是 halfway。要把模型搬到生产环境，你需要面对一系列实际问题：<strong>推理延迟、吞吐量、内存占用、硬件兼容性、服务化接口</strong>。本节覆盖业界主流的部署优化工具链。</p>
+
+  <h3>9.1 部署路径总览</h3>
+  <div class="card card-highlight">
+    <p><strong>通用决策流程</strong>：</p>
+    <ol>
+      <li>目标平台是 <strong>云端服务器 / 工作站</strong>（NVIDIA GPU）→ <strong>TensorRT</strong> 或 <strong>ONNX Runtime + CUDA</strong></li>
+      <li>目标平台是 <strong>Intel CPU / 集成显卡 / NPU</strong> → <strong>OpenVINO</strong></li>
+      <li>目标平台是 <strong>手机 / 嵌入式 / ARM</strong> → <strong>TensorFlow Lite</strong> 或 <strong>ONNX Runtime Mobile</strong></li>
+      <li>目标平台是 <strong>浏览器 / Web</strong> → <strong>ONNX Runtime Web</strong> 或 <strong>TensorFlow.js</strong></li>
+      <li>需要 <strong>跨平台统一方案</strong> → <strong>ONNX</strong> 作为中间格式，再转各平台运行时</li>
+    </ol>
+  </div>
+
+  <h3>9.2 TensorRT：NVIDIA GPU 推理的终极加速</h3>
+  <p>TensorRT 是 NVIDIA 的高性能深度学习推理 SDK，通过<strong>层融合、精度校准、内核自动调优</strong>，通常能将 PyTorch/ONNX 模型的推理速度提升 <strong>2~10 倍</strong>。</p>
+
+  <h4>安装</h4>
+  <pre><code># 方式一：通过 pip（Python API，推荐）
+pip install tensorrt
+
+# 方式二：通过 NVIDIA 官方安装包（包含 trtexec 等命令行工具）
+# 下载地址：https://developer.nvidia.com/tensorrt
+
+# 验证安装
+python -c "import tensorrt as trt; print(trt.__version__)"</code></pre>
+
+  <h4>从 ONNX 构建 TensorRT 引擎</h4>
+  <pre><code>import tensorrt as trt
+
+logger = trt.Logger(trt.Logger.WARNING)
+builder = trt.Builder(logger)
+network = builder.create_network(1 &lt;&lt; int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+parser = trt.OnnxParser(network, logger)
+
+# 解析 ONNX
+with open("model.onnx", "rb") as f:
+    parser.parse(f.read())
+
+# 配置 builder
+config = builder.create_builder_config()
+config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, 1 &lt;&lt; 30)  # 1GB
+
+# FP16 精度（速度和内存减半，精度损失通常极小）
+config.set_flag(trt.BuilderFlag.FP16)
+
+# 构建引擎
+engine = builder.build_engine(network, config)
+
+# 序列化保存（下次直接加载，无需重新构建）
+with open("model.trt", "wb") as f:
+    f.write(engine.serialize())</code></pre>
+
+  <div class="card card-warn">
+    <strong>TensorRT 的局限性</strong>：
+    <ul>
+      <li>仅支持 NVIDIA GPU，无法用于 AMD/Intel 显卡或 CPU</li>
+      <li>引擎文件与 GPU 架构绑定（在 RTX 4090 上构建的引擎不能在 A100 上直接用）</li>
+      <li>部分 ONNX 算子可能不支持，需要用 <code>polygraphy</code> 或 <code>onnx-graphsurgeon</code> 修改图</li>
+    </ul>
+  </div>
+
+  <h3>9.3 OpenVINO：Intel 硬件的最优解</h3>
+  <p>如果你的部署目标是 Intel CPU、集成显卡、NPU（如 Intel Core Ultra 的 AI Boost），OpenVINO 是最佳选择。它也支持部分 ARM 和 NVIDIA GPU。</p>
+  <pre><code># 安装 OpenVINO
+pip install openvino
+
+# 将 ONNX 模型转为 OpenVINO IR 格式
+import openvino as ov
+
+core = ov.Core()
+model = core.read_model("model.onnx")
+compiled_model = core.compile_model(model, "AUTO")  # AUTO 自动选择最佳设备
+
+# 推理
+input_tensor = compiled_model.input(0)
+output_tensor = compiled_model.output(0)
+infer_request = compiled_model.create_infer_request()
+infer_request.infer({input_tensor: your_numpy_array})
+result = infer_request.get_output_tensor(output_tensor).data</code></pre>
+
+  <h3>9.4 模型量化：用精度换速度</h3>
+  <p>量化是将模型权重和激活值从高精度（FP32）降到低精度（FP16、INT8、甚至 INT4）的技术，能显著减少模型体积和推理延迟。</p>
+
+  <table>
+    <tr><th>量化类型</th><th>精度</th><th>体积减少</th><th>速度提升</th><th>精度损失</th><th>工具</th></tr>
+    <tr><td>FP16</td><td>16-bit 浮点</td><td>~50%</td><td>1.5~2x</td><td>极小</td><td>TensorRT、ONNX Runtime</td></tr>
+    <tr><td>动态 INT8</td><td>8-bit 整数</td><td>~75%</td><td>2~4x</td><td>小</td><td>ONNX Runtime、PyTorch Quantization</td></tr>
+    <tr><td>静态 INT8（PTQ）</td><td>8-bit 整数</td><td>~75%</td><td>3~8x</td><td>中</td><td>TensorRT、OpenVINO</td></tr>
+    <tr><td>QAT（量化感知训练）</td><td>8-bit 整数</td><td>~75%</td><td>3~8x</td><td>极小</td><td>PyTorch FX、TensorFlow</td></tr>
+  </table>
+
+  <h4>PyTorch 动态量化示例（最简单，适合 CPU 推理）</h4>
+  <pre><code>import torch.quantization
+
+model = MyModel()
+model.load_state_dict(torch.load("model.pth"))
+model.eval()
+
+# 动态量化（只对 Linear/LSTM 层生效，适合 CPU）
+quantized_model = torch.quantization.quantize_dynamic(
+    model, {torch.nn.Linear}, dtype=torch.qint8
+)
+
+# 保存量化模型
+torch.save(quantized_model.state_dict(), "model_quantized.pth")
+
+# 量化后模型在 CPU 上推理速度通常提升 2~4 倍</code></pre>
+
+  <h3>9.5 TorchScript 与 torch.export：PyTorch 原生部署方案</h3>
+  <pre><code># 方式一：TorchScript（传统方案，较成熟）
+scripted = torch.jit.script(model)  # 或 torch.jit.trace(model, example_input)
+scripted.save("model.pt")
+loaded = torch.jit.load("model.pt")
+
+# 方式二：torch.export（PyTorch 2.1+ 推荐，面向生产）
+# 捕获模型图结构，支持更激进的编译优化
+exported_program = torch.export.export(model, (example_input,))
+torch.export.save(exported_program, "model.pt2")
+
+# 方式三：torch.compile（训练和推理加速，不改变模型格式）
+optimized_model = torch.compile(model, mode="max-autotune")</code></pre>
+
+  <h3>9.6 服务化部署：FastAPI vs Triton Inference Server</h3>
+
+  <table>
+    <tr><th>方案</th><th>适用场景</th><th>复杂度</th><th>性能</th></tr>
+    <tr><td><strong>FastAPI + ONNX Runtime</strong></td><td>中小规模、快速上线、REST API</td><td>低</td><td>中（单进程，可用 Gunicorn 多 worker）</td></tr>
+    <tr><td><strong>Triton Inference Server</strong></td><td>大规模生产、高并发、模型版本管理、多框架支持</td><td>高</td><td>高（动态批处理、并发执行、GPU 共享）</td></tr>
+    <tr><td><strong>BentoML / MLflow</strong></td><td>MLOps 全链路、模型注册、A/B 测试</td><td>中</td><td>中</td></tr>
+  </table>
+
+  <h4>FastAPI 最小服务化示例</h4>
+  <pre><code># 安装：pip install fastapi uvicorn python-multipart
+from fastapi import FastAPI, File, UploadFile
+import numpy as np
+import onnxruntime as ort
+from PIL import Image
+import io
+
+app = FastAPI(title="Image Classification API")
+session = ort.InferenceSession("model.onnx")
+input_name = session.get_inputs()[0].name
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+    image = image.resize((224, 224))
+    arr = np.array(image).astype(np.float32) / 255.0
+    arr = np.transpose(arr, (2, 0, 1))  # HWC -> CHW
+    arr = np.expand_dims(arr, 0)        # add batch dim
+
+    outputs = session.run(None, {input_name: arr})
+    return {"prediction": outputs[0].tolist()}
+
+# 启动：uvicorn server:app --host 0.0.0.0 --port 8000</code></pre>
+</section>
+
+<!-- ===================== STEP 10 ===================== -->
+<section id="step10">
+  <h2><span class="step-num">10</span>端到端实战案例</h2>
+
+  <p>本节提供一个完整的图像分类项目，从数据准备到模型部署，展示前文所述工具链的实际协同工作方式。</p>
+
+  <h3>10.1 案例概述：CIFAR-10 图像分类</h3>
+  <div class="card">
+    <strong>目标</strong>：训练一个 ResNet-18 模型对 CIFAR-10 图片分类，然后导出 ONNX，用 TensorRT 优化，最后通过 FastAPI 提供推理服务。<br><br>
+    <strong>涉及技术</strong>：PyTorch → ONNX → TensorRT → FastAPI
+  </div>
+
+  <h3>10.2 项目结构</h3>
+  <div class="file-tree">
+    <div class="dir">cifar10-project/</div>
+    <div class="dir">├── src/</div>
+    <div class="dir">│   └── cifar10_project/</div>
+    <div class="file">│       ├── __init__.py</div>
+    <div class="file">│       ├── data.py       <span class="comment"># 数据加载</span></div>
+    <div class="file">│       ├── model.py      <span class="comment"># ResNet-18 定义</span></div>
+    <div class="file">│       └── utils.py      <span class="comment"># 辅助函数</span></div>
+    <div class="dir">├── scripts/</div>
+    <div class="file">│   ├── train.py          <span class="comment"># 训练脚本</span></div>
+    <div class="file">│   ├── export_onnx.py    <span class="comment"># ONNX 导出</span></div>
+    <div class="file">│   └── benchmark.py      <span class="comment"># 推理 benchmark</span></div>
+    <div class="file">├── server.py             <span class="comment"># FastAPI 服务</span></div>
+    <div class="file">├── pyproject.toml</div>
+    <div class="file">├── requirements.txt</div>
+    <div class="file">└── README.md</div>
+  </div>
+
+  <h3>10.3 核心代码</h3>
+
+  <h4>src/cifar10_project/model.py</h4>
+  <pre><code>import torch
+import torch.nn as nn
+import torchvision.models as models
+
+
+def create_model(num_classes: int = 10, pretrained: bool = False) -> nn.Module:
+    """创建适配 CIFAR-10 的 ResNet-18。
+
+    CIFAR-10 图像是 32x32，原版 ResNet 针对 224x224 设计，
+    因此我们将首层 conv 的 kernel_size 从 7 改为 3，stride 从 2 改为 1。
+    """
+    model = models.resnet18(weights="IMAGENET1K_V1" if pretrained else None)
+
+    # 修改首层 conv 适配 32x32 输入
+    model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
+    model.maxpool = nn.Identity()  # CIFAR-10 不需要大的下采样
+
+    # 修改最后一层全连接
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
+    return model</code></pre>
+
+  <h4>scripts/train.py</h4>
+  <pre><code>import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+from tqdm import tqdm
+
+from cifar10_project.model import create_model
+
+
+def main() -> None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 数据增强：训练时做随机裁剪和翻转，测试时只归一化
+    train_transform = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
+    ])
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
+    ])
+
+    train_ds = datasets.CIFAR10(root="./data", train=True, download=True, transform=train_transform)
+    test_ds = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
+
+    train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_ds, batch_size=256, shuffle=False, num_workers=4, pin_memory=True)
+
+    model = create_model(num_classes=10, pretrained=False).to(device)
+    # PyTorch 2.0+ 编译加速
+    if hasattr(torch, "compile"):
+        model = torch.compile(model)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+    best_acc = 0.0
+    for epoch in range(200):
+        model.train()
+        for images, labels in tqdm(train_loader, desc=f"Epoch {epoch+1}"):
+            images, labels = images.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+        scheduler.step()
+
+        # 验证
+        model.eval()
+        correct = total = 0
+        with torch.no_grad():
+            for images, labels in test_loader:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model(images)
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
+
+        acc = 100.0 * correct / total
+        print(f"Epoch {epoch+1}: Accuracy = {acc:.2f}%")
+        if acc > best_acc:
+            best_acc = acc
+            torch.save(model.state_dict(), "best_model.pth")
+
+    print(f"Best accuracy: {best_acc:.2f}%")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+  <h4>scripts/export_onnx.py</h4>
+  <pre><code>import torch
+from cifar10_project.model import create_model
+
+model = create_model(num_classes=10)
+model.load_state_dict(torch.load("best_model.pth", map_location="cpu"))
+model.eval()
+
+# CIFAR-10 输入尺寸：batch=1, channels=3, height=32, width=32
+dummy_input = torch.randn(1, 3, 32, 32)
+
+torch.onnx.export(
+    model,
+    dummy_input,
+    "cifar10_resnet18.onnx",
+    input_names=["input"],
+    output_names=["output"],
+    opset_version=17,
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+)
+
+print("ONNX 导出完成：cifar10_resnet18.onnx")
+
+# 可选：简化 ONNX
+import onnx
+from onnxsim import simplify
+
+onnx_model = onnx.load("cifar10_resnet18.onnx")
+model_simplified, check = simplify(onnx_model)
+assert check
+onnx.save(model_simplified, "cifar10_resnet18_sim.onnx")
+print("ONNX 简化完成：cifar10_resnet18_sim.onnx")</code></pre>
+
+  <h4>server.py（FastAPI 服务）</h4>
+  <pre><code>from fastapi import FastAPI, File, UploadFile
+import numpy as np
+import onnxruntime as ort
+from PIL import Image
+import io
+
+app = FastAPI(title="CIFAR-10 Classification")
+
+# 使用 CUDA 加速（如果可用）
+providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+session = ort.InferenceSession("cifar10_resnet18_sim.onnx", providers=providers)
+input_name = session.get_inputs()[0].name
+
+# CIFAR-10 归一化参数
+MEAN = np.array([0.4914, 0.4822, 0.4465])
+STD = np.array([0.2470, 0.2435, 0.2616])
+CLASSES = ["airplane", "automobile", "bird", "cat", "deer",
+           "dog", "frog", "horse", "ship", "truck"]
+
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+    image = image.resize((32, 32))
+    arr = np.array(image).astype(np.float32) / 255.0
+    arr = (arr - MEAN) / STD
+    arr = np.transpose(arr, (2, 0, 1))
+    arr = np.expand_dims(arr, 0)
+
+    outputs = session.run(None, {input_name: arr})[0]
+    pred_idx = int(np.argmax(outputs))
+    confidence = float(np.max(outputs))
+
+    return {
+        "class": CLASSES[pred_idx],
+        "confidence": round(confidence, 4),
+        "all_scores": {cls: round(float(score), 4) for cls, score in zip(CLASSES, outputs[0])}
+    }
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "providers": ort.get_available_providers()}</code></pre>
+
+  <h3>10.4 运行步骤</h3>
+  <pre><code># 1. 创建环境
+uv venv venv
+venv\Scripts\Activate.ps1
+
+# 2. 安装依赖
+uv pip install torch torchvision onnx onnxruntime-gpu onnxsim fastapi uvicorn python-multipart pillow numpy
+
+# 3. 训练（约 30~60 分钟，RTX 3060 级别 GPU）
+python scripts/train.py
+
+# 4. 导出 ONNX
+python scripts/export_onnx.py
+
+# 5. 启动服务
+uvicorn server:app --host 0.0.0.0 --port 8000
+
+# 6. 测试
+curl -X POST "http://localhost:8000/predict" -F "file=@test_image.png"</code></pre>
+
+  <h3>10.5 Benchmark 结果参考（RTX 3060）</h3>
+  <table>
+    <tr><th>方案</th><th>推理延迟（batch=1）</th><th>相比 PyTorch eager</th></tr>
+    <tr><td>PyTorch eager（GPU）</td><td>~2.5 ms</td><td>1.0x</td></tr>
+    <tr><td>PyTorch + torch.compile</td><td>~1.8 ms</td><td>1.4x</td></tr>
+    <tr><td>ONNX Runtime（CUDA）</td><td>~1.5 ms</td><td>1.7x</td></tr>
+    <tr><td>TensorRT FP32</td><td>~0.8 ms</td><td>3.1x</td></tr>
+    <tr><td>TensorRT FP16</td><td>~0.5 ms</td><td>5.0x</td></tr>
+  </table>
+</section>
+
+<!-- ===================== STEP 11 ===================== -->
+<section id="step11">
+  <h2><span class="step-num">11</span>优秀开发实践</h2>
+
+  <p>以下实践来自工业界成熟项目的经验总结，能显著提升代码可维护性和团队协作效率。</p>
+
+  <h3>11.1 配置管理：Hydra</h3>
+  <p>深度学习实验有海量超参数（学习率、batch size、数据增强策略、模型架构变体）。把参数硬编码在 Python 文件里是灾难的开始。<strong>Hydra</strong> 让你用 YAML 文件管理配置，支持命令行覆盖、多实验组合、输出目录自动管理。</p>
+  <pre><code># 安装
+pip install hydra-core omegaconf
+
+# configs/train.yaml
+model:
+  name: resnet18
+  num_classes: 10
+train:
+  epochs: 200
+  batch_size: 128
+  lr: 0.1
+  weight_decay: 5e-4
+
+# scripts/train.py
+import hydra
+from omegaconf import DictConfig
+
+@hydra.main(config_path="../configs", config_name="train", version_base=None)
+def main(cfg: DictConfig) -&gt; None:
+    print(f"Training {cfg.model.name} for {cfg.train.epochs} epochs")
+    # cfg.train.lr 直接访问，类型安全
+    # Hydra 会自动创建输出目录，并保存本次使用的配置快照
+
+if __name__ == "__main__":
+    main()
+
+# 命令行覆盖任意参数
+python scripts/train.py model.name=resnet50 train.lr=0.01</code></pre>
+
+  <h3>11.2 实验追踪：Weights & Biases</h3>
+  <p>训练模型时，你需要记录 loss 曲线、学习率变化、验证指标、模型权重、超参数。<strong>Weights & Biases (wandb)</strong> 是目前社区最流行的实验追踪工具，比 TensorBoard 更易分享和对比。</p>
+  <pre><code>pip install wandb
+wandb login  # 首次使用需要注册并粘贴 API key
+
+# 在训练代码中集成
+import wandb
+
+wandb.init(project="cifar10-classification", config={"lr": 0.1, "epochs": 200})
+for epoch in range(epochs):
+    # ... 训练逻辑 ...
+    wandb.log({"train/loss": loss.item(), "val/accuracy": val_acc, "epoch": epoch})
+
+# 训练结束后，自动在网页上看到所有指标曲线和超参数对比表格</code></pre>
+
+  <h3>11.3 数据版本控制：DVC</h3>
+  <p>Git 不适合管理大型数据集和二进制文件（图片、视频、模型权重）。<strong>DVC (Data Version Control)</strong> 用 Git 管理数据版本元数据，用云存储（S3、GCS、本地 NAS）管理实际文件。</p>
+  <pre><code>pip install dvc
+
+# 初始化
+dvc init
+
+# 追踪数据集目录
+dvc add data/raw
+
+# 推送到远程存储（如本地 NAS 或云存储）
+dvc remote add -d myremote /path/to/nas/storage
+dvc push
+
+# 团队成员拉取数据
+dvc pull
+
+# 切换数据版本和代码版本同步
+git checkout experiment-branch
+dvc checkout</code></pre>
+
+  <h3>11.4 Docker 容器化</h3>
+  <p>"在我机器上能跑"是深度学习领域的经典噩梦。Docker 让环境可复现、可迁移。</p>
+  <pre><code># docker/Dockerfile
+FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+
+WORKDIR /app
+COPY pyproject.toml .
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+
+RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir fastapi uvicorn onnxruntime-gpu
+
+EXPOSE 8000
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# 构建镜像
+docker build -t my-dl-app:latest -f docker/Dockerfile .
+
+# 运行（挂载 GPU）
+docker run --gpus all -p 8000:8000 my-dl-app:latest</code></pre>
+
+  <h3>11.5 日志规范</h3>
+  <p>不要用裸 <code>print()</code>。Python 的 <code>logging</code> 模块提供级别控制、格式化、多输出目标。</p>
+  <pre><code>import logging
+import sys
+
+
+def setup_logger(name: str, level: int = logging.INFO) -&gt; logging.Logger:
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        formatter = logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    return logger
+
+
+# 使用
+logger = setup_logger(__name__)
+logger.info("Training started")
+logger.warning("Learning rate decay triggered")
+logger.error("Failed to load checkpoint")</code></pre>
+
+  <h3>11.6 测试策略</h3>
+  <p>深度学习代码也需要测试，至少覆盖以下方面：</p>
+  <ul>
+    <li><strong>模型前向传播</strong>：给定固定输入，输出 shape 是否正确</li>
+    <li><strong>数据加载</strong>：Dataset 返回的数据类型、shape、范围是否符合预期</li>
+    <li><strong>ONNX 导出一致性</strong>：PyTorch 和 ONNX Runtime 的输出差异是否在容差内</li>
+    <li><strong>配置文件校验</strong>：缺失必填字段时是否抛异常</li>
+  </ul>
+  <pre><code># tests/test_model.py
+import torch
+from cifar10_project.model import create_model
+
+
+def test_model_output_shape() -&gt; None:
+    model = create_model(num_classes=10)
+    x = torch.randn(4, 3, 32, 32)
+    out = model(x)
+    assert out.shape == (4, 10), f"Expected (4, 10), got {out.shape}"
+
+
+def test_model_onnx_consistency() -&gt; None:
+    model = create_model(num_classes=10)
+    model.eval()
+    x = torch.randn(1, 3, 32, 32)
+
+    # PyTorch 输出
+    with torch.no_grad():
+        pt_out = model(x).numpy()
+
+    # ONNX 输出
+    import onnxruntime as ort
+    session = ort.InferenceSession("cifar10_resnet18.onnx")
+    onnx_out = session.run(None, {"input": x.numpy()})[0]
+
+    assert pt_out.shape == onnx_out.shape
+    assert torch.allclose(torch.from_numpy(pt_out), torch.from_numpy(onnx_out), atol=1e-5)</code></pre>
+</section>
+
+<!-- ===================== STORIES ===================== -->
+<section id="stories">
+  <h2>依赖组件的背景故事</h2>
+  <p>知其然，也知其所以然。了解这些工具的来龙去脉，有助于你在遇到问题时判断该往哪个方向排查。</p>
+
+  <div class="timeline">
+    <div class="story-item">
+      <div class="story-year">1991 — Python</div>
+      <div class="story-title">Guido van Rossum 的"圣诞礼物"</div>
+      <div class="story-desc">Python 诞生于荷兰的圣诞节假期。Guido 希望创造一种简洁、可读性强的语言，让程序员把精力花在解决问题上，而非语法细节上。30 多年后，Python 凭借 NumPy、SciPy 等科学计算生态，意外成为 AI 时代的第一语言。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2006 — CUDA</div>
+      <div class="story-title">NVIDIA 的"通用计算"豪赌</div>
+      <div class="story-desc">CUDA 最初被游戏玩家和图形工作者忽视，但 NVIDIA 坚持让 GPU 能跑通用程序。当 2012 年 AlexNet 用两块 GTX 580 赢得 ImageNet 后，CUDA 成为深度学习的事实标准。没有 CUDA，现代 AI 的训练周期可能要延长数十倍。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2012 — AlexNet</div>
+      <div class="story-title">深度学习的一声惊雷</div>
+      <div class="story-desc">虽然 AlexNet 本身不是工具，但它证明了 GPU + 深度卷积网络的可行性。从此，模型参数从百万级跃升至亿级，框架之争也拉开序幕：Caffe、Torch、Theano 相继登场。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2016 — PyTorch</div>
+      <div class="story-title">Meta（Facebook）的"动态图"逆袭</div>
+      <div class="story-desc">基于古老的 Torch 框架，Meta 的 AI Research 团队推出了 PyTorch。它以<strong>动态计算图</strong>（define-by-run）为核心，调试时像写普通 Python 一样直观，迅速在学术界和工业界击败 TensorFlow 成为主流。PyTorch 2.0 引入的 torch.compile 更让它在性能上补足短板。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2017 — ONNX</div>
+      <div class="story-title">微软与 Meta 的"停战协议"</div>
+      <div class="story-desc">深度学习框架割据（TensorFlow、PyTorch、Caffe2、MXNet...），模型互迁成本极高。微软与 Meta 联合发起 ONNX，试图定义一种开放的中间表示格式。如今 ONNX 已成为部署到移动端、边缘设备、甚至 Web 的标配中转格式。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2018 — ONNX Runtime</div>
+      <div class="story-title">微软的推理引擎</div>
+      <div class="story-desc">光有格式不够，还需要一个高性能的"播放器"。ONNX Runtime 由微软开源，支持 CPU、CUDA、DirectML、OpenVINO 等多种后端。它不仅是验证工具，更是许多生产环境（包括 Azure、Office）的实际推理引擎。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2016 / 2023 — YOLO / Ultralytics</div>
+      <div class="story-title">从学术论文到工程利器</div>
+      <div class="story-desc">Joseph Redmon 提出 YOLO 时，目标检测还是以两阶段方法（R-CNN 系列）为主。YOLO 的"单阶段、端到端"思路把速度提升了几个数量级。后来 Glenn Jocher 创办的 Ultralytics 公司推出 YOLOv5/v8/v11，用极其简单的 Python API 把目标检测变成几行代码的事，彻底降低了使用门槛。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2020 — Hugging Face</div>
+      <div class="story-title">AI 界的"GitHub"</div>
+      <div class="story-desc">这个从聊天机器人创业失败转型而来的公司，意外建成了全球最大的预训练模型托管平台。Transformers 库几乎成了 NLP 的标准入口，而 Hugging Face Hub 也汇聚了大量视觉、语音、多模态模型，下载模型再也不是靠百度云盘了。</div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2023 — uv / Ruff（Astral）</div>
+      <div class="story-title">Python 工具链的"Rust 革命"</div>
+      <div class="story-desc">Astral 公司用 Rust 重写了 Python 工具链：Ruff 替代了 flake8+black+isort，uv 替代了 pip+venv。速度提升 10~100 倍的同时保持了兼容性。这是 Python 生态近年来最重要的基础设施升级之一。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TROUBLESHOOT ===================== -->
+<section id="troubleshoot">
+  <h2>常见问题排查</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <strong>pip 安装极慢或失败</strong>
+      <p>换国内镜像源：</p>
+      <pre style="font-size:0.8rem;">pip install xxx -i https://pypi.tuna.tsinghua.edu.cn/simple</pre>
+      <p>或配置永久镜像：</p>
+      <pre style="font-size:0.8rem;">pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple</pre>
+      <p>Poetry 用户：</p>
+      <pre style="font-size:0.8rem;">poetry source add --priority=default tsinghua https://pypi.tuna.tsinghua.edu.cn/simple</pre>
+    </div>
+    <div class="card">
+      <strong>CUDA out of memory</strong>
+      <p>减小 batch size，或改用 <code>torch.no_grad()</code> 上下文做推理。如果只是想验证模型，CPU 模式完全够用。训练时可用 <code>torch.cuda.empty_cache()</code> 释放碎片。</p>
+    </div>
+    <div class="card">
+      <strong>torch.cuda.is_available() 返回 False</strong>
+      <ol style="margin:8px 0;padding-left:18px;">
+        <li>检查 NVIDIA 驱动是否安装</li>
+        <li>检查 PyTorch 的 CUDA 版本是否与系统 CUDA 匹配</li>
+        <li>笔记本需确认没开在核显模式</li>
+        <li>conda 用户确认安装了 <code>cudatoolkit</code> 或 <code>cuda-nvcc</code></li>
+      </ol>
+    </div>
+    <div class="card">
+      <strong>Ultralytics 报错找不到模型</strong>
+      <p>检查当前目录是否有 <code>.pt</code> 文件，或让 YOLO 自动下载：<code>YOLO("yolov8n.pt")</code> 第一次会自动拉取。国内用户可能因网络问题下载失败，可手动从 <a href="https://github.com/ultralytics/assets/releases" target="_blank">GitHub Releases</a> 下载。</p>
+    </div>
+    <div class="card">
+      <strong>ONNX 导出后推理结果不对</strong>
+      <p>重点检查 preprocessing（归一化、resize、通道顺序 BGR/RGB）和 postprocessing（NMS、置信度阈值）是否与训练时一致。ONNX 只负责"算"，不负责"预处理"。建议使用同一批数据对比 PyTorch 和 ONNX 的输出差异。</p>
+    </div>
+    <div class="card">
+      <strong>PowerShell 激活环境报错</strong>
+      <p>执行 <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code>，或改用 CMD 的 <code>activate.bat</code>。</p>
+    </div>
+    <div class="card">
+      <strong>TensorRT 构建引擎失败</strong>
+      <p>常见原因：ONNX 算子不支持、CUDA 版本不匹配、显存不足。用 <code>polygraphy debug</code> 定位不支持的算子，或用 <code>onnx-graphsurgeon</code> 修改图结构。</p>
+    </div>
+    <div class="card">
+      <strong>uv / Poetry 创建的虚拟环境找不到包</strong>
+      <p>确认你激活了正确的虚拟环境。uv 和 Poetry 的虚拟环境路径与标准 venv 不同（通常在项目根目录的 <code>.venv</code> 下）。用 <code>poetry env info</code> 或 <code>uv pip list</code> 确认当前环境。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHEATSHEET ===================== -->
+<section id="cheatsheet">
+  <h2>快速命令参考表</h2>
+
+  <h3>环境管理</h3>
+  <table>
+    <tr><th>目的</th><th>命令</th></tr>
+    <tr><td>创建虚拟环境（标准）</td><td><code>python -m venv venv</code></td></tr>
+    <tr><td>创建虚拟环境（uv）</td><td><code>uv venv venv</code></td></tr>
+    <tr><td>创建虚拟环境（Poetry）</td><td><code>poetry install</code>（自动创建）</td></tr>
+    <tr><td>激活环境 (PS)</td><td><code>venv\Scripts\Activate.ps1</code></td></tr>
+    <tr><td>激活环境（Poetry）</td><td><code>poetry shell</code></td></tr>
+    <tr><td>退出环境</td><td><code>deactivate</code> 或 <code>exit</code></td></tr>
+  </table>
+
+  <h3>PyTorch 安装</h3>
+  <table>
+    <tr><th>目的</th><th>命令</th></tr>
+    <tr><td>PyTorch GPU（CUDA 12.4）</td><td><code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124</code></td></tr>
+    <tr><td>PyTorch GPU（CUDA 11.8）</td><td><code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118</code></td></tr>
+    <tr><td>PyTorch CPU</td><td><code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu</code></td></tr>
+    <tr><td>验证 GPU</td><td><code>python -c "import torch; print(torch.cuda.is_available())"</code></td></tr>
+  </table>
+
+  <h3>工具链安装</h3>
+  <table>
+    <tr><th>目的</th><th>命令</th></tr>
+    <tr><td>ONNX 全家桶</td><td><code>pip install onnx onnxruntime onnxscript</code></td></tr>
+    <tr><td>ONNX GPU 推理</td><td><code>pip install onnxruntime-gpu</code></td></tr>
+    <tr><td>YOLO</td><td><code>pip install ultralytics</code></td></tr>
+    <tr><td>OpenCV</td><td><code>pip install opencv-python</code></td></tr>
+    <tr><td>代码质量工具链</td><td><code>pip install ruff mypy pytest pre-commit</code></td></tr>
+    <tr><td>实验追踪</td><td><code>pip install wandb</code></td></tr>
+    <tr><td>配置管理</td><td><code>pip install hydra-core omegaconf</code></td></tr>
+    <tr><td>TensorRT</td><td><code>pip install tensorrt</code></td></tr>
+    <tr><td>OpenVINO</td><td><code>pip install openvino</code></td></tr>
+  </table>
+
+  <h3>开发工作流</h3>
+  <table>
+    <tr><th>目的</th><th>命令</th></tr>
+    <tr><td>列出已装包</td><td><code>pip list</code> / <code>poetry show</code> / <code>uv pip list</code></td></tr>
+    <tr><td>导出 requirements</td><td><code>pip freeze &gt; requirements.txt</code> / <code>poetry export -f requirements.txt</code></td></tr>
+    <tr><td>按 requirements 安装</td><td><code>pip install -r requirements.txt</code></td></tr>
+    <tr><td>代码格式化</td><td><code>ruff format .</code></td></tr>
+    <tr><td>代码检查 + 自动修复</td><td><code>ruff check . --fix</code></td></tr>
+    <tr><td>类型检查</td><td><code>mypy src/</code></td></tr>
+    <tr><td>运行测试</td><td><code>pytest tests/ -v</code></td></tr>
+    <tr><td>初始化 pre-commit</td><td><code>pre-commit install</code></td></tr>
+  </table>
+
+  <h3>模型操作</h3>
+  <table>
+    <tr><th>目的</th><th>命令/代码</th></tr>
+    <tr><td>导出 YOLO 为 ONNX</td><td><code>YOLO("yolov8n.pt").export(format="onnx")</code></td></tr>
+    <tr><td>验证 ONNX 模型</td><td><code>onnx.checker.check_model(onnx.load("model.onnx"))</code></td></tr>
+    <tr><td>ONNX 简化</td><td><code>onnxsim model.onnx model_sim.onnx</code></td></tr>
+    <tr><td>PyTorch 编译加速</td><td><code>model = torch.compile(model)</code></td></tr>
+    <tr><td>启动 FastAPI 服务</td><td><code>uvicorn server:app --host 0.0.0.0 --port 8000</code></td></tr>
+  </table>
+</section>
+
+<!-- ===================== NEXT STEPS ===================== -->
+<section>
+  <h2>下一步建议</h2>
+  <div class="card card-success">
+    <ol>
+      <li><strong>环境搭建</strong>：按顺序走完 Step 1~7，确保每个验证命令都能输出预期结果。优先尝试 <code>uv</code> 作为包管理工具。</li>
+      <li><strong>工程化入门</strong>：在一个小项目里实践 src layout 目录结构、pyproject.toml 配置、ruff + pre-commit 代码检查。</li>
+      <li><strong>完整闭环</strong>：跑通第 10 节的 CIFAR-10 案例，完成"训练 → ONNX 导出 → 推理服务"的全流程。</li>
+      <li><strong>部署进阶</strong>：在 NVIDIA GPU 上尝试 TensorRT FP16 加速，对比 ONNX Runtime 和 TensorRT 的延迟差异。</li>
+      <li><strong>MLOps 实践</strong>：引入 Weights & Biases 记录实验、Hydra 管理配置、pytest 写单元测试。</li>
+      <li><strong>持续学习</strong>：关注 PyTorch 官方博客、ONNX Runtime 发布说明、timm 和 Hugging Face 的新模型。</li>
+    </ol>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>本文档为个人开发环境搭建与工程实践参考，软件版本随时间更新，请以各项目官方文档为准。</p>
+  <p style="margin-top:6px;font-size:0.85rem;">生成时间：2026-06-12</p>
+</footer>
+
+</body>
+</html>

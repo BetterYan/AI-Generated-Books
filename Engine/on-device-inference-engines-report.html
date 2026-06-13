@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>端侧推理引擎深度调研报告 (2025-2026)</title>
+  <style>
+    :root {
+      --sidebar-w: 280px;
+      --primary: #58a6ff;
+      --primary-dim: #1f6feb;
+      --accent: #f0883e;
+      --accent-dim: #d29922;
+      --bg: #0d1117;
+      --bg-elevated: #161b22;
+      --card-bg: #161b22;
+      --card-bg-hover: #1c2128;
+      --text: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --border: #30363d;
+      --border-light: #21262d;
+      --code-bg: #0d1117;
+      --code-text: #e6edf3;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+      --sidebar-bg: #010409;
+      --sidebar-hover: #161b22;
+      --sidebar-active: #1f6feb;
+      --scrollbar-thumb: #30363d;
+      --scrollbar-track: transparent;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sidebar-header h2 {
+      font-size: 1.05em;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .sidebar-header .meta-line {
+      font-size: 0.75em;
+      color: var(--text-muted);
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+    .sidebar-nav a {
+      display: flex;
+      align-items: flex-start;
+      padding: 9px 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.87em;
+      line-height: 1.5;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .sidebar-nav a:hover {
+      color: var(--text);
+      background: var(--sidebar-hover);
+    }
+    .sidebar-nav a.active {
+      color: var(--primary);
+      border-left-color: var(--primary);
+      background: rgba(31,111,235,0.08);
+      font-weight: 600;
+    }
+    .sidebar-nav a .nav-num {
+      color: var(--text-muted);
+      margin-right: 8px;
+      font-size: 0.85em;
+      font-weight: 600;
+      min-width: 18px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav a.active .nav-num { color: var(--primary); }
+    .sidebar-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 0.72em;
+      color: var(--text-muted);
+    }
+
+    /* ===== MOBILE TOGGLE ===== */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 24px; left: 24px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--primary-dim);
+      color: #fff;
+      border: none;
+      font-size: 1.4em;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #0f1d30 100%);
+      color: #fff;
+      padding: 56px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #e6edf3, #58a6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 1.05em;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .hero .meta {
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 40px 60px;
+    }
+
+    /* ===== SECTIONS ===== */
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 36px;
+      margin-bottom: 28px;
+    }
+    .section h2 {
+      font-size: 1.5em;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+    .section h3 {
+      font-size: 1.2em;
+      color: var(--text);
+      margin: 28px 0 14px;
+      padding-left: 12px;
+      border-left: 3px solid var(--accent);
+    }
+    .section h4 {
+      font-size: 1.02em;
+      color: var(--text-secondary);
+      margin: 20px 0 10px;
+      font-weight: 600;
+    }
+    .section p { margin-bottom: 12px; }
+    .section a { color: var(--primary); }
+    .section a:hover { text-decoration: underline; }
+
+    /* ===== TABLES ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 0.9em;
+    }
+    thead {
+      background: #21262d;
+      color: var(--text);
+    }
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    tr:nth-child(even) { background: rgba(110,118,129,0.06); }
+    tr:hover { background: rgba(88,166,255,0.06); }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight-box {
+      background: rgba(31,111,235,0.1);
+      border-left: 4px solid var(--primary-dim);
+      padding: 16px 22px;
+      border-radius: 0 8px 8px 0;
+      margin: 18px 0;
+    }
+    .highlight-box strong { color: var(--primary); }
+
+    /* ===== STAT GRID ===== */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .number {
+      font-size: 1.7em;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-card .label {
+      font-size: 0.82em;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ===== TAGS ===== */
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.78em;
+      font-weight: 600;
+      margin: 2px 3px;
+    }
+    .tag-blue { background: rgba(56,139,253,0.15); color: #58a6ff; }
+    .tag-green { background: rgba(63,185,80,0.15); color: #3fb950; }
+    .tag-orange { background: rgba(210,153,34,0.15); color: #d29922; }
+    .tag-red { background: rgba(248,81,73,0.15); color: #f85149; }
+    .tag-purple { background: rgba(163,113,247,0.15); color: #a371f7; }
+
+    /* ===== CODE ===== */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 22px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      margin: 14px 0;
+      font-size: 0.86em;
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    }
+    code { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+
+    /* ===== ARCH DIAGRAM ===== */
+    .arch-diagram {
+      background: #010409;
+      color: #8b949e;
+      padding: 22px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+      font-size: 0.83em;
+      line-height: 1.5;
+      margin: 14px 0;
+      white-space: pre;
+    }
+
+    /* ===== COMPARISON GRID ===== */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .comparison-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      background: var(--bg);
+    }
+    .comparison-card h4 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 0.98em;
+    }
+    .comparison-card p { font-size: 0.92em; color: var(--text-secondary); }
+
+    /* ===== PROS / CONS ===== */
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .pros, .cons { padding: 16px; border-radius: 8px; }
+    .pros { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.25); }
+    .cons { background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.25); }
+    .pros h5 { color: var(--success); margin-bottom: 8px; }
+    .cons h5 { color: var(--danger); margin-bottom: 8px; }
+
+    ul, ol { padding-left: 22px; margin: 8px 0; }
+    li { margin: 4px 0; }
+    em { color: var(--text-secondary); }
+    strong { color: #e6edf3; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 36px 40px;
+      color: var(--text-muted);
+      font-size: 0.85em;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-toggle { display: flex; }
+      .sidebar-overlay.open { display: block; }
+      .main { margin-left: 0; }
+      .hero { padding: 40px 20px; }
+      .hero h1 { font-size: 1.6em; }
+      .container { padding: 20px 16px 40px; }
+      .section { padding: 22px 18px; }
+      .pros-cons { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media print {
+      .sidebar, .sidebar-toggle { display: none !important; }
+      .main { margin-left: 0; }
+      .section { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>端侧推理引擎</h2>
+    <div class="meta-line">深度调研报告 2025-2026</div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <a href="#sec1" class="active"><span class="nav-num">01</span>应用场景与市场规模</a>
+    <a href="#sec2"><span class="nav-num">02</span>端侧推理 vs 云端推理</a>
+    <a href="#sec3"><span class="nav-num">03</span>主流推理引擎全景</a>
+    <a href="#sec4"><span class="nav-num">04</span>核心指标对比矩阵</a>
+    <a href="#sec5"><span class="nav-num">05</span>市场份额与竞争格局</a>
+    <a href="#sec6"><span class="nav-num">06</span>核心技术要点</a>
+    <a href="#sec7"><span class="nav-num">07</span>端侧 LLM 推理技术</a>
+    <a href="#sec8"><span class="nav-num">08</span>开源引擎架构解析</a>
+    <a href="#sec9"><span class="nav-num">09</span>代码片段与教学案例</a>
+    <a href="#sec10"><span class="nav-num">10</span>技术趋势与展望</a>
+    <a href="#sec11"><span class="nav-num">11</span>参考来源</a>
+  </nav>
+  <div class="sidebar-footer">数据截至 2026 年 6 月</div>
+</aside>
+
+<!-- ===== MOBILE BUTTON + OVERLAY ===== -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">&#9776;</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+<div class="hero">
+  <h1>端侧推理引擎深度调研报告</h1>
+  <p class="subtitle">应用场景 / 市场格局 / 核心技术 / 开源引擎架构解析</p>
+  <p class="meta">2025-2026 &nbsp;|&nbsp; 涵盖 13+ 主流推理引擎 &nbsp;|&nbsp; 数据截至 2026 年 6 月</p>
+</div>
+
+<div class="container">
+
+<!-- ==================== SECTION 1 ==================== -->
+<section class="section" id="sec1">
+  <h2>一、应用场景与市场规模</h2>
+
+  <h3>1.1 主要应用场景</h3>
+  <p>端侧推理引擎将 AI 模型的推理计算从云端迁移到终端设备上执行，使得智能手机、IoT 传感器、自动驾驶汽车、智能摄像头、可穿戴设备以及 AR/VR 头显等终端设备可以在本地完成 AI 推理任务，无需依赖网络连接。以下是端侧推理的核心应用领域：</p>
+
+  <table>
+    <thead>
+      <tr><th>应用领域</th><th>典型场景</th><th>关键需求</th><th>代表引擎</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="tag tag-blue">智能手机</span></td><td>人脸解锁、实时翻译、图像增强、语音助手、AR 滤镜</td><td>低功耗、实时性、隐私保护</td><td>TFLite, Core ML, NCNN, MNN</td></tr>
+      <tr><td><span class="tag tag-green">自动驾驶</span></td><td>目标检测、车道线识别、路径规划、传感器融合</td><td>极低延迟、高可靠性、功能安全</td><td>TensorRT, SNPE/QNN</td></tr>
+      <tr><td><span class="tag tag-orange">IoT / 嵌入式</span></td><td>智能音箱、工业缺陷检测、预测性维护、智能电表</td><td>极低功耗（mW 级）、MCU 适配</td><td>TFLite Micro, ExecuTorch</td></tr>
+      <tr><td><span class="tag tag-red">智能摄像头</span></td><td>安防监控、人流计数、行为分析、车牌识别</td><td>高吞吐、7x24 运行、多路视频流</td><td>TensorRT, OpenVINO, NCNN</td></tr>
+      <tr><td><span class="tag tag-purple">可穿戴设备</span></td><td>健康监测（心率/血氧/ECG）、运动识别、睡眠分析</td><td>超低功耗、微型模型、实时处理</td><td>TFLite Micro, Core ML</td></tr>
+      <tr><td><span class="tag tag-blue">AR/VR/MR</span></td><td>手势识别、空间感知、眼动追踪、3D 重建</td><td>极低延迟（&lt;16ms）、高帧率</td><td>Core ML, ExecuTorch, SNPE</td></tr>
+      <tr><td><span class="tag tag-green">端侧大模型</span></td><td>本地 LLM 对话、文本生成、代码补全、知识问答</td><td>内存效率、量化支持、流式输出</td><td>llama.cpp, MLX, LiteRT-LM</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 市场规模数据</h3>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number">$182.9亿</div>
+      <div class="label">2025年全球边缘AI推理芯片市场</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">$727.3亿</div>
+      <div class="label">2032年预测（CAGR 21.8%）</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">2517亿元</div>
+      <div class="label">2024年中国端侧AI产业链</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">1.22万亿</div>
+      <div class="label">2029年中国端侧AI预测（CAGR 39.6%）</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>2026年被业界普遍视为"端侧AI爆发元年"。</strong>随着 Apple Intelligence、Snapdragon 8 Gen 3/4、Google Gemini Nano 等端侧 AI 方案的成熟，以及大语言模型的端侧化加速，端侧推理市场正进入高速增长阶段。中国端侧 AI 芯片国产替代也在加速，预计 2029 年国产市占率达 60%。
+  </div>
+
+  <h4>细分领域市场占比</h4>
+  <table>
+    <thead>
+      <tr><th>领域</th><th>当前占比</th><th>增长趋势</th><th>备注</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>消费电子（智能手机为主）</td><td>&gt;42%</td><td>稳定增长</td><td>目前占比最大</td></tr>
+      <tr><td>汽车电子</td><td>~18%</td><td>增速最快（2026年预计占 24.54%）</td><td>自动驾驶和智能座舱驱动</td></tr>
+      <tr><td>工业领域</td><td>~15%</td><td>未来5年增速 &gt;30%</td><td>工业视觉、预测维护</td></tr>
+      <tr><td>IoT / TinyML</td><td>~10%</td><td>稳健增长（CAGR 9.8%）</td><td>MCU 级 AI 推理</td></tr>
+      <tr><td>其他（医疗、安防等）</td><td>~15%</td><td>持续增长</td><td>政策驱动</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 核心增长驱动力</h3>
+  <ul>
+    <li><strong>隐私保护需求：</strong>GDPR、中国《个人信息保护法》等法规推动数据本地化处理，端侧推理天然满足隐私合规要求。</li>
+    <li><strong>低延迟要求：</strong>自动驾驶、AR/VR 等场景对延迟极为敏感（&lt;10ms），云端推理的网络延迟无法满足。</li>
+    <li><strong>离线可用性：</strong>在弱网/无网环境（飞机、地铁、偏远地区）中，端侧推理是唯一可行方案。</li>
+    <li><strong>成本节约：</strong>减少云端推理的带宽和算力开支，尤其在大规模设备部署场景下优势明显。</li>
+    <li><strong>端侧大模型（On-device LLM）：</strong>以 llama.cpp、MLX 为代表的本地 LLM 推理方案爆发式增长，推动了端侧推理进入新阶段。</li>
+    <li><strong>硬件算力提升：</strong>手机 SoC 的 NPU 算力已达 40-70 TOPS，PC 端 NPU（Intel Core Ultra、Apple M 系列）普及加速。</li>
+  </ul>
+</section>
+
+<!-- ==================== SECTION 2 ==================== -->
+<section class="section" id="sec2">
+  <h2>二、端侧推理 vs 云端推理对比</h2>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h5>端侧推理优势</h5>
+      <ul>
+        <li>零网络延迟，实时响应（&lt;10ms）</li>
+        <li>数据不出设备，天然隐私保护</li>
+        <li>离线可用，不依赖网络连接</li>
+        <li>无云端算力成本，边际成本为零</li>
+        <li>减少带宽消耗和网络拥堵</li>
+        <li>适合大规模设备分布式部署</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h5>端侧推理局限</h5>
+      <ul>
+        <li>算力有限，难以运行超大模型</li>
+        <li>内存和存储受限</li>
+        <li>功耗和散热约束</li>
+        <li>模型更新需 OTA 推送</li>
+        <li>设备异构性大，适配成本高</li>
+        <li>无法利用大规模数据做在线学习</li>
+      </ul>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>对比维度</th><th>端侧推理</th><th>云端推理</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>延迟</td><td>&lt;10ms（本地计算）</td><td>50-200ms（含网络往返）</td></tr>
+      <tr><td>隐私</td><td>数据不离开设备</td><td>数据需上传到服务器</td></tr>
+      <tr><td>可用性</td><td>100% 离线可用</td><td>依赖网络连接</td></tr>
+      <tr><td>模型规模</td><td>MB 级 ~ 数 GB</td><td>数十 GB ~ TB 级</td></tr>
+      <tr><td>算力</td><td>1-70 TOPS（手机 NPU）</td><td>数百 PFLOPS（数据中心）</td></tr>
+      <tr><td>成本模型</td><td>一次性硬件成本</td><td>按请求/时间付费</td></tr>
+      <tr><td>更新方式</td><td>OTA / 应用商店更新</td><td>服务端热更新</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>行业趋势：</strong>端侧推理与云端推理正走向<strong>"云-边-端协同"</strong>的混合架构。大模型在云端训练，小模型在端侧推理；敏感数据在端侧处理，复杂推理在云端完成。两者不是替代关系，而是互补关系。
+  </div>
+</section>
+
+<!-- ==================== SECTION 3 ==================== -->
+<section class="section" id="sec3">
+  <h2>三、主流端侧推理引擎全景</h2>
+
+  <h3>3.1 TFLite / LiteRT（Google）</h3>
+  <p>TensorFlow Lite（2025年更名为 <strong>LiteRT</strong>，Lite Runtime）是 Google 推出的端侧推理框架，也是全球端侧推理的<strong>事实标准</strong>。在 Android 平台默认集成，开发者使用率最高。2025年新增 LiteRT-LM 用于端侧大模型推理，号称速度比 llama.cpp 快 7 倍。主仓库 TensorFlow 拥有约 196k GitHub Stars，LiteRT 独立仓库约 2.6k Stars。</p>
+  <p><span class="tag tag-blue">Android</span><span class="tag tag-green">iOS</span><span class="tag tag-orange">MCU</span><span class="tag tag-purple">全平台</span></p>
+
+  <h3>3.2 ONNX Runtime Mobile（Microsoft）</h3>
+  <p>微软推出的<strong>框架中立</strong>推理运行时，支持 PyTorch、TensorFlow 等多种框架导出的 ONNX 模型。跨平台能力极强，支持 CUDA、TensorRT、DirectML、Core ML、NNAPI、OpenVINO 等多种硬件后端。被誉为"连接模型与硬件的桥梁"，GitHub 约 20.8k Stars。</p>
+  <p><span class="tag tag-blue">跨平台王者</span><span class="tag tag-green">框架中立</span><span class="tag tag-orange">多后端</span></p>
+
+  <h3>3.3 NCNN（腾讯）</h3>
+  <p>腾讯优图实验室开源的<strong>极致轻量</strong>推理引擎，GitHub 约 23.4k Stars。纯 C++ 实现，无第三方依赖，内存占用极低（~8MB），对 ARM 架构深度优化。是<strong>国内移动端 CV 推理的首选引擎</strong>，在 Android 低端设备上性能领先。支持 ARM CPU (NEON/SVE)、Vulkan GPU 加速。</p>
+  <p><span class="tag tag-blue">极致轻量</span><span class="tag tag-green">ARM深度优化</span><span class="tag tag-red">CV首选</span></p>
+
+  <h3>3.4 MNN（阿里巴巴）</h3>
+  <p>阿里巴巴开源的<strong>跨平台推理引擎</strong>，GitHub 约 15.5k Stars。CNN + Transformer 双优支持，NPU 适配深入，在阿里系 App（淘宝、天猫等）大规模验证。支持 ARM CPU、Mali/Adreno GPU、Metal (iOS) 以及通过 NNAPI/Core ML 对接 NPU。是<strong>国产端侧推理引擎综合实力最强</strong>的方案。</p>
+  <p><span class="tag tag-blue">CNN+Transformer</span><span class="tag tag-green">NPU深入</span><span class="tag tag-orange">阿里验证</span></p>
+
+  <h3>3.5 llama.cpp（开源社区）</h3>
+  <p>由 ggerganov 和 ggml-org 社区维护的<strong>纯 C/C++ LLM 推理引擎</strong>，GitHub 约 <strong>116k Stars</strong>（GitHub 最热门 AI 项目之一）。支持 1.5-8 bit 多种量化、极低内存占用、本地 API 服务器。几乎支持所有主流 LLM（LLaMA、Mistral、Qwen、Gemma 等），是 <strong>LLM 端侧/本地推理的事实标准</strong>。</p>
+  <p><span class="tag tag-red">LLM专精</span><span class="tag tag-purple">116k Stars</span><span class="tag tag-blue">全平台</span></p>
+
+  <h3>3.6 其他重要引擎</h3>
+  <div class="comparison-grid">
+    <div class="comparison-card">
+      <h4>TensorRT（NVIDIA）~13.1k Stars</h4>
+      <p>NVIDIA GPU 推理的绝对王者。层融合、INT8/FP16 精度校准、动态形状支持。Jetson 边缘设备专属优化，在自动驾驶和机器人领域占据主导地位。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>OpenVINO（Intel）~10.4k Stars</h4>
+      <p>Intel 硬件深度优化，在 Intel CPU 上性能远超其他方案（比 PyTorch 快 4-7 倍）。随着 Intel Core Ultra 处理器 NPU 的普及，在 PC 端侧 AI 领域份额增长。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>Core ML（Apple）闭源</h4>
+      <p>iOS/macOS 原生唯一官方方案，自动调度 ANE/GPU/CPU，与 Swift/SwiftUI 深度集成。覆盖全球 20+ 亿台活跃 Apple 设备。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>SNPE/QNN（高通）闭源 SDK</h4>
+      <p>骁龙芯片设备的标配推理方案，QNN 是 SNPE 的升级版，深度利用骁龙 Hexagon NPU（骁龙 8 Gen 3 达 45 TOPS）。覆盖数十亿台骁龙设备。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>MLX（Apple）~26.9k Stars</h4>
+      <p>Apple Silicon 原生 LLM 推理框架。延迟执行/惰性计算，统一内存架构充分利用，1-bit 量化支持。与 llama.cpp 形成互补。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>MediaPipe（Google）~35.6k Stars</h4>
+      <p>高级 AI 任务框架，提供开箱即用的解决方案（手势识别、姿态估计、人脸检测等）。2025年新增 LLM 任务支持，Android AI 快速开发首选。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>ExecuTorch（Meta）~4.7k Stars</h4>
+      <p>PyTorch 官方端侧推理框架，2025年发布 1.0 正式版。与 PyTorch 训练生态无缝衔接，Reality Labs (Meta Quest) 全面采用。</p>
+    </div>
+    <div class="comparison-card">
+      <h4>Paddle Lite（百度）~7.3k Stars</h4>
+      <p>与 PaddlePaddle 训练框架深度绑定，对国产芯片（华为 NPU、联发科 APU）支持好。百度/国产芯片生态的重要选择。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 4 ==================== -->
+<section class="section" id="sec4">
+  <h2>四、核心指标对比矩阵</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>引擎</th><th>开发方</th><th>GitHub Stars</th><th>主要平台</th>
+        <th>LLM 支持</th><th>NPU 支持</th><th>移动端优化</th><th>社区活跃度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>TFLite / LiteRT</strong></td><td>Google</td><td>196k (TF) + 2.6k</td><td>全平台</td>
+        <td>LiteRT-LM</td><td>部分</td><td><span class="tag tag-green">极优</span></td><td><span class="tag tag-green">极高</span></td>
+      </tr>
+      <tr>
+        <td><strong>ONNX Runtime</strong></td><td>Microsoft</td><td>20.8k</td><td>全平台</td>
+        <td>有限</td><td>广泛</td><td><span class="tag tag-blue">良好</span></td><td><span class="tag tag-green">高</span></td>
+      </tr>
+      <tr>
+        <td><strong>NCNN</strong></td><td>腾讯</td><td>23.4k</td><td>Android/iOS/嵌入式</td>
+        <td>无</td><td>弱</td><td><span class="tag tag-green">极优 (ARM)</span></td><td><span class="tag tag-blue">中高</span></td>
+      </tr>
+      <tr>
+        <td><strong>MNN</strong></td><td>阿里</td><td>15.5k</td><td>全平台</td>
+        <td>支持</td><td>深入</td><td><span class="tag tag-green">优秀</span></td><td><span class="tag tag-blue">中高</span></td>
+      </tr>
+      <tr>
+        <td><strong>Paddle Lite</strong></td><td>百度</td><td>7.3k</td><td>Android/iOS/嵌入式</td>
+        <td>有限</td><td>华为/联发科</td><td><span class="tag tag-blue">良好</span></td><td><span class="tag tag-orange">中</span></td>
+      </tr>
+      <tr>
+        <td><strong>TensorRT</strong></td><td>NVIDIA</td><td>13.1k</td><td>Linux/Jetson</td>
+        <td>支持</td><td>无 (GPU)</td><td><span class="tag tag-orange">不适用</span></td><td><span class="tag tag-green">高</span></td>
+      </tr>
+      <tr>
+        <td><strong>OpenVINO</strong></td><td>Intel</td><td>10.4k</td><td>Intel 全平台</td>
+        <td>支持</td><td>Intel NPU</td><td><span class="tag tag-orange">不适用</span></td><td><span class="tag tag-blue">中高</span></td>
+      </tr>
+      <tr>
+        <td><strong>Core ML</strong></td><td>Apple</td><td>闭源</td><td>Apple 全系</td>
+        <td>支持</td><td>ANE</td><td><span class="tag tag-green">极优 (iOS)</span></td><td>N/A</td>
+      </tr>
+      <tr>
+        <td><strong>SNPE/QNN</strong></td><td>高通</td><td>闭源 SDK</td><td>骁龙平台</td>
+        <td>有限</td><td>Hexagon</td><td><span class="tag tag-green">极优 (骁龙)</span></td><td>N/A</td>
+      </tr>
+      <tr>
+        <td><strong>llama.cpp</strong></td><td>社区</td><td><strong>116k</strong></td><td>全平台</td>
+        <td><span class="tag tag-red">专精LLM</span></td><td>无</td><td><span class="tag tag-blue">良好</span></td><td><span class="tag tag-green">极高</span></td>
+      </tr>
+      <tr>
+        <td><strong>MLX</strong></td><td>Apple</td><td>26.9k</td><td>macOS (Apple Silicon)</td>
+        <td><span class="tag tag-red">专精LLM</span></td><td>部分</td><td><span class="tag tag-orange">不适用</span></td><td><span class="tag tag-green">高</span></td>
+      </tr>
+      <tr>
+        <td><strong>MediaPipe</strong></td><td>Google</td><td>35.6k</td><td>Android/iOS/Web</td>
+        <td>2025新增</td><td>继承TFLite</td><td><span class="tag tag-green">优秀</span></td><td><span class="tag tag-green">高</span></td>
+      </tr>
+      <tr>
+        <td><strong>ExecuTorch</strong></td><td>Meta</td><td>4.7k</td><td>Android/iOS/MCU</td>
+        <td>支持</td><td>部分</td><td><span class="tag tag-blue">良好</span></td><td><span class="tag tag-blue">增长中</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>4.1 性能基准对比（参考值）</h3>
+  <h4>移动端 CV 模型推理（ARM CPU）</h4>
+  <table>
+    <thead>
+      <tr><th>引擎</th><th>MobileNetV2 推理耗时</th><th>内存占用</th><th>包体积增量</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>NCNN</strong></td><td>~15-25 ms</td><td>极低 (~8MB)</td><td>~2-3MB</td></tr>
+      <tr><td><strong>MNN</strong></td><td>~12-22 ms</td><td>低 (~15MB)</td><td>~3-5MB</td></tr>
+      <tr><td><strong>TFLite</strong></td><td>~20-35 ms</td><td>中 (~25MB)</td><td>~5-8MB</td></tr>
+      <tr><td><strong>ONNX Runtime</strong></td><td>~25-40 ms</td><td>中高 (~30MB)</td><td>~8-15MB</td></tr>
+    </tbody>
+  </table>
+
+  <h4>LLM 端侧推理（7B 模型）</h4>
+  <table>
+    <thead>
+      <tr><th>引擎</th><th>推理速度 (tokens/s)</th><th>内存占用</th><th>平台</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>llama.cpp</strong> (Q4)</td><td>~15-30 (CPU), ~50+ (GPU)</td><td>~4GB</td><td>全平台</td></tr>
+      <tr><td><strong>MLX</strong> (4-bit)</td><td>~40-60 (M4 Pro)</td><td>~4GB</td><td>macOS only</td></tr>
+      <tr><td><strong>LiteRT-LM</strong></td><td>号称比 llama.cpp 快 ~7x</td><td>优化中</td><td>Android 优先</td></tr>
+    </tbody>
+  </table>
+  <p><em>注：性能数据来源于社区测评，受设备型号、模型配置和量化方案影响，仅供参考。</em></p>
+</section>
+
+<!-- ==================== SECTION 5 ==================== -->
+<section class="section" id="sec5">
+  <h2>五、市场份额与竞争格局</h2>
+
+  <h3>5.1 推理引擎市场分层</h3>
+  <table>
+    <thead>
+      <tr><th>层级</th><th>引擎</th><th>市场定位</th><th>估计覆盖份额</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>全平台通用标准</strong></td>
+        <td>TFLite/LiteRT, ONNX Runtime</td>
+        <td>跨平台移动/嵌入式 AI 部署</td>
+        <td>~40-50% 移动 AI 开发者使用 TFLite</td>
+      </tr>
+      <tr>
+        <td><strong>国产专精引擎</strong></td>
+        <td>NCNN, MNN, Paddle Lite</td>
+        <td>中国移动/嵌入式 AI 深度优化</td>
+        <td>国内合计 ~20-25%</td>
+      </tr>
+      <tr>
+        <td><strong>硬件绑定方案</strong></td>
+        <td>Core ML, SNPE/QNN, TensorRT, OpenVINO</td>
+        <td>芯片厂商官方推理方案</td>
+        <td>各自平台 ~80%+ AI 推理场景</td>
+      </tr>
+      <tr>
+        <td><strong>LLM 端侧推理</strong></td>
+        <td>llama.cpp, MLX, LiteRT-LM</td>
+        <td>大模型本地化部署</td>
+        <td>llama.cpp 在开源 LLM 本地推理 ~70%+</td>
+      </tr>
+      <tr>
+        <td><strong>高级任务框架</strong></td>
+        <td>MediaPipe, ExecuTorch</td>
+        <td>快速集成 / 训练-部署一体化</td>
+        <td>份额增长迅速</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 各厂商市场策略</h3>
+  <table>
+    <thead>
+      <tr><th>厂商</th><th>策略</th><th>核心优势</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Google</strong></td><td>TFLite &rarr; LiteRT 品牌升级 + LiteRT-LM + MediaPipe</td><td>Android 生态掌控力</td></tr>
+      <tr><td><strong>Microsoft</strong></td><td>ONNX 开放标准 + ONNX Runtime 跨平台</td><td>框架中立，Azure 云-边协同</td></tr>
+      <tr><td><strong>腾讯</strong></td><td>NCNN 开源社区驱动</td><td>ARM CPU 极致优化，轻量无依赖</td></tr>
+      <tr><td><strong>阿里</strong></td><td>MNN + 阿里系 App 大规模验证</td><td>跨平台 + NPU 深度适配</td></tr>
+      <tr><td><strong>NVIDIA</strong></td><td>TensorRT + Jetson 边缘平台</td><td>GPU 推理绝对性能优势</td></tr>
+      <tr><td><strong>Intel</strong></td><td>OpenVINO + Core Ultra NPU</td><td>PC 端侧 AI 新增长点</td></tr>
+      <tr><td><strong>Apple</strong></td><td>Core ML + MLX + Apple Intelligence</td><td>20 亿+ Apple 设备封闭生态</td></tr>
+      <tr><td><strong>高通</strong></td><td>SNPE &rarr; QNN 升级</td><td>骁龙芯片数十亿设备覆盖</td></tr>
+      <tr><td><strong>Meta</strong></td><td>ExecuTorch + PyTorch 生态</td><td>PyTorch 训练-部署闭环</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== SECTION 6 ==================== -->
+<section class="section" id="sec6">
+  <h2>六、端侧推理引擎核心技术要点</h2>
+
+  <h3>6.1 模型压缩技术</h3>
+
+  <h4>6.1.1 量化（Quantization）</h4>
+  <p>量化是端侧推理最核心的优化技术，将模型权重和激活值从高精度浮点数（FP32/FP16）转换为低精度整数（INT8/INT4），从而减小模型体积、降低内存带宽需求、并利用整数运算单元加速计算。</p>
+
+  <p><strong>线性量化公式：</strong></p>
+  <pre>
+q = round(x / scale) + zero_point
+
+反量化：x_approx = (q - zero_point) * scale
+
+其中：
+  scale = (max_val - min_val) / (qmax - qmin)
+  zero_point = qmin - round(min_val / scale)
+
+INT8 对称量化（Zero-point = 0）：
+  scale = max(|x|) / 127
+  q = round(x / scale)
+
+GPTQ 量化（用于 LLM 权重）：
+  基于二阶 Hessian 信息逐层量化，最小化量化误差
+  W_quantized = argmin_W' ||W*X - W'*X||_F^2
+
+AWQ (Activation-aware Weight Quantization)：
+  保护"显著"权重通道，仅对非显著通道进行低比特量化
+  显著性 = mean(|X|) 对应权重的通道重要性</pre>
+
+  <table>
+    <thead>
+      <tr><th>量化方法</th><th>精度</th><th>压缩比</th><th>特点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>PTQ（训练后量化）</td><td>INT8</td><td>4x</td><td>无需重新训练，快速部署</td></tr>
+      <tr><td>QAT（量化感知训练）</td><td>INT8</td><td>4x</td><td>训练中模拟量化，精度更高</td></tr>
+      <tr><td>GPTQ</td><td>INT4/INT3</td><td>8-10x</td><td>LLM 专用，基于 Hessian</td></tr>
+      <tr><td>AWQ</td><td>INT4</td><td>8x</td><td>激活感知，保护关键通道</td></tr>
+      <tr><td>GGUF (llama.cpp)</td><td>1.5-8 bit</td><td>2-20x</td><td>多种混合量化格式</td></tr>
+    </tbody>
+  </table>
+
+  <h4>6.1.2 剪枝（Pruning）</h4>
+  <p>剪枝通过移除神经网络中冗余的连接或结构来减小模型规模。理论基础是<strong>彩票假说（Lottery Ticket Hypothesis）</strong>：在一个随机初始化的密集网络中，存在一个子网络（"中奖彩票"），在相同参数量的情况下可以训练到与原始网络相当的精度。</p>
+  <pre>
+非结构化剪枝：
+  将绝对值小于阈值 theta 的权重置零
+  W_pruned[i][j] = W[i][j]  if |W[i][j]| > theta
+                  = 0         otherwise
+  优点：剪枝率高  |  缺点：稀疏矩阵不友好，需特殊硬件/软件支持
+
+结构化剪枝：
+  移除整个滤波器/通道/注意力头
+  移除 Filter_k if importance(Filter_k) < threshold
+  优点：直接减小模型尺寸  |  缺点：可能损失更多精度
+
+NVIDIA 2:4 结构化稀疏：
+  每 4 个连续元素中至少 2 个为零
+  Ampere/Hopper 架构原生支持，无精度损失
+  利用 Sparse Tensor Core 实现 2x 加速</pre>
+
+  <h4>6.1.3 知识蒸馏（Knowledge Distillation）</h4>
+  <p>使用一个大型"教师模型"指导小型"学生模型"的训练，使学生模型学习教师模型的软标签分布，从而在小模型中保留大模型的知识。由 Hinton 等人在 2015 年提出。</p>
+  <pre>
+Hinton 原始蒸馏损失：
+  L_KD = alpha * CE(y, y_hat) + (1-alpha) * KL(p_teacher || p_student)
+
+  其中软标签通过温度缩放计算：
+  p_i = exp(z_i / T) / sum_j(exp(z_j / T))
+
+  T 为温度参数（T > 1 时产生更"软"的概率分布，揭示类间关系）
+  当 T -> inf 时，分布趋于均匀
+  当 T = 1 时，退化为标准 softmax
+
+实际应用案例：
+  - Apple Intelligence: 教师模型（数十B参数）蒸馏到端侧 ~3B 模型
+  - MiniCPM: 通过蒸馏在 2B 参数模型上达到 7B 级别性能
+  - Qwen-1.8B: 从 Qwen-72B 蒸馏而来</pre>
+
+  <h3>6.2 计算图优化</h3>
+
+  <h4>6.2.1 算子融合（Operator Fusion）</h4>
+  <p>将多个连续的小算子合并为一个大算子，减少内核启动开销和中间结果的内存读写。这是推理引擎最基础且效果最显著的优化。</p>
+  <pre>
+Conv + BatchNorm + ReLU 融合（最经典案例）：
+
+原始计算：
+  y_bn = gamma * (y_conv - mean) / sqrt(var + eps) + beta
+  y_out = max(y_bn, 0)
+
+融合后（离线预计算参数）：
+  W_fused = W * gamma / sqrt(var + eps)
+  b_fused = (b - mean) * gamma / sqrt(var + eps) + beta
+
+  y_conv_fused = conv(x, W_fused, b_fused)
+  y_out = max(y_conv_fused, 0)  // ReLU 可在下一次 conv 前融合
+
+MNN 的三级融合策略（实测提速 28-30%）：
+  Level 1: 常量折叠 + 简单融合 (Conv+BN)
+  Level 2: 跨层融合 (Conv+BN+ReLU+Conv)
+  Level 3: 子图级融合 (整块 pattern 替换为优化 kernel)</pre>
+
+  <h4>6.2.2 内存复用与优化</h4>
+  <pre>
+内存生命周期分析：
+  1. 构建计算图，分析每个 tensor 的生命周期 [birth, death]
+  2. 将不重叠的 tensor 分配到同一块内存
+  3. 问题等价于图着色问题（NP-hard），使用贪心算法近似
+
+内存池（Memory Pool）：
+  预分配一大块内存，按需分配/回收小块
+  避免频繁 malloc/free 的系统调用开销
+
+原地计算（In-place Computation）：
+  当输入 tensor 在计算后不再被使用时
+  直接在输入 buffer 上写入输出，零额外内存
+
+TinyEngine Patch-based 推理：
+  将大 tensor 切分为 patch，每次只加载一个 patch
+  峰值内存降低 8 倍，适用于 MCU 的 KB 级 SRAM</pre>
+
+  <h3>6.3 硬件加速技术</h3>
+
+  <h4>6.3.1 GPU 加速</h4>
+  <table>
+    <thead>
+      <tr><th>API</th><th>平台</th><th>特点</th><th>代表引擎</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Vulkan Compute</strong></td><td>Android / Linux</td><td>跨厂商 GPU 通用计算，三级内存池（分配 12ms&rarr;0.8ms）</td><td>NCNN, MNN</td></tr>
+      <tr><td><strong>Metal Performance Shaders</strong></td><td>iOS / macOS</td><td>Apple GPU 原生 API，UMA 统一内存零拷贝</td><td>Core ML, MNN</td></tr>
+      <tr><td><strong>OpenCL</strong></td><td>跨平台</td><td>标准开放但性能通常不如 Vulkan/Metal</td><td>MNN (legacy)</td></tr>
+    </tbody>
+  </table>
+
+  <h4>6.3.2 NPU / DSP 加速</h4>
+  <table>
+    <thead>
+      <tr><th>芯片</th><th>NPU 算力</th><th>推理 SDK</th><th>特点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>骁龙 8 Gen 3</td><td>45 TOPS</td><td>QNN (Hexagon)</td><td>INT4 支持，大模型加速</td></tr>
+      <tr><td>天玑 9300</td><td>~41 TOPS</td><td>NeuroPilot</td><td>联发科 APU 4.0</td></tr>
+      <tr><td>Apple A17 Pro</td><td>35 TOPS</td><td>Core ML</td><td>16 核 Neural Engine</td></tr>
+      <tr><td>Google TPU v5e</td><td>393 TOPS</td><td>TFLite / LiteRT</td><td>Edge TPU 系列</td></tr>
+      <tr><td>Intel Core Ultra</td><td>~11 TOPS</td><td>OpenVINO</td><td>PC 端侧 NPU</td></tr>
+    </tbody>
+  </table>
+
+  <h4>6.3.3 CPU SIMD 优化</h4>
+  <table>
+    <thead>
+      <tr><th>指令集</th><th>位宽</th><th>平台</th><th>单次处理</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ARM NEON</td><td>128-bit</td><td>ARM (手机/嵌入式)</td><td>4x FP32 / 16x INT8</td></tr>
+      <tr><td>ARM SVE/SVE2</td><td>128-2048 bit (可变)</td><td>ARM v8.2+</td><td>运行时自适应</td></tr>
+      <tr><td>x86 SSE</td><td>128-bit</td><td>x86/x64</td><td>4x FP32 / 16x INT8</td></tr>
+      <tr><td>x86 AVX2</td><td>256-bit</td><td>x86/x64</td><td>8x FP32 / 32x INT8</td></tr>
+      <tr><td>x86 AVX-512</td><td>512-bit</td><td>服务器 / 高端 PC</td><td>16x FP32 / 64x INT8</td></tr>
+      <tr><td>x86 AMX</td><td>矩阵寄存器</td><td>Intel Sapphire Rapids+</td><td>矩阵运算专用</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.4 推理优化算法</h3>
+
+  <h4>6.4.1 Winograd 卷积</h4>
+  <p>Winograd 算法通过多项式变换减少卷积运算中的乘法次数。以 F(2x2, 3x3) 为例（输出 2x2，卷积核 3x3），标准卷积需要 36 次乘法，Winograd 只需 16 次，<strong>减少 2.25 倍</strong>。</p>
+  <pre>
+Winograd F(2x2, 3x3) 算法流程：
+
+1. 输入变换：d = B^T * d * B    （4x4 tile 变换）
+   B^T = [1  0 -1  0]
+         [0  1  1  0]
+         [0 -1  1  0]
+         [0  1  0 -1]
+
+2. 权重变换：g = G * g * G^T    （3x3 滤波器变换为 4x4）
+   G = [1   0   0]
+       [0.5 0.5 0.5]
+       [0.5 -0.5 0.5]
+       [0   0   1]
+
+3. 逐元素乘法：M = g (.) d     （16 次乘法 vs 原始 36 次）
+
+4. 输出变换：Y = A^T * M * A   （还原为 2x2 输出）
+   A^T = [1 1 1 0]
+         [0 1 -1 -1]</pre>
+
+  <h4>6.4.2 im2col + GEMM</h4>
+  <pre>
+im2col 将卷积转化为矩阵乘法：
+
+原始卷积：
+  Input: [N, C_in, H, W]  x  Kernel: [C_out, C_in, kH, kW]
+
+im2col 展开：
+  Input_unfolded: [N*H_out*W_out, C_in*kH*kW]   (展开为列)
+  Kernel_reshaped: [C_out, C_in*kH*kW]
+
+转化为 GEMM：
+  Output = Input_unfolded @ Kernel_reshaped^T
+  结果 reshape 回 [N, C_out, H_out, W_out]
+
+缺点：内存膨胀 kH*kW 倍（通常 9x for 3x3 conv）
+改进：Implicit GEMM -- 在 GEMM 内部动态展开，不实际分配展开矩阵
+
+GEMM 五大优化技术：
+  1. 分块（Blocking/Tiling）-- 适配 Cache Line 大小
+  2. 微内核（Micro-kernel）-- 寄存器级最优计算单元
+  3. 数据重排（Packing）-- 将矩阵按访问顺序重排
+  4. 循环展开（Loop Unrolling）-- 减少分支开销
+  5. 多级并行 -- SIMD + 多线程 + Cache 层次协同</pre>
+
+  <h4>6.4.3 FlashAttention</h4>
+  <p>FlashAttention 是端侧 Transformer 推理的关键优化，通过分块计算和在线 Softmax 技巧，将注意力机制的内存复杂度从 O(N^2) 降到 O(N)，同时减少 HBM 读写次数。</p>
+  <pre>
+标准 Attention：
+  S = Q @ K^T / sqrt(d)       // O(N^2) 内存
+  P = softmax(S)               // 需要存储完整 NxN 矩阵
+  O = P @ V
+
+FlashAttention（Online Softmax 递推）：
+  对 Q 和 K 分块计算，每次只处理一个 block：
+
+  维护运行统计量：
+    m_new = max(m_old, max(S_block))     // 新的最大值
+    d_new = d_old * exp(m_old - m_new) + sum(exp(S_block - m_new))
+
+  更新输出：
+    O_new = O_old * (d_old * exp(m_old - m_new) / d_new)
+          + exp(S_block - m_new) * V_block / d_new
+
+  关键洞察：
+    - 不需要存储完整的 NxN attention 矩阵
+    - 内存 O(N) vs 标准 O(N^2)
+    - IO 复杂度从 O(N^2 d) 降到 O(N^2 d^2 / M)
+    - 在 SRAM (快) 和 HBM (慢) 之间优化数据搬运</pre>
+
+  <h3>6.5 内存管理与调度策略</h3>
+
+  <h4>四级内存层级</h4>
+  <table>
+    <thead>
+      <tr><th>层级</th><th>容量</th><th>延迟</th><th>带宽</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>SRAM (片上)</td><td>KB ~ MB</td><td>~1 ns</td><td>极高</td><td>算子级数据缓存</td></tr>
+      <tr><td>L1/L2/L3 Cache</td><td>KB ~ 数十MB</td><td>1-100 ns</td><td>高</td><td>CPU 自动缓存</td></tr>
+      <tr><td>DRAM / LPDDR</td><td>GB</td><td>~100 ns</td><td>中</td><td>模型权重、中间结果</td></tr>
+      <tr><td>Flash / eMMC</td><td>GB ~ TB</td><td>~10 us</td><td>低</td><td>模型文件存储</td></tr>
+    </tbody>
+  </table>
+
+  <h4>端侧内存管理六大策略</h4>
+  <ol>
+    <li><strong>静态内存规划：</strong>编译期分析计算图，预分配所有 tensor 的内存，运行时零 malloc（MNN 采用此策略）</li>
+    <li><strong>内存池化：</strong>预分配大块内存，按 slab/buddy 算法分配小块，减少碎片</li>
+    <li><strong>内存共享：</strong>生命周期不重叠的 tensor 共享同一块内存（In-place / Memory Reuse）</li>
+    <li><strong>mmap 映射：</strong>将模型文件通过 mmap 映射到虚拟地址空间，OS 自动按需加载页面（llama.cpp 的核心策略）</li>
+    <li><strong>流式加载：</strong>大模型分块加载，仅将当前推理层加载到内存</li>
+    <li><strong>动态反量化：</strong>权重以量化格式存储，计算时按需反量化到 FP16/FP32（节省 4-8 倍内存）</li>
+  </ol>
+
+  <h3>6.6 异构计算与运行时调度</h3>
+
+  <p>现代 SoC（如骁龙 8 Gen 3、Apple A17 Pro、天玑 9300）集成了 CPU、GPU、NPU、DSP 等多种计算单元。推理引擎需要根据算子特性、数据流和设备状态，将计算任务动态分配到最合适的计算单元上执行。</p>
+
+  <table>
+    <thead>
+      <tr><th>计算单元</th><th>擅长任务</th><th>不擅长</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>CPU</strong></td><td>控制流、小批量计算、量化/反量化、后处理</td><td>大规模并行计算</td></tr>
+      <tr><td><strong>GPU</strong></td><td>大规模并行计算、卷积、矩阵乘法、Attention</td><td>控制流密集的算子</td></tr>
+      <tr><td><strong>NPU</strong></td><td>定点推理（INT8/INT4）、标准 CNN/Transformer</td><td>自定义算子、动态形状</td></tr>
+      <tr><td><strong>DSP</strong></td><td>信号处理、音频特征提取、低功耗推理</td><td>复杂神经网络</td></tr>
+    </tbody>
+  </table>
+
+  <pre>
+异构调度运行时架构：
+
+  +-----------------------------------------+
+  |           应用层 (Application)           |
+  +-----------------------------------------+
+  |      推理引擎 API (Unified Interface)    |
+  +-----------------------------------------+
+  |        子图划分器 (Graph Partitioner)     |
+  |  分析计算图，将算子分配到不同后端          |
+  +------+------+------+--------------------+
+  | CPU  | GPU  | NPU  |  DSP   Backend     |
+  |XNNPACK|Vulkan|NNAPI | Hexagon           |
+  |NEON  |Metal |CoreML| HVX               |
+  +------+------+------+--------------------+
+  |         硬件抽象层 (HAL)                  |
+  +-----------------------------------------+
+
+关键技术：
+  1. 子图划分：将不支持的算子 "fallback" 到 CPU
+  2. 数据格式转换：不同后端使用不同的 tensor layout (NCHW/NHWC)
+  3. 回退机制：当 NPU 执行失败时自动回退到 CPU/GPU
+  4. 热管理：监控芯片温度，动态调整频率和计算单元分配</pre>
+</section>
+
+<!-- ==================== SECTION 7 ==================== -->
+<section class="section" id="sec7">
+  <h2>七、端侧 LLM 推理关键技术</h2>
+
+  <p>2024-2026 年，大语言模型的端侧推理成为端侧推理领域最重要的增长点。以 llama.cpp（116k Stars）为代表的开源引擎推动了这一领域的快速发展。以下是端侧 LLM 推理的核心技术。</p>
+
+  <h3>7.1 KV Cache 管理</h3>
+  <pre>
+KV Cache 内存计算公式：
+  KV_size = 2 * n_layers * n_heads * d_head * seq_len * sizeof(dtype)
+
+示例（LLaMA-2 7B, FP16, seq_len=4096）：
+  = 2 * 32 * 32 * 128 * 4096 * 2 bytes
+  = ~2 GB
+
+问题：KV Cache 是 LLM 推理中最大的内存消耗者，
+  在长序列场景下甚至超过模型权重本身。
+
+PagedAttention（vLLM 提出）：
+  借鉴操作系统虚拟内存分页思想
+  - 将 KV Cache 划分为固定大小的 "页"（如 16 tokens/页）
+  - 使用页表维护逻辑-物理地址映射
+  - 按需分配物理页，避免预分配造成的内存浪费
+  - 内存浪费从 60-80% 降至 &lt;4%
+  - 支持跨请求的 KV Cache 共享（Copy-on-Write）</pre>
+
+  <h3>7.2 投机解码（Speculative Decoding）</h3>
+  <pre>
+核心思想：用小模型"猜"多个 token，大模型一次性验证
+
+算法流程：
+  1. Draft Phase：小模型（如 1B）自回归生成 K 个候选 token
+     x_1, x_2, ..., x_K ~ p_small(x | context)
+
+  2. Verify Phase：大模型（如 7B）一次前向传播计算所有候选的概率
+     p_large(x_1), p_large(x_2), ..., p_large(x_K)
+
+  3. Accept/Reject：从左到右逐个验证
+     对每个 x_i:
+       以概率 min(1, p_large(x_i) / p_small(x_i)) 接受
+       若拒绝，从修正分布中重新采样，停止
+
+  关键性质：
+    - 输出分布与直接使用大模型严格等价（数学可证明）
+    - 加速比通常为 2-3x（取决于小模型的预测准确率）
+    - 小模型与大模型越"相似"，加速比越高
+
+主要变体：
+  - EAGLE: 在特征层面进行投机，而非 token 层面
+  - Medusa: 大模型自带多个"解码头"，无需外部小模型
+  - Lookahead: 使用 Jacobi 迭代并行生成候选</pre>
+
+  <h3>7.3 GGUF 量化格式（llama.cpp）</h3>
+  <pre>
+GGUF (GPT-Generated Unified Format) 是 llama.cpp 的专属模型格式：
+
+设计目标：
+  - mmap 友好：文件结构直接映射到内存
+  - 自描述：包含所有模型元数据（架构、tokenizer、参数等）
+  - 支持多种量化类型混合
+
+文件格式结构：
+  +------------------------+
+  | GGUF Magic (0x46554747)|
+  | Version (3)            |
+  | Tensor Count           |
+  | Metadata KV Count      |
+  +------------------------+
+  | Metadata Key-Value Pairs|
+  |  - general.architecture |
+  |  - tokenizer.model     |
+  |  - llama.context_length|
+  |  - ...                 |
+  +------------------------+
+  | Tensor Info Array      |
+  |  - name, dims, type,  |
+  |    offset              |
+  +------------------------+
+  | Tensor Data (aligned)  |
+  |  - 量化后的权重数据     |
+  +------------------------+
+
+量化类型表：
+  Q4_0:   4-bit, block size 32, 简单线性量化
+  Q4_K_M: 4-bit, K-quant, 混合精度 (重要层用更高精度)
+  Q5_K_S: 5-bit, K-quant, 平衡精度和速度
+  Q6_K:   6-bit, K-quant, 接近 FP16 精度
+  Q8_0:   8-bit, 几乎无精度损失
+  IQ1_S:  1.5-bit, 极端压缩（实验性）</pre>
+</section>
+
+<!-- ==================== SECTION 8 ==================== -->
+<section class="section" id="sec8">
+  <h2>八、开源引擎代码架构深度解析</h2>
+
+  <p>本章以 GitHub Stars 最高、最具代表性的三大开源端侧推理引擎——<strong>NCNN</strong>（23.4k Stars，腾讯）、<strong>MNN</strong>（15.5k Stars，阿里）、<strong>ExecuTorch</strong>（4.7k Stars，Meta）——为教学案例，深入解析其代码实现和架构设计。</p>
+
+  <h3>8.1 NCNN 架构解析</h3>
+
+  <h4>整体架构</h4>
+  <div class="arch-diagram">
+NCNN 分层架构：
+
++------------------------------------------------------+
+|                   用户 API 层                          |
+|   ncnn::Net / ncnn::Extractor / ncnn::Mat             |
++------------------------------------------------------+
+|                   计算图层                             |
+|   Net::load_model() -> 构建 Blob 和 Layer 图           |
+|   Extractor::extract() -> 按拓扑序执行 Layer           |
++------------------------------------------------------+
+|                   算子层 (Layer)                       |
+|   基类 Layer -> Convolution / ReLU / Pooling / ...    |
+|   每个算子实现 forward() 和 load_model()               |
++------------------------------------------------------+
+|                   后端层                               |
+|   CPU (NEON/SSE/AVX)   |  Vulkan GPU                 |
+|   内置于算子实现中       |  通过 VkCompute 调度         |
++------------------------------------------------------+
+|                   基础设施层                           |
+|   Mat (tensor)  |  Allocator  |  Pipeline  |  Utils  |
++------------------------------------------------------+</div>
+
+  <h4>核心数据结构：ncnn::Mat</h4>
+  <pre>
+// NCNN 的核心 tensor 类 —— 4D 矩阵
+class Mat {
+    int w;           // width
+    int h;           // height
+    int d;           // depth (for 3D data)
+    int c;           // channels
+    size_t elemsize; // 每个元素的字节数 (4=FP32, 2=FP16, 1=INT8)
+    int elempack;    // SIMD 打包数 (NEON=4, AVX=8)
+
+    void* data;       // 数据指针（引用计数共享）
+    int refcount;     // 引用计数（轻量级 RAII）
+    Allocator* allocator;  // 内存分配器
+
+    // 关键操作
+    Mat reshape(int w, int h, int c);   // 改变形状（零拷贝）
+    void fill(float v);                  // 填充值
+    void substract_mean_normalize(...);  // 图像预处理
+};
+
+// 内存管理特点：
+// 1. 引用计数实现共享语义（类似 std::shared_ptr 但更轻量）
+// 2. elempack 实现 SIMD 友好的数据布局
+//    如 c=64, elempack=4 -> 实际存储 16 个 channel，每个包含 4 个通道交织
+// 3. 支持 FP32/FP16/INT8/BF16 多种精度</pre>
+
+  <h4>算子注册机制</h4>
+  <pre>
+// NCNN 使用编译期静态注册（宏定义）
+// 在 layer.cpp 中通过 Layer* create_layer(const char* type) 工厂方法创建
+
+// 算子定义示例 (以 ReLU 为例)：
+class ReLU : public Layer {
+public:
+    ReLU() {
+        one_blob_only = true;   // 单输入单输出
+        support_inplace = true; // 支持原地计算（省内存！）
+        support_vulkan = true;  // 支持 Vulkan GPU
+    }
+
+    // 加载参数
+    int load_param(const ParamDict&amp; pd) {
+        slope = pd.get(0, 0.f); // 负半轴斜率
+        return 0;
+    }
+
+    // CPU 前向计算（根据编译选项选择最优实现）
+    int forward_inplace(Mat&amp; bottom_top_blob, const Option&amp; opt) const {
+        int size = bottom_top_blob.w * bottom_top_blob.h * bottom_top_blob.d;
+        float* ptr = bottom_top_blob;
+        for (int q = 0; q &lt; channels; q++) {
+#if __ARM_NEON
+            // ARM NEON 向量化实现
+            float32x4_t vslope = vdupq_n_f32(slope);
+            for (int i = 0; i &lt; size; i += 4) {
+                float32x4_t v = vld1q_f32(ptr + i);
+                float32x4_t vmax = vmaxq_f32(v, vdupq_n_f32(0.f));
+                float32x4_t vmin = vmulq_f32(v, vslope);
+                float32x4_t result = vbslq_f32(vcltq_f32(v, vdupq_n_f32(0.f)),
+                                                vmin, vmax);
+                vst1q_f32(ptr + i, result);
+            }
+#else
+            for (int i = 0; i &lt; size; i++) {
+                ptr[i] = std::max(ptr[i], 0.f) + slope * std::min(ptr[i], 0.f);
+            }
+#endif
+            ptr += size;
+        }
+        return 0;
+    }
+};
+
+// 推理流程：
+// 1. ncnn::Net net; net.load_param("model.param"); net.load_model("model.bin");
+// 2. ncnn::Extractor ex = net.create_extractor();
+// 3. ex.input("data", input_mat);
+// 4. ex.extract("output", output_mat);
+//
+// 内部流程：
+// 构建 Blob DAG -> 拓扑排序 -> 逐 Layer 执行 forward() -> 内存回收</pre>
+
+  <h3>8.2 MNN 架构解析</h3>
+
+  <h4>整体架构</h4>
+  <div class="arch-diagram">
+MNN 分层架构：
+
++------------------------------------------------------+
+|                  推理 API 层                           |
+|   Interpreter -> Session -> Tensor                    |
++------------------------------------------------------+
+|                  计算图层                              |
+|   Geometry (表达计算图) -> Pipeline (优化 Pass)         |
+|   三级融合：常量折叠 -> 算子融合 -> 子图融合             |
++------------------------------------------------------+
+|                  后端抽象层 (Backend)                   |
+|   CPUBackend | VulkanBackend | MetalBackend | OpenCL  |
+|   统一接口：onAcquireBuffer / onReleaseBuffer          |
+|              onCreate / onResize / onExecute           |
++------------------------------------------------------+
+|                  Execution 层                          |
+|   每个 Backend 实现各自的 Execution 子类               |
+|   CPU: MNNCompute / 汇编微内核                        |
+|   GPU: Shader / Kernel 实现                           |
++------------------------------------------------------+
+|                  基础设施层                            |
+|   BackendConfig | AutoStorage | FunctionScheduler     |
++------------------------------------------------------+</div>
+
+  <h4>后端抽象层设计（核心设计模式）</h4>
+  <pre>
+// MNN 的 Backend 抽象 —— 策略模式实现多后端
+class Backend {
+public:
+    // 内存管理接口
+    virtual bool onAcquireBuffer(const Tensor*, StorageType) = 0;
+    virtual bool onReleaseBuffer(const Tensor*, StorageType) = 0;
+
+    // 算子创建接口 —— 核心抽象！
+    virtual Execution* onCreate(const vector&lt;Tensor*&gt;&amp; inputs,
+                                const vector&lt;Tensor*&gt;&amp; outputs,
+                                const MNN::Op* op) = 0;
+
+    // 生命周期管理
+    virtual void onExecuteBegin() const = 0;
+    virtual void onExecuteEnd() const = 0;
+
+    virtual const BackendInfo* info() const = 0;
+};
+
+// Execution 基类 —— 每个算子在后端上的具体实现
+class Execution {
+public:
+    virtual ErrorCode onResize(const vector&lt;Tensor*&gt;&amp;,
+                               const vector&lt;Tensor*&gt;&amp;) = 0;
+    virtual ErrorCode onExecute(const vector&lt;Tensor*&gt;&amp;,
+                                const vector&lt;Tensor*&gt;&amp;) = 0;
+};
+
+// 后端注册机制（运行时动态注册）
+// 使用 CreatorMap 将 OpType 映射到后端 Execution 创建函数
+class CPUBackend : public Backend {
+    // 注册表示例：
+    // creatorMap[OpType_Convolution] = [](){ return new ConvExecution(); }
+    // creatorMap[OpType_Relu]        = [](){ return new ReluExecution(); }
+};
+
+// MNN 推理流程：
+// 1. auto interpreter = Interpreter::createFromFile("model.mnn");
+// 2. auto session = interpreter->createSession(config);
+// 3. auto input = interpreter->getSessionInput(session, nullptr);
+// 4. interpreter->resizeInput(input, {1, 3, 224, 224});
+// 5. interpreter->resizeSession(session);  // 触发内存规划和算子创建
+// 6. memcpy(input->host(), data, size);
+// 7. interpreter->runSession(session);     // 执行推理</pre>
+
+  <h3>8.3 ExecuTorch 架构解析</h3>
+
+  <h4>整体架构</h4>
+  <div class="arch-diagram">
+ExecuTorch (PyTorch) 分层架构：
+
++------------------------------------------------------+
+|               PyTorch 训练侧 (Authoring)              |
+|   torch.export() -> ATen Ops -> Edge Dialect          |
++------------------------------------------------------+
+|               编译与优化 (AOT Compile)                 |
+|   Edge Dialect -> Executorch Dialect                  |
+|   Passes: 算子融合 / 常量折叠 / 量化 / 内存规划        |
+|   输出 .pte 文件 (Portable Torch Execution)           |
++------------------------------------------------------+
+|               运行时 API (Runtime)                    |
+|   Program -> Method -> 执行计算图                       |
+|   executorch::runtime::Program::load()               |
++------------------------------------------------------+
+|               Kernel &amp; Delegate 层                    |
+|   Portable Kernels (CPU 参考实现)                     |
+|   Optimized Kernels (XNNPACK / CPU 优化)              |
+|   Custom Delegates (CoreML / NNAPI / Vulkan)          |
++------------------------------------------------------+
+|               基础设施层                              |
+|   MemoryManager | MemoryPlanner | HierarchicalAllocator|
++------------------------------------------------------+</div>
+
+  <h4>核心运行时设计</h4>
+  <pre>
+// ExecuTorch 的核心运行时类
+class Program {
+    static Result&lt;Program&gt; load(const char* path);
+    Result&lt;Method&gt; load_method(const char* method_name,
+                                MemoryManager* mem_manager);
+};
+
+class Method {
+    Error execute();
+    EValue* input(size_t index);
+    EValue* output(size_t index);
+    size_t inputs_size() const;
+    size_t outputs_size() const;
+};
+
+// Kernel 注册 —— 混合注册模式
+// 编译期注册（推荐，零运行时开销）：
+// EXECUTORCH_LIBRARY(my_ops, "custom_relu", &amp;custom_relu_impl);
+
+// 运行时动态注册（用于插件式 Delegate）：
+// kernel_registry.register_kernel("aten::relu", kernel_fn);
+
+// Delegate 机制 —— 将子图委托给外部硬件后端
+class Delegate {
+    virtual Error init(BackendInitContext&amp; context) = 0;
+    virtual bool is_available() const = 0;
+    virtual Error execute(Delegate::Context&amp; context) const = 0;
+};
+
+// ExecuTorch 的内存规划（AOT 编译期确定）：
+// 1. 编译时分析所有 tensor 的生命周期和大小
+// 2. 使用贪心图着色算法计算最优内存分配
+// 3. 生成固定的内存规划表（Memory Plan）
+// 4. 运行时只需一个 HierarchicalAllocator（多级分配器）
+//    - 预分配一块大内存
+//    - 按计划表切分为各 tensor 使用
+//    - 零 malloc，零碎片</pre>
+
+  <h3>8.4 三大引擎架构对比</h3>
+  <table>
+    <thead>
+      <tr><th>设计维度</th><th>NCNN</th><th>MNN</th><th>ExecuTorch</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>算子注册</strong></td>
+        <td>编译期静态注册（宏 + 工厂函数）</td>
+        <td>运行时 CreatorMap 动态注册</td>
+        <td>混合模式（编译期 + 运行时）</td>
+      </tr>
+      <tr>
+        <td><strong>多后端支持</strong></td>
+        <td>算子内条件编译（CPU/Vulkan 在同一类中）</td>
+        <td>Backend 抽象层 + Execution 策略模式</td>
+        <td>Delegate 委托机制（子图委托）</td>
+      </tr>
+      <tr>
+        <td><strong>内存管理</strong></td>
+        <td>引用计数 + PoolAllocator</td>
+        <td>Static/Dynamic 分类管理 + 后端分配</td>
+        <td>AOT 编译期内存规划 + HierarchicalAllocator</td>
+      </tr>
+      <tr>
+        <td><strong>计算图优化</strong></td>
+        <td>算子融合（有限 Pass）</td>
+        <td>三级融合（常量折叠&rarr;算子融合&rarr;子图融合）</td>
+        <td>AOT Pass Pipeline（MLIR 风格）</td>
+      </tr>
+      <tr>
+        <td><strong>模型格式</strong></td>
+        <td>.param (文本) + .bin (二进制)</td>
+        <td>.mnn (FlatBuffer)</td>
+        <td>.pte (FlatBuffer)</td>
+      </tr>
+      <tr>
+        <td><strong>设计理念</strong></td>
+        <td>极简主义：最小代码量、零依赖</td>
+        <td>工程化：完善的抽象层和优化 Pass</td>
+        <td>生态化：与 PyTorch 训练生态深度绑定</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== SECTION 9 ==================== -->
+<section class="section" id="sec9">
+  <h2>九、典型代码片段与教学案例</h2>
+
+  <p>以下通过具体的代码示例，演示如何使用主流端侧推理引擎进行模型部署。</p>
+
+  <h3>9.1 NCNN 图像分类完整示例</h3>
+  <pre>
+#include &lt;ncnn/net.h&gt;
+#include &lt;ncnn/mat.h&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+int main() {
+    // ===== 1. 创建网络并加载模型 =====
+    ncnn::Net net;
+    net.load_param("mobilenet_v2.param");
+    net.load_model("mobilenet_v2.bin");
+
+    // ===== 2. 图像预处理 =====
+    cv::Mat img = cv::imread("cat.jpg");
+    ncnn::Mat input = ncnn::Mat::from_pixels_resize(
+        img.data, ncnn::Mat::PIXEL_BGR2RGB, img.cols, img.rows, 224, 224);
+
+    const float mean_vals[3] = {103.94f, 116.78f, 123.68f};
+    const float norm_vals[3] = {1.0f/58.82f, 1.0f/58.82f, 1.0f/58.82f};
+    input.substract_mean_normalize(mean_vals, norm_vals);
+
+    // ===== 3. 创建推理器并执行 =====
+    ncnn::Extractor extractor = net.create_extractor();
+    extractor.input("data", input);
+
+    ncnn::Mat output;
+    extractor.extract("prob", output);
+
+    // ===== 4. 后处理：找到 top-1 分类 =====
+    int max_idx = 0;
+    float max_prob = output[0];
+    for (int i = 1; i &lt; output.w; i++) {
+        if (output[i] > max_prob) {
+            max_prob = output[i];
+            max_idx = i;
+        }
+    }
+    printf("Predicted class: %d, probability: %.4f\n", max_idx, max_prob);
+    return 0;
+}</pre>
+
+  <h3>9.2 MNN 推理完整示例</h3>
+  <pre>
+#include &lt;MNN/Interpreter.hpp&gt;
+#include &lt;MNN/Tensor.hpp&gt;
+
+int main() {
+    // 1. 创建解释器并加载模型
+    auto interpreter = MNN::Interpreter::createFromFile("model.mnn");
+
+    // 2. 配置后端
+    MNN::ScheduleConfig config;
+    config.type      = MNN_FORWARD_CPU;
+    config.numThread = 4;
+    auto session = interpreter->createSession(config);
+
+    // 3. 准备输入
+    auto input_tensor = interpreter->getSessionInput(session, nullptr);
+    interpreter->resizeInput(input_tensor, {1, 3, 224, 224});
+    interpreter->resizeSession(session);
+
+    auto input_host = input_tensor->host&lt;float&gt;();
+    std::memcpy(input_host, preprocessed_data,
+                1 * 3 * 224 * 224 * sizeof(float));
+
+    // 4. 执行推理
+    interpreter->runSession(session);
+
+    // 5. 获取输出
+    auto output_tensor = interpreter->getSessionOutput(session, nullptr);
+    MNN::Tensor temp(output_tensor, MNN::Tensor::CAFFE);
+    output_tensor->copyToHostTensor(&amp;temp);
+    const float* data = temp.host&lt;float&gt;();
+
+    printf("Output[0] = %f\n", data[0]);
+    delete interpreter;
+    return 0;
+}</pre>
+
+  <h3>9.3 ExecuTorch (PyTorch) 端侧部署示例</h3>
+  <pre>
+# ===== Python 侧：模型导出 =====
+import torch
+from torch.export import export
+from executorch.exir import to_edge
+
+class MobileClassifier(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = torch.nn.Conv2d(3, 32, 3, padding=1)
+        self.bn = torch.nn.BatchNorm2d(32)
+        self.relu = torch.nn.ReLU()
+        self.pool = torch.nn.AdaptiveAvgPool2d(1)
+        self.fc = torch.nn.Linear(32, 1000)
+
+    def forward(self, x):
+        x = self.relu(self.bn(self.conv(x)))
+        x = self.pool(x).flatten(1)
+        return self.fc(x)
+
+model = MobileClassifier().eval()
+exported = export(model, (torch.randn(1, 3, 224, 224),))
+edge = to_edge(exported)
+et_program = edge.to_executorch()
+with open("model.pte", "wb") as f:
+    f.write(et_program.buffer)
+
+
+// ===== C++ 侧：端侧推理 =====
+#include &lt;executorch/runtime/executor/program.h&gt;
+#include &lt;executorch/runtime/executor/method.h&gt;
+
+using namespace executorch::runtime;
+
+int main() {
+    auto program = Program::load("model.pte");
+    auto method = program->load_method("forward", &amp;mem_manager);
+
+    auto* input = method->input(0);
+    float* input_data = input->toTensor().mutable_data_ptr&lt;float&gt;();
+    std::memcpy(input_data, image_data, 1*3*224*224*sizeof(float));
+
+    method->execute();
+
+    auto* output = method->output(0);
+    const float* result = output->toTensor().const_data_ptr&lt;float&gt;();
+    printf("Output[0] = %f\n", result[0]);
+    return 0;
+}</pre>
+
+  <h3>9.4 llama.cpp LLM 推理示例</h3>
+  <pre>
+// llama.cpp 的核心推理流程（简化版）
+#include "llama.h"
+
+int main() {
+    // 1. 初始化模型
+    llama_model_params model_params = llama_model_default_params();
+    model_params.n_gpu_layers = 33;
+    llama_model* model = llama_load_model_from_file(
+        "llama-2-7b.Q4_K_M.gguf", model_params);
+
+    // 2. 创建上下文
+    llama_context_params ctx_params = llama_context_default_params();
+    ctx_params.n_ctx = 4096;
+    ctx_params.n_threads = 8;
+    llama_context* ctx = llama_new_context_with_model(model, ctx_params);
+
+    // 3. Tokenize 输入
+    const char* prompt = "Hello, I am";
+    auto tokens = llama_tokenize(ctx, prompt, true);
+
+    // 4. Prefill：一次性处理所有输入 token
+    llama_batch batch = llama_batch_init(tokens.size(), 0, 1);
+    for (size_t i = 0; i &lt; tokens.size(); i++) {
+        batch.token[i] = tokens[i];
+        batch.pos[i] = i;
+        batch.n_seq_id[i] = 1;
+        batch.logits[i] = false;
+    }
+    batch.logits[tokens.size() - 1] = true;
+    batch.n_tokens = tokens.size();
+    llama_decode(ctx, batch);
+
+    // 5. Decode：逐 token 自回归生成
+    const int max_tokens = 128;
+    for (int i = 0; i &lt; max_tokens; i++) {
+        float* logits = llama_get_logits(ctx);
+        llama_token new_token = llama_sample_token(ctx, logits);
+
+        const char* text = llama_token_to_piece(ctx, new_token);
+        printf("%s", text);
+
+        batch.n_tokens = 1;
+        batch.token[0] = new_token;
+        batch.pos[0] = tokens.size() + i;
+        batch.logits[0] = true;
+        llama_decode(ctx, batch);
+
+        if (new_token == llama_token_eos(ctx)) break;
+    }
+
+    // 6. 清理
+    llama_batch_free(batch);
+    llama_free(ctx);
+    llama_free_model(model);
+    return 0;
+}</pre>
+</section>
+
+<!-- ==================== SECTION 10 ==================== -->
+<section class="section" id="sec10">
+  <h2>十、技术趋势与展望</h2>
+
+  <h3>10.1 2025-2026 关键趋势</h3>
+
+  <div class="highlight-box">
+    <strong>趋势一：LLM 端侧推理成为最大增长点</strong><br>
+    llama.cpp (116k Stars) 爆发式增长，Google 推出 LiteRT-LM（号称比 llama.cpp 快 7 倍），Meta 推出 ExecuTorch LLM 支持。各大引擎纷纷加入大模型端侧推理能力，标志着端侧推理从"小模型 CV 推理"向"大模型全能推理"的范式转变。
+  </div>
+
+  <div class="highlight-box">
+    <strong>趋势二：端云协同架构成为主流</strong><br>
+    端侧推理与云端推理不是替代关系，而是互补关系。敏感数据在端侧处理，复杂推理在云端完成。小模型端侧运行（隐私/低延迟），大模型云端运行（高精度/强能力），通过"投机解码"等技术实现端云协同。
+  </div>
+
+  <div class="highlight-box">
+    <strong>趋势三：硬件 NPU 能力持续增强</strong><br>
+    手机 SoC 的 NPU 算力从 2023 年的 ~10 TOPS 快速增长到 2025 年的 45+ TOPS。PC 端 NPU（Intel Core Ultra, AMD Ryzen AI, Apple M4）的普及将推动 PC 端侧 AI 推理的规模化落地。
+  </div>
+
+  <div class="highlight-box">
+    <strong>趋势四：训练-部署一体化</strong><br>
+    ExecuTorch (PyTorch) 和 LiteRT (TensorFlow) 代表了"训练框架直接导出端侧部署格式"的趋势，消除了传统"训练&rarr;转换&rarr;优化&rarr;部署"的复杂流水线，降低了端侧 AI 开发门槛。
+  </div>
+
+  <h3>10.2 技术栈全景图</h3>
+  <div class="arch-diagram">
+端侧推理引擎技术栈全景：
+
++-----------------------------------------------------------------+
+|                      应用层 (Applications)                       |
+|  智能手机 AI | 自动驾驶 | IoT 设备 | AR/VR | 智能摄像头 | PC AI   |
++-----------------------------------------------------------------+
+|                      推理引擎层 (Inference Engine)                |
+|  TFLite/LiteRT | ONNX Runtime | NCNN | MNN | TensorRT | llama.cpp|
++-----------------------------------------------------------------+
+|                      优化技术层 (Optimization)                    |
+|  量化(INT8/4) | 剪枝 | 蒸馏 | 算子融合 | Winograd | FlashAttention |
++-----------------------------------------------------------------+
+|                      硬件抽象层 (HAL)                             |
+|  NNAPI | CoreML | Vulkan | Metal | CUDA | OpenCL | QNN | OpenVINO |
++-----------------------------------------------------------------+
+|                      硬件层 (Hardware)                           |
+|  CPU(ARM/x86) | GPU(Mali/Adreno/Apple) | NPU | DSP | FPGA | ASIC |
++-----------------------------------------------------------------+</div>
+</section>
+
+<!-- ==================== SECTION 11 ==================== -->
+<section class="section" id="sec11">
+  <h2>十一、参考来源</h2>
+  <ol>
+    <li>QYResearch / 格隆汇 — 边缘 AI 推理芯片市场报告 2025-2032 (CAGR 21.8%)</li>
+    <li>CSDN — 端侧 AI 推理框架选型矩阵 (2025-2026)</li>
+    <li>CSDN — NCNN、MNN 与 TFLite 特性对比分析</li>
+    <li>CSDN — AI 推理引擎市场前景与产业链洞察报告 2026</li>
+    <li>CSDN — C++ 模型推理加速引擎使用率排名</li>
+    <li>CSDN — 端侧 AI 推理技术选型 (2024-2025)</li>
+    <li>GitHub — <a href="https://github.com/Tencent/ncnn" target="_blank">Tencent/ncnn</a> (23.4k Stars)</li>
+    <li>GitHub — <a href="https://github.com/alibaba/MNN" target="_blank">alibaba/MNN</a> (15.5k Stars)</li>
+    <li>GitHub — <a href="https://github.com/ggerganov/llama.cpp" target="_blank">ggerganov/llama.cpp</a> (116k Stars)</li>
+    <li>GitHub — <a href="https://github.com/pytorch/executorch" target="_blank">pytorch/executorch</a> (4.7k Stars)</li>
+    <li>GitHub — <a href="https://github.com/microsoft/onnxruntime" target="_blank">microsoft/onnxruntime</a> (20.8k Stars)</li>
+    <li>GitHub — <a href="https://github.com/ml-explore/mlx" target="_blank">ml-explore/mlx</a> (26.9k Stars)</li>
+    <li>Google — LiteRT (TensorFlow Lite) 官方文档</li>
+    <li>Meta — ExecuTorch 官方文档与架构设计</li>
+    <li>NVIDIA — TensorRT Developer Guide</li>
+    <li>Intel — OpenVINO Toolkit Documentation</li>
+    <li>Apple — Core ML &amp; MLX Documentation</li>
+    <li>Hinton et al. — "Distilling the Knowledge in a Neural Network" (2015)</li>
+    <li>Dao et al. — "FlashAttention: Fast and Memory-Efficient Exact Attention" (2022)</li>
+    <li>Leviathan et al. — "Fast Inference from Transformers via Speculative Decoding" (2023)</li>
+    <li>Kwon et al. — "Efficient Memory Management for Large Language Model Serving with PagedAttention" (2023)</li>
+    <li>Frankle &amp; Carbin — "The Lottery Ticket Hypothesis" (2019)</li>
+    <li>Winograd — "Arithmetic Complexity of Computations" (1980)</li>
+  </ol>
+</section>
+
+</div><!-- container -->
+
+<div class="footer">
+  <p>端侧推理引擎深度调研报告 &nbsp;|&nbsp; 2025-2026 &nbsp;|&nbsp; 数据截至 2026 年 6 月</p>
+  <p>本报告数据来源于公开市场研究、GitHub 开源社区、技术文档及学术论文，仅供学习参考。</p>
+</div>
+
+</div><!-- main -->
+
+<script>
+// ===== Scroll Spy: highlight active sidebar link =====
+(function() {
+  const links = document.querySelectorAll('#sidebarNav a');
+  const sections = [];
+  links.forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({ id, el, link: a });
+  });
+
+  function onScroll() {
+    const scrollY = window.scrollY + 120;
+    let current = sections[0];
+    for (const s of sections) {
+      if (s.el.offsetTop <= scrollY) current = s;
+    }
+    links.forEach(a => a.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Smooth scroll with offset for fixed sidebar
+  links.forEach(a => {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const id = this.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (target) {
+        window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+      }
+      // Close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    });
+  });
+
+  // Mobile toggle
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  toggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ 示例与练习 - 写给 C# 开发者</title>
+<style>
+:root{--bg:#0d1117;--sf:#161b22;--sf2:#1c2333;--bd:#30363d;--tx:#e6edf3;--txm:#8b949e;--ac:#58a6ff;--ac2:#3fb950;--ac3:#d2a8ff;--ac4:#ff7b72;--ac5:#ffa657;--tip:#12261e;--tipb:#3fb950;--warn:#2a1f0e;--warnb:#ffa657;--danger:#2d1214;--dangerb:#ff7b72;--info:#0d1f3c;--infob:#58a6ff;--ex:#1a1a2e;--exb:#e2b714;--done:#0f2d1a}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tx);line-height:1.75;font-size:16px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:280px;min-width:280px;background:var(--sf);border-right:1px solid var(--bd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;padding:20px 0;z-index:100;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.sidebar-title{padding:0 18px 16px;font-size:17px;font-weight:700;color:var(--exb);border-bottom:1px solid var(--bd);margin-bottom:10px}
+.sidebar-title small{display:block;font-size:11px;color:var(--txm);font-weight:400;margin-top:3px}
+.ng{margin-bottom:6px}
+.ngt{padding:7px 18px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--txm)}
+.nl{display:block;padding:4px 18px 4px 26px;color:var(--txm);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+.nl:hover{color:var(--tx);background:rgba(255,255,255,.03);border-left-color:var(--ac)}
+.nl.active{color:var(--ac);border-left-color:var(--ac);background:rgba(88,166,255,.06)}
+.main{flex:1;margin-left:280px;padding:36px 56px 80px;max-width:960px}
+h1{font-size:34px;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,var(--exb),var(--ac5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:17px;color:var(--txm);margin-bottom:36px}
+h2{font-size:26px;font-weight:700;margin:52px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--bd);scroll-margin-top:20px}
+h3{font-size:20px;font-weight:600;margin:32px 0 12px;scroll-margin-top:20px}
+h4{font-size:16px;font-weight:600;margin:22px 0 8px;color:var(--ac5);scroll-margin-top:20px}
+p{margin-bottom:14px}strong{color:var(--ac);font-weight:600}em{color:var(--ac3)}
+a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--sf2);padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:.87em;color:var(--ac5)}
+.cb{position:relative;margin:14px 0 22px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);font-size:12px;color:var(--txm)}
+.ch .tag{font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ch .tag.cpp{color:#4da6e8}.ch .tag.out{color:var(--ac2)}.ch .tag.cmake{color:var(--ac3)}.ch .tag.sh{color:var(--ac2)}.ch .tag.ans{color:var(--exb)}
+pre{background:var(--bg);padding:14px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code','JetBrains Mono',Consolas,monospace;font-size:13.5px;line-height:1.6;scrollbar-width:thin}
+pre code{background:none;padding:0;color:var(--tx);font-size:inherit}
+.kw{color:#ff7b72}.tp{color:#79c0ff}.fn{color:#d2a8ff}.st{color:#a5d6ff}.cm{color:#8b949e;font-style:italic}.nu{color:#ffa657}.pp{color:#7ee787}
+.callout{padding:14px 18px;border-radius:8px;margin:18px 0;border-left:4px solid;font-size:14.5px}
+.ct{font-weight:700;margin-bottom:5px;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.callout.tip{background:var(--tip);border-color:var(--tipb)}.callout.tip .ct{color:var(--ac2)}
+.callout.warning{background:var(--warn);border-color:var(--warnb)}.callout.warning .ct{color:var(--ac5)}
+.callout.danger{background:var(--danger);border-color:var(--dangerb)}.callout.danger .ct{color:var(--ac4)}
+.callout.info{background:var(--info);border-color:var(--infob)}.callout.info .ct{color:var(--ac)}
+.exercise{padding:18px 22px;border-radius:10px;margin:20px 0;border:1px solid var(--exb);background:var(--ex)}
+.exercise .ex-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.exercise .ex-num{font-weight:800;font-size:15px;color:var(--exb)}
+.exercise .ex-stars{color:var(--exb);font-size:14px;letter-spacing:2px}
+.exercise .ex-desc{font-size:14px;line-height:1.8;color:var(--tx)}
+.exercise .ex-hint{margin-top:10px;padding:10px 14px;background:rgba(226,183,20,.08);border-radius:6px;font-size:13px;color:var(--exb);border:1px solid rgba(226,183,20,.2)}
+.exercise ol,.exercise ul{margin:8px 0 8px 20px;font-size:14px}
+.exercise li{margin-bottom:6px}
+details.answer{margin:8px 0 16px;border-radius:8px;overflow:hidden;border:1px solid var(--bd);background:var(--done)}
+details.answer summary{padding:10px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ac2);background:rgba(63,185,80,.08);user-select:none;list-style:none}
+details.answer summary::before{content:'▶ ';font-size:11px}
+details.answer[open] summary::before{content:'▼ '}
+details.answer summary::-webkit-details-marker{display:none}
+details.answer .ans-body{padding:14px 18px}
+details.answer .ans-body .cb{margin:8px 0 14px}
+.tbl{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px;border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.tbl th{background:var(--sf2);padding:10px 14px;text-align:left;font-weight:700;border-bottom:2px solid var(--bd)}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--bd);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl td:first-child{font-weight:600;color:var(--ac3);white-space:nowrap}.tbl td code{font-size:12px}
+ol,ul{margin:10px 0 18px 22px}li{margin-bottom:7px}li::marker{color:var(--ac)}
+.divider{margin:56px 0 36px;text-align:center;position:relative}
+.divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--bd)}
+.divider span{background:var(--bg);padding:0 18px;position:relative;color:var(--txm);font-size:12px;text-transform:uppercase;letter-spacing:2px}
+.step{display:flex;gap:14px;margin:14px 0;padding:14px 18px;background:var(--sf);border:1px solid var(--bd);border-radius:8px}
+.step-num{min-width:32px;height:32px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+.step-body{flex:1}.step-body p{margin-bottom:6px}
+.progress-tracker{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 30px;padding:18px;background:var(--sf);border-radius:10px;border:1px solid var(--bd)}
+.pt-item{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;font-size:13px;background:var(--sf2);color:var(--txm);border:1px solid var(--bd)}
+.pt-item.done{background:rgba(63,185,80,.12);border-color:var(--tipb);color:var(--ac2)}
+.pt-item .dot{width:8px;height:8px;border-radius:50%;background:var(--txm)}
+.pt-item.done .dot{background:var(--ac2)}
+.scroll-top{position:fixed;bottom:28px;right:28px;width:42px;height:42px;background:var(--ac);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:18px;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:200}
+.progress-bar{position:fixed;top:0;left:280px;right:0;height:3px;z-index:150}
+.pbf{height:100%;width:0%;background:linear-gradient(90deg,var(--exb),var(--ac5));transition:width .1s}
+.mob-tog{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--sf);border:1px solid var(--bd);color:var(--tx);padding:7px 11px;border-radius:6px;cursor:pointer;font-size:17px}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:transform .3s}.sidebar.open{transform:translateX(0)}.mob-tog{display:block}.main{margin-left:0;padding:36px 18px 80px}.progress-bar{left:0}}
+@media print{.sidebar,.mob-tog,.scroll-top,.progress-bar{display:none!important}.main{margin-left:0;max-width:100%}body{background:#fff;color:#000}h1{-webkit-text-fill-color:#b8860b}pre{background:#f6f8fa}pre code{color:#24292f}.callout,.exercise{border-left-width:3px}}
+</style>
+</head>
+<body>
+<button class="mob-tog" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+<div class="progress-bar"><div class="pbf" id="pbf"></div></div>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+<div class="sidebar-title">C++ 示例与练习<small>配套实战训练手册</small></div>
+<div class="ng"><div class="ngt">热身</div>
+<a href="#ch1" class="nl">1. 编译运行与基础语法</a>
+<a href="#ch2" class="nl">2. 类型系统与类型转换</a>
+<a href="#ch3" class="nl">3. 函数与参数传递</a></div>
+<div class="ng"><div class="ngt">核心</div>
+<a href="#ch4" class="nl">4. 指针与引用</a>
+<a href="#ch5" class="nl">5. 内存管理与 RAII</a>
+<a href="#ch6" class="nl">6. 面向对象编程</a>
+<a href="#ch7" class="nl">7. 运算符重载与异常</a></div>
+<div class="ng"><div class="ngt">进阶</div>
+<a href="#ch8" class="nl">8. STL 容器与算法</a>
+<a href="#ch9" class="nl">9. Lambda 与函数式</a>
+<a href="#ch10" class="nl">10. 模板编程</a>
+<a href="#ch11" class="nl">11. 现代 C++ 特性</a></div>
+<div class="ng"><div class="ngt">实战</div>
+<a href="#ch12" class="nl">12. 多文件 CMake 项目</a>
+<a href="#ch13" class="nl">13. 综合项目：任务管理器</a>
+<a href="#ch14" class="nl">14. 自测与能力清单</a></div>
+</nav>
+
+<main class="main">
+
+<h1>C++ 示例与练习</h1>
+<p class="sub">配套《C++ 系统教程》和《开发环境搭建指南》的实战训练手册。每章包含详细示例讲解和动手练习题，从最简单的 Hello World 到完整的多文件 CMake 项目，循序渐进地建立你的 C++ 开发信心。</p>
+
+<div class="callout info"><div class="ct">如何使用本手册</div>
+<p>每章结构：<strong>示例讲解</strong>（带详细注释的完整可运行代码）&rarr; <strong>练习题</strong>（按难度标注 1-3 星）&rarr; <strong>参考答案</strong>（可折叠，建议先独立完成再对照）。所有代码均基于 C++20 标准，使用任意主流编译器（MSVC / GCC / Clang）均可编译。</p></div>
+
+<div class="progress-tracker">
+<div class="pt-item" id="pt1"><div class="dot"></div>1. 编译运行</div>
+<div class="pt-item" id="pt2"><div class="dot"></div>2. 类型系统</div>
+<div class="pt-item" id="pt3"><div class="dot"></div>3. 函数</div>
+<div class="pt-item" id="pt4"><div class="dot"></div>4. 指针引用</div>
+<div class="pt-item" id="pt5"><div class="dot"></div>5. 内存管理</div>
+<div class="pt-item" id="pt6"><div class="dot"></div>6. 面向对象</div>
+<div class="pt-item" id="pt7"><div class="dot"></div>7. 运算符与异常</div>
+<div class="pt-item" id="pt8"><div class="dot"></div>8. STL</div>
+<div class="pt-item" id="pt9"><div class="dot"></div>9. Lambda</div>
+<div class="pt-item" id="pt10"><div class="dot"></div>10. 模板</div>
+<div class="pt-item" id="pt11"><div class="dot"></div>11. 现代C++</div>
+<div class="pt-item" id="pt12"><div class="dot"></div>12. CMake项目</div>
+<div class="pt-item" id="pt13"><div class="dot"></div>13. 综合项目</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 1: 编译运行与基础语法 -->
+<!-- ============================================================ -->
+<div class="divider"><span>热身篇</span></div>
+
+<h2 id="ch1">1. 编译运行与基础语法</h2>
+
+<h3>示例 1.1 — Hello World 与编译流程</h3>
+<p>在 C# 中你习惯了 <code>dotnet run</code> 一键运行。C++ 需要先编译再运行。下面是最简单的 C++ 程序，我们来看看完整的编译流程。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">hello.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>   <span class="cm">// 引入输入输出库（类似 C# 的 using System）</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>     <span class="cm">// 引入字符串库</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// std::cout 相当于 Console.Write</span>
+    <span class="cm">// &lt;&lt; 是流插入运算符，把数据"推入"输出流</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Hello, C++ World!"</span> &lt;&lt; <span class="tp">std</span>::endl;
+
+    <span class="cm">// std::cin 相当于 Console.ReadLine</span>
+    <span class="tp">std::string</span> name;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"What's your name? "</span>;
+    <span class="tp">std</span>::<span class="fn">cin</span> &gt;&gt; name;   <span class="cm">// &gt;&gt; 从输入流读取（以空格为分隔）</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Welcome, "</span> &lt;&lt; name &lt;&lt; <span class="st">"!"</span> &lt;&lt; <span class="tp">std</span>::endl;
+
+    <span class="kw">return</span> <span class="nu">0</span>;  <span class="cm">// 返回 0 表示程序正常退出</span>
+}</code></pre></div>
+
+<div class="callout info"><div class="ct">编译命令对照</div>
+<p>使用 GCC（MinGW）：<code>g++ -std=c++20 -o hello hello.cpp &amp;&amp; hello.exe</code><br>
+使用 MSVC（开发者命令提示符）：<code>cl hello.cpp &amp;&amp; hello.exe</code><br>
+使用 Clang：<code>clang++ -std=c++20 -o hello hello.cpp &amp;&amp; hello.exe</code></p></div>
+
+<h3>示例 1.2 — 变量、输入输出与格式化</h3>
+<p>C# 中你用 <code>$"Hello {name}"</code> 做字符串插值。C++20 引入了 <code>std::format</code>，用法类似。我们先看传统方式和现代方式。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">format_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;format&gt;</span>     <span class="cm">// C++20 格式化（类似 C# 的字符串插值）</span>
+<span class="pp">#include</span> <span class="st">&lt;iomanip&gt;</span>    <span class="cm">// 输出格式控制</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::string</span> name = <span class="st">"Alice"</span>;
+    <span class="tp">int</span> age = <span class="nu">25</span>;
+    <span class="tp">double</span> gpa = <span class="nu">3.87</span>;
+
+    <span class="cm">// 方式 1：流式输出（传统方式）</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Name: "</span> &lt;&lt; name
+              &lt;&lt; <span class="st">", Age: "</span> &lt;&lt; age
+              &lt;&lt; <span class="st">", GPA: "</span> &lt;&lt; gpa &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 方式 2：std::format（C++20，类似 C# 的 $"{name}"）</span>
+    <span class="tp">std::string</span> msg = <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"{} is {} years old, GPA={:.1f}"</span>, name, age, gpa);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; msg &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 控制精度和宽度</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="tp">std</span>::<span class="fn">fixed</span> &lt;&lt; <span class="tp">std</span>::<span class="fn">setprecision</span>(<span class="nu">2</span>);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Pi = "</span> &lt;&lt; <span class="nu">3.14159265</span> &lt;&lt; <span class="st">"\n"</span>;   <span class="cm">// 输出 3.14</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="tp">std</span>::<span class="fn">setw</span>(<span class="nu">10</span>) &lt;&lt; <span class="st">"right"</span> &lt;&lt; <span class="st">"|\n"</span>;  <span class="cm">// 右对齐，宽度10</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag out">预期输出</span></div>
+<pre><code>Name: Alice, Age: 25, GPA: 3.87
+Alice is 25 years old, GPA=3.9
+Pi = 3.14
+     right|</code></pre></div>
+
+<h3>示例 1.3 — 控制流（和 C# 几乎一样）</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">control_flow.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// if-else（和 C# 完全一样）</span>
+    <span class="tp">int</span> score = <span class="nu">85</span>;
+    <span class="kw">if</span> (score &gt;= <span class="nu">90</span>) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"A\n"</span>;
+    } <span class="kw">else if</span> (score &gt;= <span class="nu">80</span>) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"B\n"</span>;
+    } <span class="kw">else</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"C or below\n"</span>;
+    }
+
+    <span class="cm">// for 循环（和 C# 的 for 一样）</span>
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; <span class="nu">5</span>; ++i) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; i &lt;&lt; <span class="st">" "</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// Range-based for（类似 C# 的 foreach）</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>, <span class="nu">50</span>};
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; n : nums) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; n &lt;&lt; <span class="st">" "</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// switch（C++ 的 switch 需要 break，否则会 fall-through！）</span>
+    <span class="tp">int</span> day = <span class="nu">3</span>;
+    <span class="kw">switch</span> (day) {
+        <span class="kw">case</span> <span class="nu">1</span>: <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Mon\n"</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="nu">2</span>: <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Tue\n"</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="nu">3</span>: <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Wed\n"</span>; <span class="kw">break</span>;
+        <span class="kw">default</span>: <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Other\n"</span>; <span class="kw">break</span>;
+    }
+
+    <span class="cm">// while 循环</span>
+    <span class="tp">int</span> count = <span class="nu">3</span>;
+    <span class="kw">while</span> (count &gt; <span class="nu">0</span>) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Countdown: "</span> &lt;&lt; count-- &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<div class="callout warning"><div class="ct">注意：switch 的 fall-through</div>
+<p>C# 的 switch 默认不允许 fall-through（每个 case 自动 break）。C++ 的 switch <strong>默认会 fall-through</strong>，忘了写 <code>break</code> 就会执行下一个 case 的代码，这是 C++ 中非常常见的 bug 来源。</p></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 1.1</span><span class="ex-stars">&#9733;</span></div>
+<div class="ex-desc">
+<p>编写一个程序，让用户输入一个整数 <code>n</code>，判断它是正数、负数还是零，并输出结果。然后输出 <code>n</code> 的绝对值。</p>
+</div>
+<div class="ex-hint">提示：使用 <code>if-else</code> 判断；绝对值可以用 <code>n &lt; 0 ? -n : n</code> 或 <code>std::abs(n)</code>（需 <code>#include &lt;cmath&gt;</code>）。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_1_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cmath&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Enter an integer: "</span>;
+    <span class="tp">std</span>::<span class="fn">cin</span> &gt;&gt; n;
+
+    <span class="kw">if</span> (n &gt; <span class="nu">0</span>)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; n &lt;&lt; <span class="st">" is positive\n"</span>;
+    <span class="kw">else if</span> (n &lt; <span class="nu">0</span>)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; n &lt;&lt; <span class="st">" is negative\n"</span>;
+    <span class="kw">else</span>
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"The number is zero\n"</span>;
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Absolute value: "</span> &lt;&lt; <span class="tp">std</span>::<span class="fn">abs</span>(n) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 1.2</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写一个"FizzBuzz"程序：遍历 1 到 30，对于每个数：</p>
+<ul>
+<li>如果能被 3 和 5 同时整除，输出 <code>FizzBuzz</code></li>
+<li>如果只被 3 整除，输出 <code>Fizz</code></li>
+<li>如果只被 5 整除，输出 <code>Buzz</code></li>
+<li>否则输出数字本身</li>
+</ul>
+</div>
+<div class="ex-hint">提示：先判断"同时整除"的情况（即 <code>i % 15 == 0</code>），再判断单个。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_1_2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">1</span>; i &lt;= <span class="nu">30</span>; ++i) {
+        <span class="kw">if</span> (i % <span class="nu">15</span> == <span class="nu">0</span>)
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"FizzBuzz"</span>;
+        <span class="kw">else if</span> (i % <span class="nu">3</span> == <span class="nu">0</span>)
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Fizz"</span>;
+        <span class="kw">else if</span> (i % <span class="nu">5</span> == <span class="nu">0</span>)
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Buzz"</span>;
+        <span class="kw">else</span>
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; i;
+
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; (i &lt; <span class="nu">30</span> ? <span class="st">", "</span> : <span class="st">"\n"</span>);
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 1.3</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写一个简易计算器：用户输入两个 <code>double</code> 数和一个运算符（<code>+</code>、<code>-</code>、<code>*</code>、<code>/</code>），输出计算结果。如果除数为零，输出错误提示。</p>
+</div>
+<div class="ex-hint">提示：用 <code>char op</code> 读取运算符，用 <code>switch</code> 分发处理。注意除法时检查除数。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_1_3.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">double</span> a, b;
+    <span class="tp">char</span> op;
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Enter expression (e.g. 3.5 + 2.1): "</span>;
+    <span class="tp">std</span>::<span class="fn">cin</span> &gt;&gt; a &gt;&gt; op &gt;&gt; b;
+
+    <span class="kw">switch</span> (op) {
+        <span class="kw">case</span> <span class="st">'+'</span>:
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" + "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a + b &lt;&lt; <span class="st">"\n"</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="st">'-'</span>:
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" - "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a - b &lt;&lt; <span class="st">"\n"</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="st">'*'</span>:
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" * "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a * b &lt;&lt; <span class="st">"\n"</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="st">'/'</span>:
+            <span class="kw">if</span> (b == <span class="nu">0.0</span>)
+                <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Error: division by zero!\n"</span>;
+            <span class="kw">else</span>
+                <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" / "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a / b &lt;&lt; <span class="st">"\n"</span>;
+            <span class="kw">break</span>;
+        <span class="kw">default</span>:
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Unknown operator: "</span> &lt;&lt; op &lt;&lt; <span class="st">"\n"</span>;
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 2: 类型系统 -->
+<!-- ============================================================ -->
+<h2 id="ch2">2. 类型系统与类型转换</h2>
+
+<h3>示例 2.1 — 基础类型与固定宽度类型</h3>
+<p>C# 中 <code>int</code> 永远是 32 位，<code>long</code> 永远是 64 位。C++ 中 <code>int</code> 的大小取决于平台。跨平台代码应该使用 <code>&lt;cstdint&gt;</code> 中的固定宽度类型。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">types_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cstdint&gt;</span>    <span class="cm">// 固定宽度整数类型</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 查看各类型在当前平台上的大小</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"=== Type Sizes ===\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"char:       "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">char</span>)       &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"short:      "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">short</span>)      &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"int:        "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">int</span>)        &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"long:       "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">long</span>)       &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"long long:  "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">long long</span>)  &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"float:      "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">float</span>)      &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"double:     "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">double</span>)     &lt;&lt; <span class="st">" bytes\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"pointer:    "</span> &lt;&lt; <span class="kw">sizeof</span>(<span class="tp">void</span>*)     &lt;&lt; <span class="st">" bytes\n"</span>;
+
+    <span class="cm">// 固定宽度类型（推荐在跨平台代码中使用）</span>
+    <span class="tp">int32_t</span>  a = <span class="nu">42</span>;          <span class="cm">// 保证 32 位有符号</span>
+    <span class="tp">uint64_t</span> b = <span class="nu">1000000ULL</span>;  <span class="cm">// 保证 64 位无符号</span>
+    <span class="tp">int8_t</span>   c = <span class="nu">127</span>;         <span class="cm">// 保证 8 位有符号</span>
+    <span class="tp">uint8_t</span>  d = <span class="nu">255</span>;         <span class="cm">// 保证 8 位无符号</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n=== Fixed Width ===\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"int32_t  a = "</span> &lt;&lt; a &lt;&lt; <span class="st">" ("</span> &lt;&lt; <span class="kw">sizeof</span>(a) &lt;&lt; <span class="st">" bytes)\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"uint64_t b = "</span> &lt;&lt; b &lt;&lt; <span class="st">" ("</span> &lt;&lt; <span class="kw">sizeof</span>(b) &lt;&lt; <span class="st">" bytes)\n"</span>;
+
+    <span class="cm">// 类型转换</span>
+    <span class="tp">double</span> pi = <span class="nu">3.14159</span>;
+    <span class="tp">int</span> truncated = <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(pi);  <span class="cm">// 显式转换，截断小数</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\nstatic_cast&lt;int&gt;(3.14159) = "</span> &lt;&lt; truncated &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// auto 类型推导（类似 C# 的 var）</span>
+    <span class="kw">auto</span> x = <span class="nu">42</span>;           <span class="cm">// int</span>
+    <span class="kw">auto</span> y = <span class="nu">3.14</span>;         <span class="cm">// double</span>
+    <span class="kw">auto</span> z = <span class="tp">std::string</span>(<span class="st">"hello"</span>);  <span class="cm">// std::string</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"x type size: "</span> &lt;&lt; <span class="kw">sizeof</span>(x) &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>示例 2.2 — 字符串操作</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">string_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>  <span class="cm">// std::reverse, std::transform</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 创建字符串</span>
+    <span class="tp">std::string</span> s1 = <span class="st">"Hello"</span>;
+    <span class="tp">std::string</span> s2(<span class="st">"World"</span>);        <span class="cm">// 构造函数方式</span>
+    <span class="tp">std::string</span> s3 = s1 + <span class="st">" "</span> + s2;  <span class="cm">// 拼接</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; s3 &lt;&lt; <span class="st">"\n"</span>;          <span class="cm">// Hello World</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Length: "</span> &lt;&lt; s3.<span class="fn">size</span>() &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 11</span>
+
+    <span class="cm">// 访问与修改</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"s3[0] = "</span> &lt;&lt; s3[<span class="nu">0</span>] &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// H</span>
+    s3[<span class="nu">0</span>] = <span class="st">'h'</span>;  <span class="cm">// 修改第一个字符</span>
+
+    <span class="cm">// 子串、查找、替换</span>
+    <span class="tp">std::string</span> sub = s3.<span class="fn">substr</span>(<span class="nu">6</span>, <span class="nu">5</span>);   <span class="cm">// 从位置6取5个字符 → "World"</span>
+    <span class="kw">auto</span> pos = s3.<span class="fn">find</span>(<span class="st">"World"</span>);           <span class="cm">// 查找，返回位置</span>
+    <span class="kw">if</span> (pos != <span class="tp">std::string</span>::npos) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Found 'World' at position "</span> &lt;&lt; pos &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="cm">// 遍历字符串</span>
+    <span class="kw">for</span> (<span class="tp">char</span> c : s3) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; c &lt;&lt; <span class="st">"-"</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 反转字符串</span>
+    <span class="tp">std::string</span> original = <span class="st">"C++ is fun"</span>;
+    <span class="tp">std</span>::<span class="fn">reverse</span>(original.<span class="fn">begin</span>(), original.<span class="fn">end</span>());
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Reversed: "</span> &lt;&lt; original &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// string ↔ 数字转换</span>
+    <span class="tp">int</span> num = <span class="tp">std</span>::<span class="fn">stoi</span>(<span class="st">"42"</span>);          <span class="cm">// string → int</span>
+    <span class="tp">double</span> d = <span class="tp">std</span>::<span class="fn">stod</span>(<span class="st">"3.14"</span>);       <span class="cm">// string → double</span>
+    <span class="tp">std::string</span> sn = <span class="tp">std</span>::<span class="fn">to_string</span>(num);  <span class="cm">// int → string</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"stoi(\"42\") = "</span> &lt;&lt; num &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"stod(\"3.14\") = "</span> &lt;&lt; d &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 2.1</span><span class="ex-stars">&#9733;</span></div>
+<div class="ex-desc">
+<p>编写程序：让用户输入一个字符串，输出以下信息：</p>
+<ol>
+<li>字符串长度</li>
+<li>字符串的大写版本</li>
+<li>字符串反转后的结果</li>
+</ol>
+</div>
+<div class="ex-hint">提示：用 <code>std::getline(std::cin, s)</code> 读取含空格的整行输入。用 <code>std::transform</code> 配合 <code>::toupper</code> 转大写。用 <code>std::reverse</code> 反转。注意反转会修改原串，建议先拷贝。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_2_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cctype&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::string</span> s;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Enter a string: "</span>;
+    <span class="tp">std</span>::<span class="fn">getline</span>(<span class="tp">std</span>::cin, s);
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Length: "</span> &lt;&lt; s.<span class="fn">size</span>() &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">std::string</span> upper = s;
+    <span class="tp">std</span>::<span class="fn">transform</span>(upper.<span class="fn">begin</span>(), upper.<span class="fn">end</span>(), upper.<span class="fn">begin</span>(), ::toupper);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Uppercase: "</span> &lt;&lt; upper &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">std::string</span> rev = s;
+    <span class="tp">std</span>::<span class="fn">reverse</span>(rev.<span class="fn">begin</span>(), rev.<span class="fn">end</span>());
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Reversed: "</span> &lt;&lt; rev &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 2.2</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写一个函数 <code>bool isPalindrome(const std::string&amp; s)</code>，判断字符串是否是回文（正反读一样）。忽略大小写。例如 <code>"Racecar"</code> 是回文，<code>"hello"</code> 不是。</p>
+</div>
+<div class="ex-hint">提示：先转小写再和反转版本比较。或者用双指针从两端向中间逼近。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_2_2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cctype&gt;</span>
+
+<span class="tp">bool</span> <span class="fn">isPalindrome</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; s) {
+    <span class="tp">std::string</span> lower = s;
+    <span class="tp">std</span>::<span class="fn">transform</span>(lower.<span class="fn">begin</span>(), lower.<span class="fn">end</span>(), lower.<span class="fn">begin</span>(), ::tolower);
+
+    <span class="tp">int</span> left = <span class="nu">0</span>, right = <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(lower.<span class="fn">size</span>()) - <span class="nu">1</span>;
+    <span class="kw">while</span> (left &lt; right) {
+        <span class="kw">if</span> (lower[left] != lower[right])
+            <span class="kw">return false</span>;
+        ++left; --right;
+    }
+    <span class="kw">return true</span>;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::string</span> tests[] = {<span class="st">"Racecar"</span>, <span class="st">"hello"</span>, <span class="st">"level"</span>, <span class="st">"C++"</span>};
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; t : tests) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; t &lt;&lt; <span class="st">" is "</span>
+                  &lt;&lt; (<span class="fn">isPalindrome</span>(t) ? <span class="st">""</span> : <span class="st">"NOT "</span>)
+                  &lt;&lt; <span class="st">"a palindrome\n"</span>;
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 3: 函数 -->
+<!-- ============================================================ -->
+<h2 id="ch3">3. 函数与参数传递</h2>
+
+<h3>示例 3.1 — 函数声明与定义分离</h3>
+<p>在 C# 中，函数声明和定义在同一个类文件里。C++ 中函数声明放在头文件（<code>.h</code>），定义放在源文件（<code>.cpp</code>）。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">math_utils.h — 头文件（声明）</span></div>
+<pre><code><span class="pp">#pragma once</span>    <span class="cm">// 头文件保护（防止重复包含）</span>
+
+<span class="cm">// 函数声明（只有签名，没有实现）</span>
+<span class="tp">int</span> <span class="fn">Add</span>(<span class="tp">int</span> a, <span class="tp">int</span> b);
+<span class="tp">double</span> <span class="fn">Average</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; values);
+<span class="tp">int</span> <span class="fn">Factorial</span>(<span class="tp">int</span> n);
+<span class="tp">int</span> <span class="fn">Fibonacci</span>(<span class="tp">int</span> n);</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">math_utils.cpp — 源文件（实现）</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">"math_utils.h"</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="tp">int</span> <span class="fn">Add</span>(<span class="tp">int</span> a, <span class="tp">int</span> b) {
+    <span class="kw">return</span> a + b;
+}
+
+<span class="tp">double</span> <span class="fn">Average</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; values) {
+    <span class="kw">if</span> (values.<span class="fn">empty</span>()) <span class="kw">return</span> <span class="nu">0.0</span>;
+    <span class="tp">double</span> sum = <span class="tp">std</span>::<span class="fn">accumulate</span>(values.<span class="fn">begin</span>(), values.<span class="fn">end</span>(), <span class="nu">0.0</span>);
+    <span class="kw">return</span> sum / <span class="kw">static_cast</span>&lt;<span class="tp">double</span>&gt;(values.<span class="fn">size</span>());
+}
+
+<span class="tp">int</span> <span class="fn">Factorial</span>(<span class="tp">int</span> n) {
+    <span class="kw">if</span> (n &lt;= <span class="nu">1</span>) <span class="kw">return</span> <span class="nu">1</span>;
+    <span class="kw">return</span> n * <span class="fn">Factorial</span>(n - <span class="nu">1</span>);
+}
+
+<span class="tp">int</span> <span class="fn">Fibonacci</span>(<span class="tp">int</span> n) {
+    <span class="kw">if</span> (n &lt;= <span class="nu">0</span>) <span class="kw">return</span> <span class="nu">0</span>;
+    <span class="kw">if</span> (n == <span class="nu">1</span>) <span class="kw">return</span> <span class="nu">1</span>;
+    <span class="tp">int</span> a = <span class="nu">0</span>, b = <span class="nu">1</span>;
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">2</span>; i &lt;= n; ++i) {
+        <span class="tp">int</span> temp = a + b;
+        a = b;
+        b = temp;
+    }
+    <span class="kw">return</span> b;
+}</code></pre></div>
+
+<h3>示例 3.2 — 三种参数传递方式</h3>
+<p>这是 C++ 和 C# 最重要的差异之一。C++ 有三种传递方式：按值、按引用、按指针。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">pass_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+
+<span class="cm">// 1. 按值传递 — 拷贝一份（适合小类型如 int, double）</span>
+<span class="tp">int</span> <span class="fn">Square</span>(<span class="tp">int</span> x) {
+    x = x * x;  <span class="cm">// 只修改了局部拷贝，不影响原变量</span>
+    <span class="kw">return</span> x;
+}
+
+<span class="cm">// 2. 按引用传递 — 不拷贝，直接操作原变量（类似 C# ref）</span>
+<span class="kw">void</span> <span class="fn">Swap</span>(<span class="tp">int</span>&amp; a, <span class="tp">int</span>&amp; b) {
+    <span class="tp">int</span> temp = a;
+    a = b;
+    b = temp;
+}
+
+<span class="cm">// 3. 按 const 引用传递 — 不拷贝，但不能修改（最常用！）</span>
+<span class="kw">void</span> <span class="fn">PrintVector</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt;&amp; v) {
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; item : v) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; item &lt;&lt; <span class="st">" "</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+    <span class="cm">// v.push_back(999);  // 编译错误！const 引用不允许修改</span>
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 按值</span>
+    <span class="tp">int</span> num = <span class="nu">5</span>;
+    <span class="tp">int</span> result = <span class="fn">Square</span>(num);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"num="</span> &lt;&lt; num &lt;&lt; <span class="st">", result="</span> &lt;&lt; result &lt;&lt; <span class="st">"\n"</span>;
+    <span class="cm">// 输出: num=5, result=25 （num 没变！）</span>
+
+    <span class="cm">// 按引用</span>
+    <span class="tp">int</span> x = <span class="nu">10</span>, y = <span class="nu">20</span>;
+    <span class="fn">Swap</span>(x, y);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"x="</span> &lt;&lt; x &lt;&lt; <span class="st">", y="</span> &lt;&lt; y &lt;&lt; <span class="st">"\n"</span>;
+    <span class="cm">// 输出: x=20, y=10 （被交换了！）</span>
+
+    <span class="cm">// const 引用</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; data = {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>};
+    <span class="fn">PrintVector</span>(data);
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<div class="callout tip"><div class="ct">选择指南</div>
+<p>内置小类型（int, double, char, bool, 指针）→ 按值传递。大对象或容器不需要修改 → <code>const T&amp;</code>。需要修改原变量 → <code>T&amp;</code>。参数可选（可以为 null）→ <code>T*</code> 指针。</p></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 3.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写以下函数并在 <code>main</code> 中测试：</p>
+<ol>
+<li><code>int Max(int a, int b)</code> — 返回两数中较大的</li>
+<li><code>void Clamp(int&amp; value, int minVal, int maxVal)</code> — 将 value 限制在 [minVal, maxVal] 范围内（修改原值）</li>
+<li><code>double DotProduct(const std::vector&lt;double&gt;&amp; a, const std::vector&lt;double&gt;&amp; b)</code> — 计算两个向量的点积</li>
+</ol>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_3_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+
+<span class="tp">int</span> <span class="fn">Max</span>(<span class="tp">int</span> a, <span class="tp">int</span> b) {
+    <span class="kw">return</span> (a &gt;= b) ? a : b;
+}
+
+<span class="kw">void</span> <span class="fn">Clamp</span>(<span class="tp">int</span>&amp; value, <span class="tp">int</span> minVal, <span class="tp">int</span> maxVal) {
+    <span class="kw">if</span> (value &lt; minVal) value = minVal;
+    <span class="kw">if</span> (value &gt; maxVal) value = maxVal;
+    <span class="cm">// 也可以用 std::clamp(value, minVal, maxVal) — C++17</span>
+}
+
+<span class="tp">double</span> <span class="fn">DotProduct</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; a, <span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; b) {
+    <span class="tp">double</span> sum = <span class="nu">0.0</span>;
+    <span class="tp">size_t</span> len = <span class="tp">std</span>::<span class="fn">min</span>(a.<span class="fn">size</span>(), b.<span class="fn">size</span>());
+    <span class="kw">for</span> (<span class="tp">size_t</span> i = <span class="nu">0</span>; i &lt; len; ++i) {
+        sum += a[i] * b[i];
+    }
+    <span class="kw">return</span> sum;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Max(7,3) = "</span> &lt;&lt; <span class="fn">Max</span>(<span class="nu">7</span>, <span class="nu">3</span>) &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">int</span> val = <span class="nu">150</span>;
+    <span class="fn">Clamp</span>(val, <span class="nu">0</span>, <span class="nu">100</span>);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Clamp(150, 0, 100) = "</span> &lt;&lt; val &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt; a = {<span class="nu">1.0</span>, <span class="nu">2.0</span>, <span class="nu">3.0</span>};
+    <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt; b = {<span class="nu">4.0</span>, <span class="nu">5.0</span>, <span class="nu">6.0</span>};
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Dot product = "</span> &lt;&lt; <span class="fn">DotProduct</span>(a, b) &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 3.2</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>实现函数 <code>void SplitString(const std::string&amp; text, char delimiter, std::vector&lt;std::string&gt;&amp; result)</code>，按指定分隔符拆分字符串并将结果存入 result 向量。例如输入 <code>"apple,banana,cherry"</code> 和分隔符 <code>','</code>，result 应包含三个元素。</p>
+</div>
+<div class="ex-hint">提示：用 <code>std::string::find</code> 和 <code>std::string::substr</code> 循环查找分隔符位置。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_3_2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+
+<span class="kw">void</span> <span class="fn">SplitString</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; text, <span class="tp">char</span> delimiter,
+                 <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt;&amp; result) {
+    result.<span class="fn">clear</span>();
+    <span class="tp">size_t</span> start = <span class="nu">0</span>;
+    <span class="tp">size_t</span> pos = text.<span class="fn">find</span>(delimiter);
+
+    <span class="kw">while</span> (pos != <span class="tp">std::string</span>::npos) {
+        result.<span class="fn">push_back</span>(text.<span class="fn">substr</span>(start, pos - start));
+        start = pos + <span class="nu">1</span>;
+        pos = text.<span class="fn">find</span>(delimiter, start);
+    }
+    result.<span class="fn">push_back</span>(text.<span class="fn">substr</span>(start));  <span class="cm">// 最后一段</span>
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt; parts;
+    <span class="fn">SplitString</span>(<span class="st">"apple,banana,cherry"</span>, <span class="st">','</span>, parts);
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; p : parts)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"["</span> &lt;&lt; p &lt;&lt; <span class="st">"] "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 4: 指针与引用 -->
+<!-- ============================================================ -->
+<div class="divider"><span>核心篇</span></div>
+
+<h2 id="ch4">4. 指针与引用</h2>
+
+<h3>示例 4.1 — 指针基础操作</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">pointer_basics.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> x = <span class="nu">42</span>;
+
+    <span class="cm">// 创建指针：指向 x 的地址</span>
+    <span class="tp">int</span>* ptr = &amp;x;
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"x     = "</span> &lt;&lt; x &lt;&lt; <span class="st">"\n"</span>;       <span class="cm">// 42</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"&amp;x    = "</span> &lt;&lt; &amp;x &lt;&lt; <span class="st">"\n"</span>;      <span class="cm">// 0x7fff...（某个地址）</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"ptr   = "</span> &lt;&lt; ptr &lt;&lt; <span class="st">"\n"</span>;      <span class="cm">// 和 &amp;x 相同的地址</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"*ptr  = "</span> &lt;&lt; *ptr &lt;&lt; <span class="st">"\n"</span>;     <span class="cm">// 42（解引用：读取指向的值）</span>
+
+    <span class="cm">// 通过指针修改值</span>
+    *ptr = <span class="nu">100</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"x after *ptr=100: "</span> &lt;&lt; x &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 100</span>
+
+    <span class="cm">// 空指针</span>
+    <span class="tp">int</span>* nullPtr = <span class="kw">nullptr</span>;
+    <span class="kw">if</span> (nullPtr == <span class="kw">nullptr</span>) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Pointer is null\n"</span>;
+    }
+    <span class="cm">// *nullPtr = 5;  // 崩溃！解引用空指针 = 未定义行为</span>
+
+    <span class="cm">// 指针与数组的关系</span>
+    <span class="tp">int</span> arr[] = {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>};
+    <span class="tp">int</span>* p = arr;   <span class="cm">// 数组名退化为指针</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"arr[0]="</span> &lt;&lt; *p &lt;&lt; <span class="st">"\n"</span>;           <span class="cm">// 10</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"arr[2]="</span> &lt;&lt; *(p + <span class="nu">2</span>) &lt;&lt; <span class="st">"\n"</span>;     <span class="cm">// 30（指针算术）</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"arr[3]="</span> &lt;&lt; p[<span class="nu">3</span>] &lt;&lt; <span class="st">"\n"</span>;          <span class="cm">// 40（下标运算符）</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>示例 4.2 — 指针实现动态数组（理解 new/delete）</h3>
+<p>虽然现代 C++ 不推荐裸用 new/delete，但理解它有助于你理解内存管理。</p>
+
+<div class="cb"><div class="ch"><span class="tag cpp">dynamic_array.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> size = <span class="nu">5</span>;
+
+    <span class="cm">// 在堆上分配数组</span>
+    <span class="tp">int</span>* arr = <span class="kw">new int</span>[size];
+
+    <span class="cm">// 填充数据</span>
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; size; ++i) {
+        arr[i] = (i + <span class="nu">1</span>) * <span class="nu">10</span>;
+    }
+
+    <span class="cm">// 打印</span>
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; size; ++i) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; arr[i] &lt;&lt; <span class="st">" "</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 释放！（数组用 delete[]）</span>
+    <span class="kw">delete</span>[] arr;
+    arr = <span class="kw">nullptr</span>;  <span class="cm">// 好习惯：释放后置空</span>
+
+    <span class="cm">// 现代 C++ 的做法：用 std::vector 或 std::unique_ptr</span>
+    <span class="kw">auto</span> modern = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">int</span>[]&gt;(size);
+    modern[<span class="nu">0</span>] = <span class="nu">10</span>;
+    <span class="cm">// 不需要手动释放！离开作用域自动释放</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 4.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写函数 <code>void ReverseArray(int* arr, int size)</code>，使用指针操作（不使用下标运算符 <code>[]</code>）将数组原地反转。在 main 中测试。</p>
+</div>
+<div class="ex-hint">提示：用两个指针（头指针和尾指针）向中间逼近，交换值。<code>*(arr + i)</code> 等价于 <code>arr[i]</code>。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_4_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="kw">void</span> <span class="fn">ReverseArray</span>(<span class="tp">int</span>* arr, <span class="tp">int</span> size) {
+    <span class="tp">int</span>* left = arr;
+    <span class="tp">int</span>* right = arr + size - <span class="nu">1</span>;
+
+    <span class="kw">while</span> (left &lt; right) {
+        <span class="tp">int</span> temp = *left;
+        *left = *right;
+        *right = temp;
+        ++left;
+        --right;
+    }
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> data[] = {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>};
+    <span class="tp">int</span> size = <span class="kw">sizeof</span>(data) / <span class="kw">sizeof</span>(data[<span class="nu">0</span>]);
+
+    <span class="fn">ReverseArray</span>(data, size);
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; size; ++i)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; data[i] &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 输出: 5 4 3 2 1</span>
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 4.2</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>下面这段代码有 3 个 bug，找出并修复它们：</p>
+</div>
+<div class="cb"><div class="ch"><span class="tag cpp">buggy_code.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span>* <span class="fn">CreateArray</span>(<span class="tp">int</span> size) {
+    <span class="tp">int</span> arr[<span class="nu">100</span>];
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; size; ++i)
+        arr[i] = i * i;
+    <span class="kw">return</span> arr;
+}
+
+<span class="kw">void</span> <span class="fn">PrintArray</span>(<span class="tp">int</span>* arr, <span class="tp">int</span> size) {
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt;= size; ++i)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; arr[i] &lt;&lt; <span class="st">" "</span>;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span>* data = <span class="fn">CreateArray</span>(<span class="nu">5</span>);
+    <span class="fn">PrintArray</span>(data, <span class="nu">5</span>);
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<p>三个 bug 分别是：</p>
+<ol>
+<li><strong>Bug 1</strong>：<code>CreateArray</code> 返回了局部数组的地址。局部数组在函数返回后被销毁，变成悬垂指针。</li>
+<li><strong>Bug 2</strong>：<code>PrintArray</code> 循环条件 <code>i &lt;= size</code> 导致数组越界（应该是 <code>i &lt; size</code>）。</li>
+<li><strong>Bug 3</strong>：<code>main</code> 中没有释放堆内存（如果用 new 分配的话）。</li>
+</ol>
+<div class="cb"><div class="ch"><span class="tag ans">fixed_code.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+
+<span class="cm">// 修复1: 返回 vector 而非裸指针（现代 C++ 做法）</span>
+<span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; <span class="fn">CreateArray</span>(<span class="tp">int</span> size) {
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; arr(size);
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; size; ++i)
+        arr[i] = i * i;
+    <span class="kw">return</span> arr;  <span class="cm">// 移动语义，零拷贝</span>
+}
+
+<span class="kw">void</span> <span class="fn">PrintArray</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt;&amp; arr) {
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; val : arr)  <span class="cm">// 修复2: 范围for避免越界</span>
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; val &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="kw">auto</span> data = <span class="fn">CreateArray</span>(<span class="nu">5</span>);
+    <span class="fn">PrintArray</span>(data);
+    <span class="kw">return</span> <span class="nu">0</span>;  <span class="cm">// 修复3: 不需要手动释放</span>
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 5: 内存管理与 RAII -->
+<!-- ============================================================ -->
+<h2 id="ch5">5. 内存管理与 RAII</h2>
+
+<h3>示例 5.1 — 智能指针完全指南</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">smart_ptr_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="kw">class</span> <span class="tp">Weapon</span> {
+    <span class="tp">std::string</span> name;
+<span class="kw">public</span>:
+    <span class="fn">Weapon</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; n) : name(n) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Weapon '"</span> &lt;&lt; name &lt;&lt; <span class="st">"' created\n"</span>;
+    }
+    ~<span class="fn">Weapon</span>() {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Weapon '"</span> &lt;&lt; name &lt;&lt; <span class="st">"' destroyed\n"</span>;
+    }
+    <span class="kw">void</span> <span class="fn">Attack</span>() <span class="kw">const</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; name &lt;&lt; <span class="st">" attacks!\n"</span>;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// === unique_ptr: 独占所有权 ===</span>
+    {
+        <span class="kw">auto</span> sword = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Weapon</span>&gt;(<span class="st">"Excalibur"</span>);
+        sword-&gt;<span class="fn">Attack</span>();
+
+        <span class="cm">// auto copy = sword;  // 编译错误！unique_ptr 不能拷贝</span>
+        <span class="kw">auto</span> moved = <span class="tp">std</span>::<span class="fn">move</span>(sword);  <span class="cm">// 转移所有权</span>
+        <span class="cm">// sword 现在是 nullptr</span>
+        <span class="kw">if</span> (!sword) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"sword is null after move\n"</span>;
+        moved-&gt;<span class="fn">Attack</span>();
+    } <span class="cm">// moved 析构，Weapon 自动销毁</span>
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"---\n"</span>;
+
+    <span class="cm">// === shared_ptr: 引用计数 ===</span>
+    {
+        <span class="kw">auto</span> bow = <span class="tp">std</span>::<span class="fn">make_shared</span>&lt;<span class="tp">Weapon</span>&gt;(<span class="st">"Longbow"</span>);
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Count: "</span> &lt;&lt; bow.<span class="fn">use_count</span>() &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 1</span>
+        {
+            <span class="kw">auto</span> bow2 = bow;  <span class="cm">// 共享所有权</span>
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Count: "</span> &lt;&lt; bow.<span class="fn">use_count</span>() &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 2</span>
+        } <span class="cm">// bow2 析构，计数变1，但 Weapon 不销毁</span>
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Count: "</span> &lt;&lt; bow.<span class="fn">use_count</span>() &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 1</span>
+    } <span class="cm">// bow 析构，计数变0，Weapon 销毁</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag out">预期输出</span></div>
+<pre><code>Weapon 'Excalibur' created
+Excalibur attacks!
+sword is null after move
+Excalibur attacks!
+Weapon 'Excalibur' destroyed
+---
+Weapon 'Longbow' created
+Count: 1
+Count: 2
+Count: 1
+Weapon 'Longbow' destroyed</code></pre></div>
+
+<h3>示例 5.2 — RAII 自定义资源管理</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">raii_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;fstream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;functional&gt;</span>
+
+<span class="cm">// 自定义 ScopeGuard（类似 Go 的 defer / C# 的 using 结尾清理）</span>
+<span class="kw">class</span> <span class="tp">ScopeGuard</span> {
+    <span class="tp">std::function</span>&lt;<span class="kw">void</span>()&gt; cleanup;
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">ScopeGuard</span>(<span class="tp">std::function</span>&lt;<span class="kw">void</span>()&gt; fn) : cleanup(<span class="tp">std</span>::<span class="fn">move</span>(fn)) {}
+    ~<span class="fn">ScopeGuard</span>() { <span class="fn">cleanup</span>(); }
+
+    <span class="cm">// 禁止拷贝，确保只执行一次</span>
+    <span class="fn">ScopeGuard</span>(<span class="kw">const</span> <span class="tp">ScopeGuard</span>&amp;) = <span class="kw">delete</span>;
+    <span class="tp">ScopeGuard</span>&amp; <span class="kw">operator</span>=(<span class="kw">const</span> <span class="tp">ScopeGuard</span>&amp;) = <span class="kw">delete</span>;
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// RAII 文件操作 — 无需手动关闭</span>
+    {
+        <span class="tp">std::ofstream</span> file(<span class="st">"test.txt"</span>);
+        <span class="kw">if</span> (!file) {
+            <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; <span class="st">"Cannot open file\n"</span>;
+            <span class="kw">return</span> <span class="nu">1</span>;
+        }
+        file &lt;&lt; <span class="st">"Hello from C++\n"</span>;
+        <span class="cm">// 无需 file.close() — 析构函数自动关闭</span>
+    }
+
+    <span class="cm">// 自定义 ScopeGuard</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Acquiring resource...\n"</span>;
+    {
+        <span class="tp">ScopeGuard</span> guard([] {
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Releasing resource (auto cleanup)!\n"</span>;
+        });
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Working with resource...\n"</span>;
+        <span class="cm">// 即使这里 throw 异常，guard 析构时也会执行清理</span>
+    }
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Done.\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 5.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>定义一个 <code>DynamicBuffer</code> 类，内部使用 <code>std::unique_ptr&lt;int[]&gt;</code> 管理一个动态整数数组。实现以下功能：</p>
+<ul>
+<li>构造函数接受 size 参数</li>
+<li><code>void Set(int index, int value)</code> 和 <code>int Get(int index) const</code></li>
+<li><code>int Size() const</code> 返回数组大小</li>
+</ul>
+<p>在 main 中测试，验证离开作用域时自动释放（析构函数会打印信息）。</p>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_5_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdexcept&gt;</span>
+
+<span class="kw">class</span> <span class="tp">DynamicBuffer</span> {
+    <span class="tp">std::unique_ptr</span>&lt;<span class="tp">int</span>[]&gt; data;
+    <span class="tp">int</span> size;
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">DynamicBuffer</span>(<span class="tp">int</span> s) : data(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">int</span>[]&gt;(s)), size(s) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Buffer("</span> &lt;&lt; s &lt;&lt; <span class="st">") created\n"</span>;
+    }
+
+    ~<span class="fn">DynamicBuffer</span>() {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Buffer("</span> &lt;&lt; size &lt;&lt; <span class="st">") destroyed\n"</span>;
+    }
+
+    <span class="kw">void</span> <span class="fn">Set</span>(<span class="tp">int</span> index, <span class="tp">int</span> value) {
+        <span class="kw">if</span> (index &lt; <span class="nu">0</span> || index &gt;= size)
+            <span class="kw">throw</span> <span class="tp">std::out_of_range</span>(<span class="st">"Index out of range"</span>);
+        data[index] = value;
+    }
+
+    <span class="tp">int</span> <span class="fn">Get</span>(<span class="tp">int</span> index) <span class="kw">const</span> {
+        <span class="kw">if</span> (index &lt; <span class="nu">0</span> || index &gt;= size)
+            <span class="kw">throw</span> <span class="tp">std::out_of_range</span>(<span class="st">"Index out of range"</span>);
+        <span class="kw">return</span> data[index];
+    }
+
+    <span class="tp">int</span> <span class="fn">Size</span>() <span class="kw">const</span> { <span class="kw">return</span> size; }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    {
+        <span class="tp">DynamicBuffer</span> buf(<span class="nu">5</span>);
+        <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; buf.<span class="fn">Size</span>(); ++i)
+            buf.<span class="fn">Set</span>(i, i * <span class="nu">10</span>);
+        <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nu">0</span>; i &lt; buf.<span class="fn">Size</span>(); ++i)
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; buf.<span class="fn">Get</span>(i) &lt;&lt; <span class="st">" "</span>;
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+    } <span class="cm">// buf 自动销毁</span>
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 6: 面向对象编程 -->
+<!-- ============================================================ -->
+<h2 id="ch6">6. 面向对象编程</h2>
+
+<h3>示例 6.1 — 完整的类设计（含 Rule of Zero）</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">student.h</span></div>
+<pre><code><span class="pp">#pragma once</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="kw">class</span> <span class="tp">Student</span> {
+    <span class="tp">std::string</span> name;
+    <span class="tp">int</span> id;
+    <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt; grades;
+
+<span class="kw">public</span>:
+    <span class="cm">// 构造函数（使用初始化列表）</span>
+    <span class="fn">Student</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; n, <span class="tp">int</span> i) : name(n), id(i) {}
+
+    <span class="cm">// 方法</span>
+    <span class="kw">void</span> <span class="fn">AddGrade</span>(<span class="tp">double</span> grade) { grades.<span class="fn">push_back</span>(grade); }
+
+    <span class="tp">double</span> <span class="fn">GetAverage</span>() <span class="kw">const</span> {
+        <span class="kw">if</span> (grades.<span class="fn">empty</span>()) <span class="kw">return</span> <span class="nu">0.0</span>;
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">accumulate</span>(grades.<span class="fn">begin</span>(), grades.<span class="fn">end</span>(), <span class="nu">0.0</span>)
+               / grades.<span class="fn">size</span>();
+    }
+
+    <span class="cm">// const 方法 — 不修改对象</span>
+    <span class="kw">const</span> <span class="tp">std::string</span>&amp; <span class="fn">GetName</span>() <span class="kw">const</span> { <span class="kw">return</span> name; }
+    <span class="tp">int</span> <span class="fn">GetId</span>() <span class="kw">const</span> { <span class="kw">return</span> id; }
+    <span class="tp">size_t</span> <span class="fn">GetGradeCount</span>() <span class="kw">const</span> { <span class="kw">return</span> grades.<span class="fn">size</span>(); }
+
+    <span class="cm">// Rule of Zero: 所有成员都是 RAII 类型（string, vector）</span>
+    <span class="cm">// 不需要写析构函数、拷贝构造、移动构造 — 编译器自动生成正确的版本</span>
+};</code></pre></div>
+
+<h3>示例 6.2 — 继承、多态与接口</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">shapes.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cmath&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numbers&gt;</span>  <span class="cm">// C++20: std::numbers::pi</span>
+
+<span class="cm">// 接口（纯虚基类）</span>
+<span class="kw">class</span> <span class="tp">IShape</span> {
+<span class="kw">public</span>:
+    <span class="kw">virtual double</span> <span class="fn">Area</span>() <span class="kw">const</span> = <span class="nu">0</span>;
+    <span class="kw">virtual double</span> <span class="fn">Perimeter</span>() <span class="kw">const</span> = <span class="nu">0</span>;
+    <span class="kw">virtual</span> <span class="tp">std::string</span> <span class="fn">Name</span>() <span class="kw">const</span> = <span class="nu">0</span>;
+    <span class="kw">virtual</span> ~<span class="fn">IShape</span>() = <span class="kw">default</span>;  <span class="cm">// 虚析构必须有！</span>
+};
+
+<span class="cm">// 圆形</span>
+<span class="kw">class</span> <span class="tp">Circle</span> : <span class="kw">public</span> <span class="tp">IShape</span> {
+    <span class="tp">double</span> radius;
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">Circle</span>(<span class="tp">double</span> r) : radius(r) {}
+    <span class="tp">double</span> <span class="fn">Area</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> <span class="tp">std</span>::numbers::pi * radius * radius;
+    }
+    <span class="tp">double</span> <span class="fn">Perimeter</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> <span class="nu">2.0</span> * <span class="tp">std</span>::numbers::pi * radius;
+    }
+    <span class="tp">std::string</span> <span class="fn">Name</span>() <span class="kw">const override</span> { <span class="kw">return</span> <span class="st">"Circle"</span>; }
+};
+
+<span class="cm">// 矩形</span>
+<span class="kw">class</span> <span class="tp">Rectangle</span> : <span class="kw">public</span> <span class="tp">IShape</span> {
+    <span class="tp">double</span> width, height;
+<span class="kw">public</span>:
+    <span class="fn">Rectangle</span>(<span class="tp">double</span> w, <span class="tp">double</span> h) : width(w), height(h) {}
+    <span class="tp">double</span> <span class="fn">Area</span>() <span class="kw">const override</span> { <span class="kw">return</span> width * height; }
+    <span class="tp">double</span> <span class="fn">Perimeter</span>() <span class="kw">const override</span> { <span class="kw">return</span> <span class="nu">2.0</span> * (width + height); }
+    <span class="tp">std::string</span> <span class="fn">Name</span>() <span class="kw">const override</span> { <span class="kw">return</span> <span class="st">"Rectangle"</span>; }
+};
+
+<span class="cm">// 三角形</span>
+<span class="kw">class</span> <span class="tp">Triangle</span> : <span class="kw">public</span> <span class="tp">IShape</span> {
+    <span class="tp">double</span> a, b, c;
+<span class="kw">public</span>:
+    <span class="fn">Triangle</span>(<span class="tp">double</span> a, <span class="tp">double</span> b, <span class="tp">double</span> c) : a(a), b(b), c(c) {}
+    <span class="tp">double</span> <span class="fn">Perimeter</span>() <span class="kw">const override</span> { <span class="kw">return</span> a + b + c; }
+    <span class="tp">double</span> <span class="fn">Area</span>() <span class="kw">const override</span> {
+        <span class="tp">double</span> s = <span class="fn">Perimeter</span>() / <span class="nu">2.0</span>;
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">sqrt</span>(s * (s-a) * (s-b) * (s-c));  <span class="cm">// 海伦公式</span>
+    }
+    <span class="tp">std::string</span> <span class="fn">Name</span>() <span class="kw">const override</span> { <span class="kw">return</span> <span class="st">"Triangle"</span>; }
+};
+
+<span class="cm">// 多态函数：打印任何形状的信息</span>
+<span class="kw">void</span> <span class="fn">PrintShapeInfo</span>(<span class="kw">const</span> <span class="tp">IShape</span>&amp; shape) {
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; shape.<span class="fn">Name</span>()
+              &lt;&lt; <span class="st">" | Area="</span> &lt;&lt; shape.<span class="fn">Area</span>()
+              &lt;&lt; <span class="st">" | Perimeter="</span> &lt;&lt; shape.<span class="fn">Perimeter</span>() &lt;&lt; <span class="st">"\n"</span>;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 用 unique_ptr 存储多态对象</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::unique_ptr</span>&lt;<span class="tp">IShape</span>&gt;&gt; shapes;
+    shapes.<span class="fn">push_back</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Circle</span>&gt;(<span class="nu">5.0</span>));
+    shapes.<span class="fn">push_back</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Rectangle</span>&gt;(<span class="nu">4.0</span>, <span class="nu">6.0</span>));
+    shapes.<span class="fn">push_back</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Triangle</span>&gt;(<span class="nu">3.0</span>, <span class="nu">4.0</span>, <span class="nu">5.0</span>));
+
+    <span class="tp">double</span> totalArea = <span class="nu">0</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; s : shapes) {
+        <span class="fn">PrintShapeInfo</span>(*s);
+        totalArea += s-&gt;<span class="fn">Area</span>();
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Total area: "</span> &lt;&lt; totalArea &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 6.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>定义一个 <code>BankAccount</code> 类，包含：</p>
+<ul>
+<li>私有成员：<code>std::string owner</code>、<code>double balance</code></li>
+<li>构造函数、<code>Deposit(double)</code>、<code>Withdraw(double)</code>（余额不足时返回 false）</li>
+<li><code>GetBalance() const</code>、<code>GetOwner() const</code></li>
+</ul>
+<p>在 main 中创建账户，进行存取操作并打印余额。</p>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_6_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="kw">class</span> <span class="tp">BankAccount</span> {
+    <span class="tp">std::string</span> owner;
+    <span class="tp">double</span> balance;
+<span class="kw">public</span>:
+    <span class="fn">BankAccount</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; name, <span class="tp">double</span> initial)
+        : owner(name), balance(initial) {}
+
+    <span class="tp">bool</span> <span class="fn">Deposit</span>(<span class="tp">double</span> amount) {
+        <span class="kw">if</span> (amount &lt;= <span class="nu">0</span>) <span class="kw">return false</span>;
+        balance += amount;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="tp">bool</span> <span class="fn">Withdraw</span>(<span class="tp">double</span> amount) {
+        <span class="kw">if</span> (amount &lt;= <span class="nu">0</span> || amount &gt; balance) <span class="kw">return false</span>;
+        balance -= amount;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="tp">double</span> <span class="fn">GetBalance</span>() <span class="kw">const</span> { <span class="kw">return</span> balance; }
+    <span class="kw">const</span> <span class="tp">std::string</span>&amp; <span class="fn">GetOwner</span>() <span class="kw">const</span> { <span class="kw">return</span> owner; }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">BankAccount</span> acc(<span class="st">"Alice"</span>, <span class="nu">1000.0</span>);
+    acc.<span class="fn">Deposit</span>(<span class="nu">500.0</span>);
+    acc.<span class="fn">Withdraw</span>(<span class="nu">200.0</span>);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; acc.<span class="fn">GetOwner</span>() &lt;&lt; <span class="st">"'s balance: "</span> &lt;&lt; acc.<span class="fn">GetBalance</span>() &lt;&lt; <span class="st">"\n"</span>;
+    <span class="cm">// 输出: Alice's balance: 1300</span>
+
+    <span class="kw">if</span> (!acc.<span class="fn">Withdraw</span>(<span class="nu">9999</span>))
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Insufficient funds!\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 6.2</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>设计一个简易的图形系统：</p>
+<ol>
+<li>定义接口 <code>IDrawable</code>，含纯虚函数 <code>Draw()</code> 和 <code>std::string Describe()</code></li>
+<li>实现 <code>TextElement</code>（含文本内容）和 <code>ImageElement</code>（含文件名、宽高）</li>
+<li>实现 <code>Canvas</code> 类，内部用 <code>vector&lt;unique_ptr&lt;IDrawable&gt;&gt;</code> 存储元素，有 <code>Add</code> 和 <code>DrawAll</code> 方法</li>
+</ol>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_6_2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;format&gt;</span>
+
+<span class="kw">class</span> <span class="tp">IDrawable</span> {
+<span class="kw">public</span>:
+    <span class="kw">virtual void</span> <span class="fn">Draw</span>() <span class="kw">const</span> = <span class="nu">0</span>;
+    <span class="kw">virtual</span> <span class="tp">std::string</span> <span class="fn">Describe</span>() <span class="kw">const</span> = <span class="nu">0</span>;
+    <span class="kw">virtual</span> ~<span class="fn">IDrawable</span>() = <span class="kw">default</span>;
+};
+
+<span class="kw">class</span> <span class="tp">TextElement</span> : <span class="kw">public</span> <span class="tp">IDrawable</span> {
+    <span class="tp">std::string</span> text;
+<span class="kw">public</span>:
+    <span class="kw">explicit</span> <span class="fn">TextElement</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; t) : text(t) {}
+    <span class="kw">void</span> <span class="fn">Draw</span>() <span class="kw">const override</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"[Text] "</span> &lt;&lt; text &lt;&lt; <span class="st">"\n"</span>;
+    }
+    <span class="tp">std::string</span> <span class="fn">Describe</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"TextElement('{}')"</span>, text);
+    }
+};
+
+<span class="kw">class</span> <span class="tp">ImageElement</span> : <span class="kw">public</span> <span class="tp">IDrawable</span> {
+    <span class="tp">std::string</span> filename;
+    <span class="tp">int</span> width, height;
+<span class="kw">public</span>:
+    <span class="fn">ImageElement</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; f, <span class="tp">int</span> w, <span class="tp">int</span> h)
+        : filename(f), width(w), height(h) {}
+    <span class="kw">void</span> <span class="fn">Draw</span>() <span class="kw">const override</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"[Image] "</span> &lt;&lt; filename
+                  &lt;&lt; <span class="st">" ("</span> &lt;&lt; width &lt;&lt; <span class="st">"x"</span> &lt;&lt; height &lt;&lt; <span class="st">")\n"</span>;
+    }
+    <span class="tp">std::string</span> <span class="fn">Describe</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"Image({}, {}x{})"</span>, filename, width, height);
+    }
+};
+
+<span class="kw">class</span> <span class="tp">Canvas</span> {
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::unique_ptr</span>&lt;<span class="tp">IDrawable</span>&gt;&gt; elements;
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Add</span>(<span class="tp">std::unique_ptr</span>&lt;<span class="tp">IDrawable</span>&gt; elem) {
+        elements.<span class="fn">push_back</span>(<span class="tp">std</span>::<span class="fn">move</span>(elem));
+    }
+    <span class="kw">void</span> <span class="fn">DrawAll</span>() <span class="kw">const</span> {
+        <span class="kw">for</span> (<span class="kw">const auto</span>&amp; e : elements) e-&gt;<span class="fn">Draw</span>();
+    }
+    <span class="tp">size_t</span> <span class="fn">Count</span>() <span class="kw">const</span> { <span class="kw">return</span> elements.<span class="fn">size</span>(); }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Canvas</span> canvas;
+    canvas.<span class="fn">Add</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">TextElement</span>&gt;(<span class="st">"Hello World"</span>));
+    canvas.<span class="fn">Add</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">ImageElement</span>&gt;(<span class="st">"logo.png"</span>, <span class="nu">200</span>, <span class="nu">100</span>));
+    canvas.<span class="fn">Add</span>(<span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">TextElement</span>&gt;(<span class="st">"Footer"</span>));
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Elements: "</span> &lt;&lt; canvas.<span class="fn">Count</span>() &lt;&lt; <span class="st">"\n"</span>;
+    canvas.<span class="fn">DrawAll</span>();
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 7: 运算符重载与异常 -->
+<!-- ============================================================ -->
+<h2 id="ch7">7. 运算符重载与异常处理</h2>
+
+<h3>示例 7.1 — Vec2 向量类（运算符重载完整版）</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">vec2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cmath&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;format&gt;</span>
+
+<span class="kw">struct</span> <span class="tp">Vec2</span> {
+    <span class="tp">float</span> x, y;
+
+    <span class="cm">// 构造函数</span>
+    <span class="fn">Vec2</span>(<span class="tp">float</span> x = <span class="nu">0</span>, <span class="tp">float</span> y = <span class="nu">0</span>) : x(x), y(y) {}
+
+    <span class="cm">// 加法</span>
+    <span class="tp">Vec2</span> <span class="kw">operator</span>+(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; o) <span class="kw">const</span> { <span class="kw">return</span> {x + o.x, y + o.y}; }
+    <span class="cm">// 减法</span>
+    <span class="tp">Vec2</span> <span class="kw">operator</span>-(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; o) <span class="kw">const</span> { <span class="kw">return</span> {x - o.x, y - o.y}; }
+    <span class="cm">// 标量乘法</span>
+    <span class="tp">Vec2</span> <span class="kw">operator</span>*(<span class="tp">float</span> s) <span class="kw">const</span> { <span class="kw">return</span> {x * s, y * s}; }
+    <span class="cm">// 相等判断</span>
+    <span class="tp">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; o) <span class="kw">const</span> { <span class="kw">return</span> x == o.x &amp;&amp; y == o.y; }
+    <span class="cm">// 下标运算符</span>
+    <span class="tp">float</span>&amp; <span class="kw">operator</span>[](<span class="tp">int</span> i) { <span class="kw">return</span> i == <span class="nu">0</span> ? x : y; }
+    <span class="tp">float</span> <span class="kw">operator</span>[](<span class="tp">int</span> i) <span class="kw">const</span> { <span class="kw">return</span> i == <span class="nu">0</span> ? x : y; }
+    <span class="cm">// 复合赋值</span>
+    <span class="tp">Vec2</span>&amp; <span class="kw">operator</span>+=(<span class="kw">const</span> <span class="tp">Vec2</span>&amp; o) { x += o.x; y += o.y; <span class="kw">return</span> *<span class="kw">this</span>; }
+
+    <span class="cm">// 成员函数</span>
+    <span class="tp">float</span> <span class="fn">Length</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">sqrt</span>(x*x + y*y); }
+    <span class="tp">Vec2</span> <span class="fn">Normalized</span>() <span class="kw">const</span> {
+        <span class="tp">float</span> len = <span class="fn">Length</span>();
+        <span class="kw">return</span> (len &gt; <span class="nu">0</span>) ? <span class="tp">Vec2</span>{x/len, y/len} : <span class="tp">Vec2</span>{};
+    }
+
+    <span class="cm">// 友元函数：输出流运算符</span>
+    <span class="kw">friend</span> <span class="tp">std::ostream</span>&amp; <span class="kw">operator</span>&lt;&lt;(<span class="tp">std::ostream</span>&amp; os, <span class="kw">const</span> <span class="tp">Vec2</span>&amp; v) {
+        <span class="kw">return</span> os &lt;&lt; <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"({:.1f}, {:.1f})"</span>, v.x, v.y);
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Vec2</span> a{<span class="nu">3</span>, <span class="nu">4</span>}, b{<span class="nu">1</span>, <span class="nu">2</span>};
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"a = "</span> &lt;&lt; a &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"b = "</span> &lt;&lt; b &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"a + b = "</span> &lt;&lt; a + b &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"a * 2 = "</span> &lt;&lt; a * <span class="nu">2</span> &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"|a| = "</span> &lt;&lt; a.<span class="fn">Length</span>() &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"normalize(a) = "</span> &lt;&lt; a.<span class="fn">Normalized</span>() &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"a[0] = "</span> &lt;&lt; a[<span class="nu">0</span>] &lt;&lt; <span class="st">", a[1] = "</span> &lt;&lt; a[<span class="nu">1</span>] &lt;&lt; <span class="st">"\n"</span>;
+
+    a += b;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"a after += b: "</span> &lt;&lt; a &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>示例 7.2 — 异常处理实践</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">exception_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdexcept&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="cm">// 自定义异常</span>
+<span class="kw">class</span> <span class="tp">InsufficientFundsError</span> : <span class="kw">public</span> <span class="tp">std::runtime_error</span> {
+    <span class="tp">double</span> balance, requested;
+<span class="kw">public</span>:
+    <span class="fn">InsufficientFundsError</span>(<span class="tp">double</span> bal, <span class="tp">double</span> req)
+        : <span class="tp">std</span>::runtime_error(<span class="st">"Insufficient funds"</span>), balance(bal), requested(req) {}
+    <span class="tp">double</span> <span class="fn">GetBalance</span>() <span class="kw">const</span> { <span class="kw">return</span> balance; }
+    <span class="tp">double</span> <span class="fn">GetRequested</span>() <span class="kw">const</span> { <span class="kw">return</span> requested; }
+};
+
+<span class="tp">double</span> <span class="fn">SafeDivide</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+    <span class="kw">if</span> (b == <span class="nu">0.0</span>)
+        <span class="kw">throw</span> <span class="tp">std</span>::invalid_argument(<span class="st">"Division by zero"</span>);
+    <span class="kw">return</span> a / b;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 基础异常捕获</span>
+    <span class="kw">try</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="fn">SafeDivide</span>(<span class="nu">10</span>, <span class="nu">3</span>) &lt;&lt; <span class="st">"\n"</span>;
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="fn">SafeDivide</span>(<span class="nu">10</span>, <span class="nu">0</span>) &lt;&lt; <span class="st">"\n"</span>;  <span class="cm">// 抛异常</span>
+    }
+    <span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">std</span>::invalid_argument&amp; e) {
+        <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; <span class="st">"Error: "</span> &lt;&lt; e.<span class="fn">what</span>() &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="cm">// 自定义异常</span>
+    <span class="kw">try</span> {
+        <span class="tp">double</span> balance = <span class="nu">100.0</span>;
+        <span class="tp">double</span> amount = <span class="nu">200.0</span>;
+        <span class="kw">if</span> (amount &gt; balance)
+            <span class="kw">throw</span> <span class="tp">InsufficientFundsError</span>(balance, amount);
+    }
+    <span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">InsufficientFundsError</span>&amp; e) {
+        <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; e.<span class="fn">what</span>() &lt;&lt; <span class="st">": balance="</span> &lt;&lt; e.<span class="fn">GetBalance</span>()
+                  &lt;&lt; <span class="st">", requested="</span> &lt;&lt; e.<span class="fn">GetRequested</span>() &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="cm">// 捕获所有标准异常</span>
+    <span class="kw">try</span> {
+        <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; v;
+        v.<span class="fn">at</span>(<span class="nu">100</span>);  <span class="cm">// 越界</span>
+    }
+    <span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">std</span>::exception&amp; e) {
+        <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; <span class="st">"Caught: "</span> &lt;&lt; e.<span class="fn">what</span>() &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 7.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>创建一个 <code>Fraction</code>（分数）类，包含分子和分母（<code>int</code>），实现：</p>
+<ul>
+<li>构造函数（分母为 0 时抛 <code>std::invalid_argument</code>）</li>
+<li><code>operator+</code>、<code>operator*</code>、<code>operator==</code></li>
+<li><code>operator&lt;&lt;</code> 输出为 "分子/分母" 格式</li>
+<li><code>ToDouble()</code> 转换为小数</li>
+</ul>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_7_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdexcept&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="kw">class</span> <span class="tp">Fraction</span> {
+    <span class="tp">int</span> num, den;
+
+    <span class="kw">void</span> <span class="fn">Simplify</span>() {
+        <span class="tp">int</span> g = <span class="tp">std</span>::<span class="fn">gcd</span>(<span class="tp">std</span>::<span class="fn">abs</span>(num), <span class="tp">std</span>::<span class="fn">abs</span>(den));
+        num /= g; den /= g;
+        <span class="kw">if</span> (den &lt; <span class="nu">0</span>) { num = -num; den = -den; }
+    }
+<span class="kw">public</span>:
+    <span class="fn">Fraction</span>(<span class="tp">int</span> n, <span class="tp">int</span> d) : num(n), den(d) {
+        <span class="kw">if</span> (d == <span class="nu">0</span>) <span class="kw">throw</span> <span class="tp">std</span>::invalid_argument(<span class="st">"Denominator cannot be zero"</span>);
+        <span class="fn">Simplify</span>();
+    }
+
+    <span class="tp">Fraction</span> <span class="kw">operator</span>+(<span class="kw">const</span> <span class="tp">Fraction</span>&amp; o) <span class="kw">const</span> {
+        <span class="kw">return</span> {num * o.den + o.num * den, den * o.den};
+    }
+    <span class="tp">Fraction</span> <span class="kw">operator</span>*(<span class="kw">const</span> <span class="tp">Fraction</span>&amp; o) <span class="kw">const</span> {
+        <span class="kw">return</span> {num * o.num, den * o.den};
+    }
+    <span class="tp">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">Fraction</span>&amp; o) <span class="kw">const</span> {
+        <span class="kw">return</span> num == o.num &amp;&amp; den == o.den;
+    }
+    <span class="tp">double</span> <span class="fn">ToDouble</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="kw">static_cast</span>&lt;<span class="tp">double</span>&gt;(num) / den; }
+
+    <span class="kw">friend</span> <span class="tp">std::ostream</span>&amp; <span class="kw">operator</span>&lt;&lt;(<span class="tp">std::ostream</span>&amp; os, <span class="kw">const</span> <span class="tp">Fraction</span>&amp; f) {
+        <span class="kw">return</span> os &lt;&lt; f.num &lt;&lt; <span class="st">"/"</span> &lt;&lt; f.den;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="kw">try</span> {
+        <span class="tp">Fraction</span> a{<span class="nu">1</span>, <span class="nu">2</span>}, b{<span class="nu">1</span>, <span class="nu">3</span>};
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" + "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a + b &lt;&lt; <span class="st">"\n"</span>;
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; a &lt;&lt; <span class="st">" * "</span> &lt;&lt; b &lt;&lt; <span class="st">" = "</span> &lt;&lt; a * b &lt;&lt; <span class="st">"\n"</span>;
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"1/2 as double: "</span> &lt;&lt; a.<span class="fn">ToDouble</span>() &lt;&lt; <span class="st">"\n"</span>;
+
+        <span class="tp">Fraction</span> bad{<span class="nu">1</span>, <span class="nu">0</span>};  <span class="cm">// 抛异常</span>
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">std</span>::exception&amp; e) {
+        <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; <span class="st">"Error: "</span> &lt;&lt; e.<span class="fn">what</span>() &lt;&lt; <span class="st">"\n"</span>;
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 8: STL 容器与算法 -->
+<!-- ============================================================ -->
+<div class="divider"><span>进阶篇</span></div>
+
+<h2 id="ch8">8. STL 容器与算法</h2>
+
+<h3>示例 8.1 — 常用容器综合演示</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">stl_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;unordered_map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;set&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// === vector: 动态数组（最常用！） ===</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">5</span>, <span class="nu">2</span>, <span class="nu">8</span>, <span class="nu">1</span>, <span class="nu">9</span>, <span class="nu">3</span>};
+    nums.<span class="fn">push_back</span>(<span class="nu">7</span>);
+    <span class="tp">std</span>::<span class="fn">sort</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>());
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Sorted: "</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; n : nums) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; n &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">int</span> sum = <span class="tp">std</span>::<span class="fn">accumulate</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>(), <span class="nu">0</span>);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Sum: "</span> &lt;&lt; sum &lt;&lt; <span class="st">", Avg: "</span> &lt;&lt; (<span class="tp">double</span>)sum / nums.<span class="fn">size</span>() &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 查找</span>
+    <span class="kw">auto</span> it = <span class="tp">std</span>::<span class="fn">find</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>(), <span class="nu">8</span>);
+    <span class="kw">if</span> (it != nums.<span class="fn">end</span>()) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Found 8!\n"</span>;
+
+    <span class="cm">// 条件筛选</span>
+    <span class="tp">int</span> evenCount = <span class="tp">std</span>::<span class="fn">count_if</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>(),
+        [](<span class="tp">int</span> x) { <span class="kw">return</span> x % <span class="nu">2</span> == <span class="nu">0</span>; });
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Even count: "</span> &lt;&lt; evenCount &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// === map: 有序字典 ===</span>
+    <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>&gt; ages;
+    ages[<span class="st">"Alice"</span>] = <span class="nu">25</span>;
+    ages[<span class="st">"Bob"</span>] = <span class="nu">30</span>;
+    ages[<span class="st">"Charlie"</span>] = <span class="nu">22</span>;
+
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; [name, age] : ages) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; name &lt;&lt; <span class="st">": "</span> &lt;&lt; age &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="kw">if</span> (<span class="kw">auto</span> it = ages.<span class="fn">find</span>(<span class="st">"Bob"</span>); it != ages.<span class="fn">end</span>()) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Bob is "</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="cm">// === set: 自动去重排序 ===</span>
+    <span class="tp">std::set</span>&lt;<span class="tp">int</span>&gt; unique = {<span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">4</span>, <span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">2</span>, <span class="nu">6</span>};
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Unique count: "</span> &lt;&lt; unique.<span class="fn">size</span>() &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; v : unique) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; v &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 8.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>编写一个"词频统计"程序：给定一个 <code>vector&lt;string&gt;</code>，统计每个单词出现的次数，然后按频率从高到低输出。</p>
+</div>
+<div class="ex-hint">提示：用 <code>unordered_map&lt;string, int&gt;</code> 统计频率，然后将结果转入 <code>vector&lt;pair&gt;</code> 排序。</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_8_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;unordered_map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt; words = {
+        <span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"apple"</span>, <span class="st">"cherry"</span>,
+        <span class="st">"banana"</span>, <span class="st">"apple"</span>, <span class="st">"date"</span>, <span class="st">"cherry"</span>, <span class="st">"cherry"</span>
+    };
+
+    <span class="tp">std::unordered_map</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>&gt; freq;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; w : words) freq[w]++;
+
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::pair</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>&gt;&gt; sorted(freq.<span class="fn">begin</span>(), freq.<span class="fn">end</span>());
+    <span class="tp">std</span>::<span class="fn">sort</span>(sorted.<span class="fn">begin</span>(), sorted.<span class="fn">end</span>(),
+        [](<span class="kw">const auto</span>&amp; a, <span class="kw">const auto</span>&amp; b) { <span class="kw">return</span> a.second &gt; b.second; });
+
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; [word, count] : sorted)
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; word &lt;&lt; <span class="st">": "</span> &lt;&lt; count &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 8.2</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>实现一个简易的电话簿系统：</p>
+<ul>
+<li>用 <code>unordered_map&lt;string, vector&lt;string&gt;&gt;</code> 存储联系人及其电话号码（一个人可能有多个号码）</li>
+<li>实现 <code>AddContact</code>、<code>RemoveContact</code>、<code>FindNumbers</code> 函数</li>
+<li>实现 <code>PrintAll</code> 按字母序输出所有联系人</li>
+</ul>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_8_2.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;unordered_map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+
+<span class="kw">using</span> <span class="tp">PhoneBook</span> = <span class="tp">std::unordered_map</span>&lt;<span class="tp">std::string</span>, <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt;&gt;;
+
+<span class="kw">void</span> <span class="fn">AddContact</span>(<span class="tp">PhoneBook</span>&amp; book, <span class="kw">const</span> <span class="tp">std::string</span>&amp; name, <span class="kw">const</span> <span class="tp">std::string</span>&amp; phone) {
+    book[name].<span class="fn">push_back</span>(phone);
+}
+
+<span class="tp">bool</span> <span class="fn">RemoveContact</span>(<span class="tp">PhoneBook</span>&amp; book, <span class="kw">const</span> <span class="tp">std::string</span>&amp; name) {
+    <span class="kw">return</span> book.<span class="fn">erase</span>(name) &gt; <span class="nu">0</span>;
+}
+
+<span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt; <span class="fn">FindNumbers</span>(<span class="kw">const</span> <span class="tp">PhoneBook</span>&amp; book, <span class="kw">const</span> <span class="tp">std::string</span>&amp; name) {
+    <span class="kw">auto</span> it = book.<span class="fn">find</span>(name);
+    <span class="kw">return</span> (it != book.<span class="fn">end</span>()) ? it-&gt;second : <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt;{};
+}
+
+<span class="kw">void</span> <span class="fn">PrintAll</span>(<span class="kw">const</span> <span class="tp">PhoneBook</span>&amp; book) {
+    <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt;&gt; sorted(book.<span class="fn">begin</span>(), book.<span class="fn">end</span>());
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; [name, phones] : sorted) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; name &lt;&lt; <span class="st">": "</span>;
+        <span class="kw">for</span> (<span class="kw">const auto</span>&amp; p : phones) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; p &lt;&lt; <span class="st">" "</span>;
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+    }
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">PhoneBook</span> book;
+    <span class="fn">AddContact</span>(book, <span class="st">"Alice"</span>, <span class="st">"111-1111"</span>);
+    <span class="fn">AddContact</span>(book, <span class="st">"Alice"</span>, <span class="st">"222-2222"</span>);
+    <span class="fn">AddContact</span>(book, <span class="st">"Bob"</span>, <span class="st">"333-3333"</span>);
+    <span class="fn">AddContact</span>(book, <span class="st">"Charlie"</span>, <span class="st">"444-4444"</span>);
+
+    <span class="fn">PrintAll</span>(book);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"---\n"</span>;
+
+    <span class="kw">auto</span> nums = <span class="fn">FindNumbers</span>(book, <span class="st">"Alice"</span>);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Alice has "</span> &lt;&lt; nums.<span class="fn">size</span>() &lt;&lt; <span class="st">" numbers\n"</span>;
+
+    <span class="fn">RemoveContact</span>(book, <span class="st">"Bob"</span>);
+    <span class="fn">PrintAll</span>(book);
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 9: Lambda 与函数式 -->
+<!-- ============================================================ -->
+<h2 id="ch9">9. Lambda 与函数式编程</h2>
+
+<h3>示例 9.1 — Lambda 捕获与高阶函数</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">lambda_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;functional&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="cm">// 高阶函数：接受函数作为参数</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span> <span class="tp">Pred</span>&gt;
+<span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt; <span class="fn">Filter</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt;&amp; v, <span class="tp">Pred</span> pred) {
+    <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt; result;
+    <span class="tp">std</span>::<span class="fn">copy_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="tp">std</span>::<span class="fn">back_inserter</span>(result), pred);
+    <span class="kw">return</span> result;
+}
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>, <span class="kw">typename</span> <span class="tp">Transform</span>&gt;
+<span class="kw">auto</span> <span class="fn">Map</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt;&amp; v, <span class="tp">Transform</span> fn) {
+    <span class="kw">using</span> <span class="tp">ResultT</span> = <span class="kw">decltype</span>(<span class="fn">fn</span>(v[<span class="nu">0</span>]));
+    <span class="tp">std::vector</span>&lt;<span class="tp">ResultT</span>&gt; result;
+    result.<span class="fn">reserve</span>(v.<span class="fn">size</span>());
+    <span class="tp">std</span>::<span class="fn">transform</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="tp">std</span>::<span class="fn">back_inserter</span>(result), fn);
+    <span class="kw">return</span> result;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">6</span>, <span class="nu">7</span>, <span class="nu">8</span>, <span class="nu">9</span>, <span class="nu">10</span>};
+
+    <span class="cm">// 筛选偶数</span>
+    <span class="kw">auto</span> evens = <span class="fn">Filter</span>(nums, [](<span class="tp">int</span> x) { <span class="kw">return</span> x % <span class="nu">2</span> == <span class="nu">0</span>; });
+
+    <span class="cm">// 求平方</span>
+    <span class="kw">auto</span> squares = <span class="fn">Map</span>(evens, [](<span class="tp">int</span> x) { <span class="kw">return</span> x * x; });
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Even squares: "</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; s : squares) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; s &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 捕获外部变量</span>
+    <span class="tp">int</span> threshold = <span class="nu">5</span>;
+    <span class="kw">auto</span> big = <span class="fn">Filter</span>(nums, [threshold](<span class="tp">int</span> x) { <span class="kw">return</span> x &gt; threshold; });
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"&gt; "</span> &lt;&lt; threshold &lt;&lt; <span class="st">": "</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; b : big) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; b &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 计数器 lambda（按引用捕获）</span>
+    <span class="tp">int</span> count = <span class="nu">0</span>;
+    <span class="kw">auto</span> counter = [&amp;count] { ++count; };
+    <span class="tp">std</span>::<span class="fn">for_each</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>(), [&amp;](<span class="tp">int</span> x) {
+        <span class="kw">if</span> (x % <span class="nu">3</span> == <span class="nu">0</span>) <span class="fn">counter</span>();
+    });
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Multiples of 3: "</span> &lt;&lt; count &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 9.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>用 lambda 和 STL 算法完成以下任务（不允许写普通函数）：</p>
+<ol>
+<li>对 <code>vector&lt;string&gt;</code> 按字符串长度排序</li>
+<li>将 <code>vector&lt;int&gt;</code> 中所有负数替换为 0</li>
+<li>用 <code>std::accumulate</code> 和 lambda 计算 <code>vector&lt;string&gt;</code> 中所有字符串的总长度</li>
+</ol>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_9_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;algorithm&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;numeric&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 1. 按字符串长度排序</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::string</span>&gt; words = {<span class="st">"banana"</span>, <span class="st">"fig"</span>, <span class="st">"apple"</span>, <span class="st">"kiwi"</span>, <span class="st">"pear"</span>};
+    <span class="tp">std</span>::<span class="fn">sort</span>(words.<span class="fn">begin</span>(), words.<span class="fn">end</span>(),
+        [](<span class="kw">const</span> <span class="tp">std::string</span>&amp; a, <span class="kw">const</span> <span class="tp">std::string</span>&amp; b) {
+            <span class="kw">return</span> a.<span class="fn">size</span>() &lt; b.<span class="fn">size</span>();
+        });
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; w : words) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; w &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 2. 负数替换为 0</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">3</span>, -<span class="nu">1</span>, <span class="nu">4</span>, -<span class="nu">5</span>, <span class="nu">9</span>, -<span class="nu">2</span>};
+    <span class="tp">std</span>::<span class="fn">transform</span>(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>(), nums.<span class="fn">begin</span>(),
+        [](<span class="tp">int</span> x) { <span class="kw">return</span> x &lt; <span class="nu">0</span> ? <span class="nu">0</span> : x; });
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; n : nums) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; n &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 3. 计算所有字符串总长度</span>
+    <span class="tp">int</span> totalLen = <span class="tp">std</span>::<span class="fn">accumulate</span>(words.<span class="fn">begin</span>(), words.<span class="fn">end</span>(), <span class="nu">0</span>,
+        [](<span class="tp">int</span> acc, <span class="kw">const</span> <span class="tp">std::string</span>&amp; s) { <span class="kw">return</span> acc + (<span class="tp">int</span>)s.<span class="fn">size</span>(); });
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Total length: "</span> &lt;&lt; totalLen &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 10: 模板编程 -->
+<!-- ============================================================ -->
+<h2 id="ch10">10. 模板编程</h2>
+
+<h3>示例 10.1 — 函数模板与类模板</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">template_demo.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;concepts&gt;</span>
+
+<span class="cm">// 函数模板：泛型最大值</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="tp">T</span> <span class="fn">Max</span>(<span class="tp">T</span> a, <span class="tp">T</span> b) { <span class="kw">return</span> (a &gt;= b) ? a : b; }
+
+<span class="cm">// 类模板：简易栈</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">class</span> <span class="tp">SimpleStack</span> {
+    <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt; data;
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Push</span>(<span class="kw">const</span> <span class="tp">T</span>&amp; item) { data.<span class="fn">push_back</span>(item); }
+    <span class="tp">T</span> <span class="fn">Pop</span>() {
+        <span class="kw">if</span> (data.<span class="fn">empty</span>()) <span class="kw">throw</span> <span class="tp">std</span>::runtime_error(<span class="st">"Stack is empty"</span>);
+        <span class="tp">T</span> top = data.<span class="fn">back</span>();
+        data.<span class="fn">pop_back</span>();
+        <span class="kw">return</span> top;
+    }
+    <span class="kw">const</span> <span class="tp">T</span>&amp; <span class="fn">Top</span>() <span class="kw">const</span> { <span class="kw">return</span> data.<span class="fn">back</span>(); }
+    <span class="tp">bool</span> <span class="fn">IsEmpty</span>() <span class="kw">const</span> { <span class="kw">return</span> data.<span class="fn">empty</span>(); }
+    <span class="tp">size_t</span> <span class="fn">Size</span>() <span class="kw">const</span> { <span class="kw">return</span> data.<span class="fn">size</span>(); }
+};
+
+<span class="cm">// C++20 Concepts：给模板加约束</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">concept</span> <span class="tp">Numeric</span> = <span class="tp">std</span>::is_arithmetic_v&lt;<span class="tp">T</span>&gt;;
+
+<span class="kw">template</span>&lt;<span class="tp">Numeric</span> <span class="tp">T</span>&gt;
+<span class="tp">T</span> <span class="fn">Sum</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">T</span>&gt;&amp; v) {
+    <span class="tp">T</span> total{};
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; item : v) total += item;
+    <span class="kw">return</span> total;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 函数模板</span>
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="fn">Max</span>(<span class="nu">3</span>, <span class="nu">7</span>) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="fn">Max</span>(<span class="st">"apple"</span>, <span class="st">"banana"</span>) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="fn">Max</span>(<span class="nu">3.14</span>, <span class="nu">2.71</span>) &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// 类模板</span>
+    <span class="tp">SimpleStack</span>&lt;<span class="tp">int</span>&gt; intStack;
+    intStack.<span class="fn">Push</span>(<span class="nu">10</span>); intStack.<span class="fn">Push</span>(<span class="nu">20</span>); intStack.<span class="fn">Push</span>(<span class="nu">30</span>);
+    <span class="kw">while</span> (!intStack.<span class="fn">IsEmpty</span>())
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; intStack.<span class="fn">Pop</span>() &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">SimpleStack</span>&lt;<span class="tp">std::string</span>&gt; strStack;
+    strStack.<span class="fn">Push</span>(<span class="st">"Hello"</span>); strStack.<span class="fn">Push</span>(<span class="st">"World"</span>);
+    <span class="kw">while</span> (!strStack.<span class="fn">IsEmpty</span>())
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; strStack.<span class="fn">Pop</span>() &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// Concepts 约束</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; nums = {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>};
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Sum: "</span> &lt;&lt; <span class="fn">Sum</span>(nums) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="cm">// Sum(words); // 编译错误！string 不满足 Numeric 约束</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 10.1</span><span class="ex-stars">&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>实现一个类模板 <code>Pair&lt;T1, T2&gt;</code>，包含两个成员 <code>first</code> 和 <code>second</code>，实现：</p>
+<ul>
+<li>构造函数、<code>operator==</code>、<code>operator&lt;&lt;</code></li>
+<li>一个函数模板 <code>Swap(pair&amp;)</code> 交换 first 和 second（要求 T1 和 T2 相同类型）</li>
+</ul>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_10_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T1</span>, <span class="kw">typename</span> <span class="tp">T2</span>&gt;
+<span class="kw">struct</span> <span class="tp">Pair</span> {
+    <span class="tp">T1</span> first;
+    <span class="tp">T2</span> second;
+
+    <span class="fn">Pair</span>(<span class="kw">const</span> <span class="tp">T1</span>&amp; a, <span class="kw">const</span> <span class="tp">T2</span>&amp; b) : first(a), second(b) {}
+
+    <span class="tp">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> <span class="tp">Pair</span>&amp; o) <span class="kw">const</span> {
+        <span class="kw">return</span> first == o.first &amp;&amp; second == o.second;
+    }
+
+    <span class="kw">friend</span> <span class="tp">std::ostream</span>&amp; <span class="kw">operator</span>&lt;&lt;(<span class="tp">std::ostream</span>&amp; os, <span class="kw">const</span> <span class="tp">Pair</span>&amp; p) {
+        <span class="kw">return</span> os &lt;&lt; <span class="st">"("</span> &lt;&lt; p.first &lt;&lt; <span class="st">", "</span> &lt;&lt; p.second &lt;&lt; <span class="st">")"</span>;
+    }
+};
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="tp">T</span>&gt;
+<span class="kw">void</span> <span class="fn">Swap</span>(<span class="tp">Pair</span>&lt;<span class="tp">T</span>, <span class="tp">T</span>&gt;&amp; p) {
+    <span class="tp">T</span> temp = p.first;
+    p.first = p.second;
+    p.second = temp;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Pair</span>&lt;<span class="tp">int</span>, <span class="tp">std::string</span>&gt; p1{<span class="nu">1</span>, <span class="st">"Hello"</span>};
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; p1 &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">Pair</span>&lt;<span class="tp">int</span>, <span class="tp">int</span>&gt; p2{<span class="nu">10</span>, <span class="nu">20</span>};
+    <span class="fn">Swap</span>(p2);
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"After swap: "</span> &lt;&lt; p2 &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 11: 现代 C++ 特性 -->
+<!-- ============================================================ -->
+<h2 id="ch11">11. 现代 C++ 特性</h2>
+
+<h3>示例 11.1 — C++17/20 特性综合</h3>
+
+<div class="cb"><div class="ch"><span class="tag cpp">modern_cpp.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;optional&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;variant&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;tuple&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="cm">// std::optional：可能有值也可能没有</span>
+<span class="tp">std::optional</span>&lt;<span class="tp">int</span>&gt; <span class="fn">FindIndex</span>(<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt;&amp; v, <span class="tp">int</span> target) {
+    <span class="kw">for</span> (<span class="tp">size_t</span> i = <span class="nu">0</span>; i &lt; v.<span class="fn">size</span>(); ++i)
+        <span class="kw">if</span> (v[i] == target) <span class="kw">return</span> <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(i);
+    <span class="kw">return</span> <span class="tp">std</span>::nullopt;
+}
+
+<span class="cm">// 结构化绑定返回多个值</span>
+<span class="tp">std::tuple</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>, <span class="tp">double</span>&gt; <span class="fn">GetPlayerInfo</span>() {
+    <span class="kw">return</span> {<span class="st">"Alice"</span>, <span class="nu">25</span>, <span class="nu">98.5</span>};
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 结构化绑定</span>
+    <span class="kw">auto</span> [name, age, score] = <span class="fn">GetPlayerInfo</span>();
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; name &lt;&lt; <span class="st">", age "</span> &lt;&lt; age &lt;&lt; <span class="st">", score "</span> &lt;&lt; score &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="cm">// std::optional</span>
+    <span class="tp">std::vector</span>&lt;<span class="tp">int</span>&gt; data = {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>};
+    <span class="kw">if</span> (<span class="kw">auto</span> idx = <span class="fn">FindIndex</span>(data, <span class="nu">30</span>)) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Found at index "</span> &lt;&lt; *idx &lt;&lt; <span class="st">"\n"</span>;
+    }
+    <span class="kw">if</span> (<span class="kw">auto</span> idx = <span class="fn">FindIndex</span>(data, <span class="nu">99</span>)) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Found\n"</span>;
+    } <span class="kw">else</span> {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Not found\n"</span>;
+    }
+
+    <span class="cm">// std::variant：类型安全的 union</span>
+    <span class="kw">using</span> <span class="tp">JsonValue</span> = <span class="tp">std::variant</span>&lt;<span class="tp">int</span>, <span class="tp">double</span>, <span class="tp">std::string</span>, <span class="tp">bool</span>&gt;;
+    <span class="tp">std::vector</span>&lt;<span class="tp">JsonValue</span>&gt; json = {<span class="nu">42</span>, <span class="nu">3.14</span>, <span class="tp">std::string</span>(<span class="st">"hello"</span>), <span class="kw">true</span>};
+
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; val : json) {
+        <span class="tp">std</span>::<span class="fn">visit</span>([](<span class="kw">auto</span>&amp;&amp; v) {
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; v &lt;&lt; <span class="st">" ("</span> &lt;&lt; <span class="kw">typeid</span>(v).<span class="fn">name</span>() &lt;&lt; <span class="st">")\n"</span>;
+        }, val);
+    }
+
+    <span class="cm">// if with initializer (C++17)</span>
+    <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">int</span>&gt; config = {{<span class="st">"width"</span>, <span class="nu">800</span>}, {<span class="st">"height"</span>, <span class="nu">600</span>}};
+    <span class="kw">if</span> (<span class="kw">auto</span> it = config.<span class="fn">find</span>(<span class="st">"width"</span>); it != config.<span class="fn">end</span>()) {
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"Width = "</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 11.1</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>使用 <code>std::optional</code> 和 <code>std::variant</code> 实现一个简易的配置解析器：</p>
+<ul>
+<li>定义 <code>ConfigValue = variant&lt;int, double, string, bool&gt;</code></li>
+<li>实现 <code>optional&lt;ConfigValue&gt; Get(const string&amp; key)</code>，从 map 中查找</li>
+<li>实现 <code>string TypeOf(const ConfigValue&amp;)</code>，返回类型的字符串描述</li>
+<li>实现 <code>PrintAll()</code> 输出所有键值对和类型</li>
+</ul>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag ans">solution_11_1.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;map&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;optional&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;variant&gt;</span>
+
+<span class="kw">using</span> <span class="tp">ConfigValue</span> = <span class="tp">std::variant</span>&lt;<span class="tp">int</span>, <span class="tp">double</span>, <span class="tp">std::string</span>, <span class="tp">bool</span>&gt;;
+
+<span class="kw">class</span> <span class="tp">Config</span> {
+    <span class="tp">std::map</span>&lt;<span class="tp">std::string</span>, <span class="tp">ConfigValue</span>&gt; data;
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">Set</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; key, <span class="tp">ConfigValue</span> val) { data[key] = <span class="tp">std</span>::<span class="fn">move</span>(val); }
+
+    <span class="tp">std::optional</span>&lt;<span class="tp">ConfigValue</span>&gt; <span class="fn">Get</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; key) <span class="kw">const</span> {
+        <span class="kw">auto</span> it = data.<span class="fn">find</span>(key);
+        <span class="kw">if</span> (it != data.<span class="fn">end</span>()) <span class="kw">return</span> it-&gt;second;
+        <span class="kw">return</span> <span class="tp">std</span>::nullopt;
+    }
+
+    <span class="kw">static</span> <span class="tp">std::string</span> <span class="fn">TypeOf</span>(<span class="kw">const</span> <span class="tp">ConfigValue</span>&amp; v) {
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">visit</span>([](<span class="kw">auto</span>&amp;&amp; val) -&gt; <span class="tp">std::string</span> {
+            <span class="kw">using</span> <span class="tp">T</span> = <span class="kw">std::decay_t</span>&lt;<span class="kw">decltype</span>(val)&gt;;
+            <span class="kw">if constexpr</span> (<span class="tp">std</span>::is_same_v&lt;<span class="tp">T</span>, <span class="tp">int</span>&gt;) <span class="kw">return</span> <span class="st">"int"</span>;
+            <span class="kw">else if constexpr</span> (<span class="tp">std</span>::is_same_v&lt;<span class="tp">T</span>, <span class="tp">double</span>&gt;) <span class="kw">return</span> <span class="st">"double"</span>;
+            <span class="kw">else if constexpr</span> (<span class="tp">std</span>::is_same_v&lt;<span class="tp">T</span>, <span class="tp">std::string</span>&gt;) <span class="kw">return</span> <span class="st">"string"</span>;
+            <span class="kw">else if constexpr</span> (<span class="tp">std</span>::is_same_v&lt;<span class="tp">T</span>, <span class="tp">bool</span>&gt;) <span class="kw">return</span> <span class="st">"bool"</span>;
+            <span class="kw">else return</span> <span class="st">"unknown"</span>;
+        }, v);
+    }
+
+    <span class="kw">void</span> <span class="fn">PrintAll</span>() <span class="kw">const</span> {
+        <span class="kw">for</span> (<span class="kw">const auto</span>&amp; [key, val] : data) {
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; key &lt;&lt; <span class="st">" = "</span>;
+            <span class="tp">std</span>::<span class="fn">visit</span>([](<span class="kw">auto</span>&amp;&amp; v) { <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; v; }, val);
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">" ["</span> &lt;&lt; <span class="fn">TypeOf</span>(val) &lt;&lt; <span class="st">"]\n"</span>;
+        }
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Config</span> cfg;
+    cfg.<span class="fn">Set</span>(<span class="st">"width"</span>, <span class="nu">800</span>);
+    cfg.<span class="fn">Set</span>(<span class="st">"scale"</span>, <span class="nu">1.5</span>);
+    cfg.<span class="fn">Set</span>(<span class="st">"title"</span>, <span class="tp">std::string</span>(<span class="st">"My App"</span>));
+    cfg.<span class="fn">Set</span>(<span class="st">"fullscreen"</span>, <span class="kw">true</span>);
+
+    cfg.<span class="fn">PrintAll</span>();
+
+    <span class="kw">if</span> (<span class="kw">auto</span> val = cfg.<span class="fn">Get</span>(<span class="st">"width"</span>))
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"width type: "</span> &lt;&lt; <span class="tp">Config</span>::<span class="fn">TypeOf</span>(*val) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="kw">if</span> (!cfg.<span class="fn">Get</span>(<span class="st">"missing"</span>))
+        <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"'missing' not found\n"</span>;
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 12: 多文件 CMake 项目 -->
+<!-- ============================================================ -->
+<div class="divider"><span>实战篇</span></div>
+
+<h2 id="ch12">12. 多文件 CMake 项目</h2>
+
+<h3>示例 12.1 — 从零创建一个完整的 CMake 项目</h3>
+<p>这是从 C# 的 <code>.csproj</code> 思维转换到 C++ 的 CMake 思维的关键练习。我们将创建一个多文件项目。</p>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+<p><strong>项目结构</strong></p>
+<div class="cb"><div class="ch"><span class="tag sh">目录结构</span></div>
+<pre><code>calculator/
+├── CMakeLists.txt
+├── include/
+│   ├── Calculator.h
+│   └── Logger.h
+├── src/
+│   ├── main.cpp
+│   ├── Calculator.cpp
+│   └── Logger.cpp
+└── tests/
+    └── test_calculator.cpp</code></pre></div>
+</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body">
+<p><strong>头文件（声明）</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">include/Calculator.h</span></div>
+<pre><code><span class="pp">#pragma once</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdexcept&gt;</span>
+
+<span class="kw">class</span> <span class="tp">Calculator</span> {
+    <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt; history;
+
+<span class="kw">public</span>:
+    <span class="tp">double</span> <span class="fn">Add</span>(<span class="tp">double</span> a, <span class="tp">double</span> b);
+    <span class="tp">double</span> <span class="fn">Subtract</span>(<span class="tp">double</span> a, <span class="tp">double</span> b);
+    <span class="tp">double</span> <span class="fn">Multiply</span>(<span class="tp">double</span> a, <span class="tp">double</span> b);
+    <span class="tp">double</span> <span class="fn">Divide</span>(<span class="tp">double</span> a, <span class="tp">double</span> b);
+    <span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; <span class="fn">GetHistory</span>() <span class="kw">const</span>;
+    <span class="kw">void</span> <span class="fn">ClearHistory</span>();
+};</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">include/Logger.h</span></div>
+<pre><code><span class="pp">#pragma once</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+
+<span class="kw">enum class</span> <span class="tp">LogLevel</span> { Info, Warning, Error };
+
+<span class="kw">void</span> <span class="fn">Log</span>(<span class="tp">LogLevel</span> level, <span class="kw">const</span> <span class="tp">std::string</span>&amp; message);</code></pre></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-body">
+<p><strong>源文件（实现）</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">src/Calculator.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">"Calculator.h"</span>
+
+<span class="tp">double</span> <span class="tp">Calculator</span>::<span class="fn">Add</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+    <span class="tp">double</span> r = a + b; history.<span class="fn">push_back</span>(r); <span class="kw">return</span> r;
+}
+<span class="tp">double</span> <span class="tp">Calculator</span>::<span class="fn">Subtract</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+    <span class="tp">double</span> r = a - b; history.<span class="fn">push_back</span>(r); <span class="kw">return</span> r;
+}
+<span class="tp">double</span> <span class="tp">Calculator</span>::<span class="fn">Multiply</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+    <span class="tp">double</span> r = a * b; history.<span class="fn">push_back</span>(r); <span class="kw">return</span> r;
+}
+<span class="tp">double</span> <span class="tp">Calculator</span>::<span class="fn">Divide</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+    <span class="kw">if</span> (b == <span class="nu">0.0</span>) <span class="kw">throw</span> <span class="tp">std</span>::invalid_argument(<span class="st">"Division by zero"</span>);
+    <span class="tp">double</span> r = a / b; history.<span class="fn">push_back</span>(r); <span class="kw">return</span> r;
+}
+<span class="kw">const</span> <span class="tp">std::vector</span>&lt;<span class="tp">double</span>&gt;&amp; <span class="tp">Calculator</span>::<span class="fn">GetHistory</span>() <span class="kw">const</span> { <span class="kw">return</span> history; }
+<span class="kw">void</span> <span class="tp">Calculator</span>::<span class="fn">ClearHistory</span>() { history.<span class="fn">clear</span>(); }</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">src/Logger.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">"Logger.h"</span>
+<span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="kw">void</span> <span class="fn">Log</span>(<span class="tp">LogLevel</span> level, <span class="kw">const</span> <span class="tp">std::string</span>&amp; message) {
+    <span class="kw">switch</span> (level) {
+        <span class="kw">case</span> <span class="tp">LogLevel</span>::Info:    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"[INFO] "</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="tp">LogLevel</span>::Warning: <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"[WARN] "</span>; <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="tp">LogLevel</span>::Error:   <span class="tp">std</span>::<span class="fn">cerr</span> &lt;&lt; <span class="st">"[ERROR] "</span>; <span class="kw">break</span>;
+    }
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; message &lt;&lt; <span class="st">"\n"</span>;
+}</code></pre></div>
+
+<div class="cb"><div class="ch"><span class="tag cpp">src/main.cpp</span></div>
+<pre><code><span class="pp">#include</span> <span class="st">"Calculator.h"</span>
+<span class="pp">#include</span> <span class="st">"Logger.h"</span>
+<span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">Log</span>(<span class="tp">LogLevel</span>::Info, <span class="st">"Calculator started"</span>);
+
+    <span class="tp">Calculator</span> calc;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"10 + 5 = "</span> &lt;&lt; calc.<span class="fn">Add</span>(<span class="nu">10</span>, <span class="nu">5</span>) &lt;&lt; <span class="st">"\n"</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"10 / 3 = "</span> &lt;&lt; calc.<span class="fn">Divide</span>(<span class="nu">10</span>, <span class="nu">3</span>) &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"History: "</span>;
+    <span class="kw">for</span> (<span class="kw">const auto</span>&amp; h : calc.<span class="fn">GetHistory</span>()) <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; h &lt;&lt; <span class="st">" "</span>;
+    <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; <span class="st">"\n"</span>;
+
+    <span class="kw">try</span> { calc.<span class="fn">Divide</span>(<span class="nu">1</span>, <span class="nu">0</span>); }
+    <span class="kw">catch</span> (<span class="kw">const</span> <span class="tp">std</span>::exception&amp; e) {
+        <span class="fn">Log</span>(<span class="tp">LogLevel</span>::Error, e.<span class="fn">what</span>());
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-body">
+<p><strong>CMakeLists.txt</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag cmake">CMakeLists.txt</span></div>
+<pre><code>cmake_minimum_required(VERSION 3.20)
+project(Calculator VERSION 1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# 主程序
+add_executable(calculator
+    src/main.cpp
+    src/Calculator.cpp
+    src/Logger.cpp
+)
+target_include_directories(calculator PRIVATE include)
+
+# 编译警告
+target_compile_options(calculator PRIVATE
+    $&lt;$&lt;CXX_COMPILER_ID:MSVC&gt;:/W4 /WX&gt;
+    $&lt;$&lt;NOT:$&lt;CXX_COMPILER_ID:MSVC&gt;&gt;:-Wall -Wextra&gt;
+)</code></pre></div>
+
+<div class="step"><div class="step-num">5</div><div class="step-body">
+<p><strong>编译运行</strong></p>
+</div></div>
+
+<div class="cb"><div class="ch"><span class="tag sh">Shell</span></div>
+<pre><code><span class="cm"># 在项目根目录执行</span>
+cmake -B build -G Ninja
+cmake --build build
+./build/calculator
+
+<span class="cm"># 预期输出：</span>
+<span class="cm"># [INFO] Calculator started</span>
+<span class="cm"># 10 + 5 = 15</span>
+<span class="cm"># 10 / 3 = 3.33333</span>
+<span class="cm"># History: 15 3.33333</span>
+<span class="cm"># [ERROR] Division by zero</span></code></pre></div>
+
+<h3>练习题</h3>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">练习 12.1</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p>在上面的 Calculator 项目中扩展功能：</p>
+<ol>
+<li>添加 <code>Power(double base, int exp)</code> 和 <code>Sqrt(double x)</code> 方法</li>
+<li>添加一个 <code>Statistics</code> 类（新文件），统计 history 的最大值、最小值、平均值</li>
+<li>更新 CMakeLists.txt 添加新文件</li>
+</ol>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 13: 综合项目 -->
+<!-- ============================================================ -->
+<h2 id="ch13">13. 综合项目：命令行任务管理器</h2>
+
+<p>这是一个完整的综合项目，运用本手册学到的几乎所有知识。你需要实现一个命令行 TODO 应用，支持增删改查、优先级、持久化存储。</p>
+
+<div class="exercise">
+<div class="ex-head"><span class="ex-num">综合项目</span><span class="ex-stars">&#9733;&#9733;&#9733;</span></div>
+<div class="ex-desc">
+<p><strong>需求：</strong></p>
+<ol>
+<li>定义 <code>Task</code> 类：id、title、description、priority（enum class: Low/Medium/High）、completed 状态、创建时间</li>
+<li>定义 <code>TaskManager</code> 类：添加/删除/更新/列出任务，按优先级排序，标记完成</li>
+<li>实现文件持久化：保存/加载为 JSON 格式（用简单的字符串拼接即可）</li>
+<li>实现命令行交互界面：add / list / done / remove / save / load / quit</li>
+</ol>
+<p><strong>技术要点：</strong>使用 <code>unique_ptr</code> 管理任务、<code>vector</code> 存储、<code>fstream</code> 读写文件、<code>optional</code> 处理查找结果、<code>const</code> 正确性、RAII 文件操作。</p>
+</div>
+</div>
+
+<details class="answer"><summary>查看参考答案（核心代码）</summary><div class="ans-body">
+<div class="cb"><div class="ch"><span class="tag cpp">task_manager.h — 核心头文件</span></div>
+<pre><code><span class="pp">#pragma once</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;optional&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;chrono&gt;</span>
+
+<span class="kw">enum class</span> <span class="tp">Priority</span> { Low, Medium, High };
+
+<span class="tp">std::string</span> <span class="fn">PriorityToString</span>(<span class="tp">Priority</span> p) {
+    <span class="kw">switch</span> (p) {
+        <span class="kw">case</span> <span class="tp">Priority</span>::Low:    <span class="kw">return</span> <span class="st">"Low"</span>;
+        <span class="kw">case</span> <span class="tp">Priority</span>::Medium: <span class="kw">return</span> <span class="st">"Medium"</span>;
+        <span class="kw">case</span> <span class="tp">Priority</span>::High:   <span class="kw">return</span> <span class="st">"High"</span>;
+    }
+    <span class="kw">return</span> <span class="st">"Unknown"</span>;
+}
+
+<span class="kw">struct</span> <span class="tp">Task</span> {
+    <span class="tp">int</span> id;
+    <span class="tp">std::string</span> title;
+    <span class="tp">std::string</span> description;
+    <span class="tp">Priority</span> priority;
+    <span class="tp">bool</span> completed = <span class="kw">false</span>;
+    <span class="tp">int</span> createdAt;  <span class="cm">// 简化的时间戳</span>
+
+    <span class="tp">std::string</span> <span class="fn">Display</span>() <span class="kw">const</span> {
+        <span class="kw">auto</span> status = completed ? <span class="st">"[x]"</span> : <span class="st">"[ ]"</span>;
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">format</span>(<span class="st">"{} #{} [{}] {} - {}"</span>,
+            status, id, <span class="fn">PriorityToString</span>(priority), title, description);
+    }
+};
+
+<span class="kw">class</span> <span class="tp">TaskManager</span> {
+    <span class="tp">std::vector</span>&lt;<span class="tp">std::unique_ptr</span>&lt;<span class="tp">Task</span>&gt;&gt; tasks;
+    <span class="tp">int</span> nextId = <span class="nu">1</span>;
+
+<span class="kw">public</span>:
+    <span class="tp">int</span> <span class="fn">Add</span>(<span class="kw">const</span> <span class="tp">std::string</span>&amp; title, <span class="kw">const</span> <span class="tp">std::string</span>&amp; desc, <span class="tp">Priority</span> pri) {
+        <span class="kw">auto</span> task = <span class="tp">std</span>::<span class="fn">make_unique</span>&lt;<span class="tp">Task</span>&gt;();
+        task-&gt;id = nextId++;
+        task-&gt;title = title;
+        task-&gt;description = desc;
+        task-&gt;priority = pri;
+        task-&gt;createdAt = <span class="kw">static_cast</span>&lt;<span class="tp">int</span>&gt;(
+            <span class="tp">std</span>::chrono::system_clock::now().time_since_epoch().count() % <span class="nu">100000</span>);
+        <span class="tp">int</span> id = task-&gt;id;
+        tasks.<span class="fn">push_back</span>(<span class="tp">std</span>::<span class="fn">move</span>(task));
+        <span class="kw">return</span> id;
+    }
+
+    <span class="tp">bool</span> <span class="fn">Remove</span>(<span class="tp">int</span> id) {
+        <span class="kw">auto</span> it = <span class="tp">std</span>::<span class="fn">remove_if</span>(tasks.<span class="fn">begin</span>(), tasks.<span class="fn">end</span>(),
+            [id](<span class="kw">const auto</span>&amp; t) { <span class="kw">return</span> t-&gt;id == id; });
+        <span class="kw">if</span> (it != tasks.<span class="fn">end</span>()) { tasks.<span class="fn">erase</span>(it, tasks.<span class="fn">end</span>()); <span class="kw">return true</span>; }
+        <span class="kw">return false</span>;
+    }
+
+    <span class="tp">bool</span> <span class="fn">MarkDone</span>(<span class="tp">int</span> id) {
+        <span class="kw">for</span> (<span class="kw">auto</span>&amp; t : tasks)
+            <span class="kw">if</span> (t-&gt;id == id) { t-&gt;completed = <span class="kw">true</span>; <span class="kw">return true</span>; }
+        <span class="kw">return false</span>;
+    }
+
+    <span class="tp">std::optional</span>&lt;<span class="kw">const</span> <span class="tp">Task</span>&amp;&gt; <span class="fn">Find</span>(<span class="tp">int</span> id) <span class="kw">const</span> {
+        <span class="kw">for</span> (<span class="kw">const auto</span>&amp; t : tasks)
+            <span class="kw">if</span> (t-&gt;id == id) <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">cref</span>(*t);
+        <span class="kw">return</span> <span class="tp">std</span>::nullopt;
+    }
+
+    <span class="kw">void</span> <span class="fn">ListAll</span>() <span class="kw">const</span> {
+        <span class="kw">for</span> (<span class="kw">const auto</span>&amp; t : tasks)
+            <span class="tp">std</span>::<span class="fn">cout</span> &lt;&lt; t-&gt;<span class="fn">Display</span>() &lt;&lt; <span class="st">"\n"</span>;
+    }
+
+    <span class="tp">size_t</span> <span class="fn">Count</span>() <span class="kw">const</span> { <span class="kw">return</span> tasks.<span class="fn">size</span>(); }
+    <span class="tp">size_t</span> <span class="fn">CountPending</span>() <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="tp">std</span>::<span class="fn">count_if</span>(tasks.<span class="fn">begin</span>(), tasks.<span class="fn">end</span>(),
+            [](<span class="kw">const auto</span>&amp; t) { <span class="kw">return</span> !t-&gt;completed; });
+    }
+};</code></pre></div>
+
+<p>这个综合项目覆盖了：类设计、继承与多态、智能指针、STL 容器与算法、模板、异常处理、文件 I/O、Lambda、现代 C++ 特性。完成它后，你已经有信心进行真正的 C++ 开发了。</p>
+</div></details>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 14: 自测清单 -->
+<!-- ============================================================ -->
+<h2 id="ch14">14. 自测与能力清单</h2>
+
+<p>完成所有练习后，用以下清单检验你的掌握程度。每项如果你能不看参考独立写出代码，就可以打勾。</p>
+
+<table class="tbl">
+<tr><th>能力项</th><th>涉及章节</th><th>自检标准</th></tr>
+<tr><td>编译运行</td><td>1</td><td>能用 g++/cl/clang++ 编译并运行一个 .cpp 文件</td></tr>
+<tr><td>基础语法</td><td>1, 2</td><td>能用 for/while/switch 写逻辑，能操作 std::string</td></tr>
+<tr><td>函数设计</td><td>3</td><td>理解三种传递方式，能正确选择 const T&amp; 或 T</td></tr>
+<tr><td>指针与引用</td><td>4</td><td>理解指针操作、解引用、指针算术，不会返回局部变量引用</td></tr>
+<tr><td>内存管理</td><td>5</td><td>能用 unique_ptr/shared_ptr，理解 RAII，不写裸 new/delete</td></tr>
+<tr><td>面向对象</td><td>6</td><td>能设计类层次、使用虚函数实现多态、记得虚析构</td></tr>
+<tr><td>运算符重载</td><td>7</td><td>能重载 +、==、&lt;&lt;、[]，能写自定义异常</td></tr>
+<tr><td>STL</td><td>8</td><td>能选用 vector/map/set，能用 sort/find/count_if 等算法</td></tr>
+<tr><td>Lambda</td><td>9</td><td>理解捕获列表，能写高阶函数（函数作参数）</td></tr>
+<tr><td>模板</td><td>10</td><td>能写函数模板和类模板，理解 concepts 约束</td></tr>
+<tr><td>现代 C++</td><td>11</td><td>能用 optional、variant、结构化绑定、if constexpr</td></tr>
+<tr><td>CMake 项目</td><td>12</td><td>能组织多文件项目，写 CMakeLists.txt，管理 include 路径</td></tr>
+<tr><td>综合实战</td><td>13</td><td>能独立设计和实现一个完整的 C++ 控制台应用</td></tr>
+</table>
+
+<div class="callout tip"><div class="ct">恭喜</div>
+<p>如果你能在上面的清单中打勾 10 项以上，你已经具备了 C++ 开发的基本功。接下来可以深入感兴趣的领域：游戏开发（Unreal Engine）、系统编程（网络/操作系统）、嵌入式开发、高性能计算等。C++ 的世界很大，享受探索的过程吧！</p></div>
+
+<div style="margin-top:72px;padding:28px 0;border-top:1px solid var(--bd);text-align:center;color:var(--txm);font-size:14px">
+<p>C++ 示例与练习 | 配套《C++ 系统教程》和《开发环境搭建指南》 | 2026</p>
+</div>
+
+</main>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
+
+<script>
+const pbf=document.getElementById('pbf'),st=document.getElementById('scrollTop');
+window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-window.innerHeight;pbf.style.width=(window.scrollY/h*100)+'%';st.style.display=window.scrollY>400?'flex':'none'});
+const nls=document.querySelectorAll('.nl'),secs=[];
+nls.forEach(n=>{const id=n.getAttribute('href')?.slice(1);if(id){const el=document.getElementById(id);if(el)secs.push({el,link:n})}});
+function upd(){let c=null;for(const s of secs)if(s.el.getBoundingClientRect().top<=100)c=s;nls.forEach(l=>l.classList.remove('active'));if(c)c.link.classList.add('active')}
+window.addEventListener('scroll',upd);upd();
+nls.forEach(n=>n.addEventListener('click',()=>{if(window.innerWidth<=900)document.querySelector('.sidebar').classList.remove('open')}));
+</script>
+</body>
+</html>
