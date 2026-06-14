@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>513040 T+0 策略回测报告</title>
+<style>
+:root { --pri: #1a56db; --ok: #16a34a; --bad: #dc2626; --bg: #f8fafc; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background:#fff; color:#1e293b; line-height:1.7; }
+.wrap { max-width:1100px; margin:0 auto; padding:32px 24px 64px; }
+h1 { font-size:26px; text-align:center; padding:32px 0 8px; color:var(--pri); }
+.sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:32px; }
+h2 { font-size:20px; margin:36px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--pri); }
+h3 { font-size:16px; margin:24px 0 10px; color:#475569; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:16px 0; }
+.card { background:var(--bg); border:1px solid #e2e8f0; border-radius:8px; padding:16px; text-align:center; }
+.card .val { font-size:28px; font-weight:800; color:var(--pri); }
+.card .val.ok { color:var(--ok); } .card .val.bad { color:var(--bad); }
+.card .lbl { font-size:12px; color:#94a3b8; margin-top:4px; }
+table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+th { background:var(--pri); color:#fff; padding:8px 12px; text-align:left; font-size:12px; }
+td { padding:8px 12px; border-bottom:1px solid #e2e8f0; }
+tr:nth-child(even) { background:var(--bg); }
+.chart { margin:16px 0; text-align:center; }
+.chart img { max-width:100%; border-radius:8px; border:1px solid #e2e8f0; }
+.disc { margin-top:40px; padding:16px; background:#f1f5f9; border-radius:8px; font-size:11px; color:#94a3b8; }
+.strategy-section { margin:24px 0; padding:20px; background:var(--bg); border-radius:10px; border:1px solid #e2e8f0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>513040 T+0 策略回测报告</h1>
+<p class="sub">生成时间: 2026-06-14 20:28:35 &nbsp;|&nbsp; 回测模式: 日K线 &nbsp;|&nbsp; 初始资金: ¥100,000</p>
+<h2>策略综合对比</h2>
+<table><tr><th>策略</th><th>交易次数</th><th>胜率</th><th>盈亏比</th><th>总盈亏</th><th>最大回撤</th><th>夏普比率</th></tr>
+<tr><td><b>VWAP均值回归</b></td><td>167</td><td class="ok">62.9%</td><td>2.77</td><td class="ok">¥+9,626.92</td><td class="bad">0.32%</td><td>9.38</td></tr>
+<tr><td><b>ATR网格交易</b></td><td>312</td><td class="bad">54.8%</td><td>1.84</td><td class="ok">¥+7,522.80</td><td class="bad">0.48%</td><td>7.31</td></tr>
+<tr><td><b>开盘动量突破</b></td><td>42</td><td class="bad">52.4%</td><td>1.89</td><td class="ok">¥+1,818.53</td><td class="bad">0.47%</td><td>2.73</td></tr>
+<tr><td><b>日内做T</b></td><td>155</td><td class="bad">51.0%</td><td>1.43</td><td class="ok">¥+2,574.53</td><td class="bad">0.77%</td><td>2.67</td></tr>
+<tr><td><b>综合策略</b></td><td>210</td><td class="ok">68.1%</td><td>3.52</td><td class="ok">¥+16,130.08</td><td class="bad">0.39%</td><td>11.63</td></tr>
+</table>
+<div class="strategy-section">
+<h3>VWAP均值回归</h3>
+<div class="grid">
+<div class="card"><div class="val">167</div><div class="lbl">总交易次数</div></div>
+<div class="card"><div class="val ok">62.9%</div><div class="lbl">胜率</div></div>
+<div class="card"><div class="val ok">¥+9,626.92</div><div class="lbl">总盈亏</div></div>
+<div class="card"><div class="val">2.77</div><div class="lbl">盈亏比</div></div>
+<div class="card"><div class="val bad">0.32%</div><div class="lbl">最大回撤</div></div>
+<div class="card"><div class="val">9.38</div><div class="lbl">夏普比率</div></div>
+<div class="card"><div class="val ok">81.232%</div><div class="lbl">平均盈利</div></div>
+<div class="card"><div class="val bad">-49.684%</div><div class="lbl">平均亏损</div></div>
+</div>
+<div class="chart"><img src="chart_VWAP均值回归.png" alt="VWAP均值回归 资金曲线"></div>
+<h4 style="font-size:14px;margin:12px 0 6px;">最近交易明细</h4>
+<table><tr><th>日期</th><th>方向</th><th>买入价</th><th>卖出价</th><th>盈亏%</th><th>盈亏额</th><th>时间</th></tr>
+<tr><td>2026-05-28 00:00:00</td><td>SELL</td><td>0.9943</td><td>0.9892</td><td style="color:var(--bad)">-0.511%</td><td style="color:var(--bad)">¥-103.41</td><td>09:06→10:26</td></tr>
+<tr><td>2026-05-28 00:00:00</td><td>BUY</td><td>0.9919</td><td>0.9990</td><td style="color:var(--ok)">+0.720%</td><td style="color:var(--ok)">¥+136.18</td><td>12:13→14:56</td></tr>
+<tr><td>2026-05-29 00:00:00</td><td>BUY</td><td>0.9929</td><td>0.9991</td><td style="color:var(--ok)">+0.630%</td><td style="color:var(--ok)">¥+118.73</td><td>13:50→14:14</td></tr>
+<tr><td>2026-05-29 00:00:00</td><td>BUY</td><td>0.9936</td><td>1.0057</td><td style="color:var(--ok)">+1.224%</td><td style="color:var(--ok)">¥+234.29</td><td>11:40→12:02</td></tr>
+<tr><td>2026-06-01 00:00:00</td><td>BUY</td><td>1.0157</td><td>1.0229</td><td style="color:var(--ok)">+0.710%</td><td style="color:var(--ok)">¥+134.75</td><td>12:25→14:44</td></tr>
+<tr><td>2026-06-02 00:00:00</td><td>BUY</td><td>1.0569</td><td>1.0656</td><td style="color:var(--ok)">+0.822%</td><td style="color:var(--ok)">¥+156.80</td><td>13:47→14:22</td></tr>
+<tr><td>2026-06-03 00:00:00</td><td>SELL</td><td>1.0611</td><td>1.0554</td><td style="color:var(--bad)">-0.538%</td><td style="color:var(--bad)">¥-109.34</td><td>09:02→09:13</td></tr>
+<tr><td>2026-06-03 00:00:00</td><td>SELL</td><td>1.0629</td><td>1.0584</td><td style="color:var(--bad)">-0.419%</td><td style="color:var(--bad)">¥-85.96</td><td>10:43→10:56</td></tr>
+<tr><td>2026-06-04 00:00:00</td><td>BUY</td><td>1.0241</td><td>1.0311</td><td style="color:var(--ok)">+0.684%</td><td style="color:var(--ok)">¥+129.77</td><td>13:56→13:25</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>BUY</td><td>1.0147</td><td>1.0213</td><td style="color:var(--ok)">+0.646%</td><td style="color:var(--ok)">¥+122.55</td><td>13:30→14:28</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>BUY</td><td>1.0121</td><td>1.0204</td><td style="color:var(--ok)">+0.820%</td><td style="color:var(--ok)">¥+156.53</td><td>09:39→09:32</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>BUY</td><td>0.9838</td><td>0.9944</td><td style="color:var(--ok)">+1.075%</td><td style="color:var(--ok)">¥+207.00</td><td>12:22→13:25</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>BUY</td><td>0.9854</td><td>0.9949</td><td style="color:var(--ok)">+0.962%</td><td style="color:var(--ok)">¥+184.91</td><td>12:23→14:44</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9841</td><td>0.9916</td><td style="color:var(--ok)">+0.770%</td><td style="color:var(--ok)">¥+147.61</td><td>10:05→10:28</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9846</td><td>0.9931</td><td style="color:var(--ok)">+0.858%</td><td style="color:var(--ok)">¥+164.98</td><td>13:45→14:01</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>BUY</td><td>0.9765</td><td>0.9860</td><td style="color:var(--ok)">+0.978%</td><td style="color:var(--ok)">¥+189.25</td><td>09:58→10:18</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>BUY</td><td>0.9777</td><td>0.9820</td><td style="color:var(--ok)">+0.439%</td><td style="color:var(--ok)">¥+82.72</td><td>11:57→13:34</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9799</td><td>0.9743</td><td style="color:var(--bad)">-0.579%</td><td style="color:var(--bad)">¥-118.61</td><td>13:49→14:23</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9775</td><td>0.9706</td><td style="color:var(--bad)">-0.703%</td><td style="color:var(--bad)">¥-143.09</td><td>09:51→09:12</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>SELL</td><td>0.9732</td><td>0.9688</td><td style="color:var(--bad)">-0.449%</td><td style="color:var(--bad)">¥-92.57</td><td>09:48→10:39</td></tr>
+</table>
+</div>
+<div class="strategy-section">
+<h3>ATR网格交易</h3>
+<div class="grid">
+<div class="card"><div class="val">312</div><div class="lbl">总交易次数</div></div>
+<div class="card"><div class="val bad">54.8%</div><div class="lbl">胜率</div></div>
+<div class="card"><div class="val ok">¥+7,522.80</div><div class="lbl">总盈亏</div></div>
+<div class="card"><div class="val">1.84</div><div class="lbl">盈亏比</div></div>
+<div class="card"><div class="val bad">0.48%</div><div class="lbl">最大回撤</div></div>
+<div class="card"><div class="val">7.31</div><div class="lbl">夏普比率</div></div>
+<div class="card"><div class="val ok">59.559%</div><div class="lbl">平均盈利</div></div>
+<div class="card"><div class="val bad">-39.165%</div><div class="lbl">平均亏损</div></div>
+</div>
+<div class="chart"><img src="chart_ATR网格交易.png" alt="ATR网格交易 资金曲线"></div>
+<h4 style="font-size:14px;margin:12px 0 6px;">最近交易明细</h4>
+<table><tr><th>日期</th><th>方向</th><th>买入价</th><th>卖出价</th><th>盈亏%</th><th>盈亏额</th><th>时间</th></tr>
+<tr><td>2026-06-03 00:00:00</td><td>SELL</td><td>1.0620</td><td>1.0582</td><td style="color:var(--bad)">-0.361%</td><td style="color:var(--bad)">¥-73.03</td><td>12:55→12:06</td></tr>
+<tr><td>2026-06-04 00:00:00</td><td>BUY</td><td>1.0221</td><td>1.0277</td><td style="color:var(--ok)">+0.546%</td><td style="color:var(--ok)">¥+100.75</td><td>13:10→14:09</td></tr>
+<tr><td>2026-06-04 00:00:00</td><td>BUY</td><td>1.0216</td><td>1.0284</td><td style="color:var(--ok)">+0.667%</td><td style="color:var(--ok)">¥+123.95</td><td>13:02→13:25</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>SELL</td><td>1.0190</td><td>1.0156</td><td style="color:var(--bad)">-0.336%</td><td style="color:var(--bad)">¥-68.36</td><td>12:04→13:24</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>SELL</td><td>1.0179</td><td>1.0117</td><td style="color:var(--bad)">-0.608%</td><td style="color:var(--bad)">¥-120.58</td><td>11:30→12:18</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>BUY</td><td>1.0142</td><td>1.0187</td><td style="color:var(--ok)">+0.444%</td><td style="color:var(--ok)">¥+81.39</td><td>12:48→14:19</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>BUY</td><td>1.0135</td><td>1.0187</td><td style="color:var(--ok)">+0.512%</td><td style="color:var(--ok)">¥+94.49</td><td>09:03→11:20</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>BUY</td><td>0.9860</td><td>0.9930</td><td style="color:var(--ok)">+0.708%</td><td style="color:var(--ok)">¥+132.04</td><td>11:11→11:20</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>SELL</td><td>0.9908</td><td>0.9869</td><td style="color:var(--bad)">-0.396%</td><td style="color:var(--bad)">¥-79.92</td><td>10:21→10:33</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9844</td><td>0.9942</td><td style="color:var(--ok)">+1.003%</td><td style="color:var(--ok)">¥+188.81</td><td>10:46→11:09</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9843</td><td>0.9905</td><td style="color:var(--ok)">+0.635%</td><td style="color:var(--ok)">¥+118.10</td><td>11:53→13:09</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>SELL</td><td>0.9895</td><td>0.9846</td><td style="color:var(--bad)">-0.490%</td><td style="color:var(--bad)">¥-98.05</td><td>10:39→10:30</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9857</td><td>0.9922</td><td style="color:var(--ok)">+0.664%</td><td style="color:var(--ok)">¥+123.84</td><td>11:53→11:56</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>BUY</td><td>0.9755</td><td>0.9811</td><td style="color:var(--ok)">+0.576%</td><td style="color:var(--ok)">¥+107.11</td><td>11:48→13:26</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>SELL</td><td>0.9819</td><td>0.9791</td><td style="color:var(--bad)">-0.294%</td><td style="color:var(--bad)">¥-60.44</td><td>12:25→13:45</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>BUY</td><td>0.9715</td><td>0.9774</td><td style="color:var(--ok)">+0.603%</td><td style="color:var(--ok)">¥+112.44</td><td>11:06→13:52</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>BUY</td><td>0.9749</td><td>0.9818</td><td style="color:var(--ok)">+0.707%</td><td style="color:var(--ok)">¥+132.42</td><td>13:20→14:36</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9768</td><td>0.9725</td><td style="color:var(--bad)">-0.435%</td><td style="color:var(--bad)">¥-87.78</td><td>10:22→10:01</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>BUY</td><td>0.9705</td><td>0.9785</td><td style="color:var(--ok)">+0.828%</td><td style="color:var(--ok)">¥+155.96</td><td>13:14→13:13</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>BUY</td><td>0.9702</td><td>0.9743</td><td style="color:var(--ok)">+0.421%</td><td style="color:var(--ok)">¥+77.42</td><td>10:44→12:54</td></tr>
+</table>
+</div>
+<div class="strategy-section">
+<h3>开盘动量突破</h3>
+<div class="grid">
+<div class="card"><div class="val">42</div><div class="lbl">总交易次数</div></div>
+<div class="card"><div class="val bad">52.4%</div><div class="lbl">胜率</div></div>
+<div class="card"><div class="val ok">¥+1,818.53</div><div class="lbl">总盈亏</div></div>
+<div class="card"><div class="val">1.89</div><div class="lbl">盈亏比</div></div>
+<div class="card"><div class="val bad">0.47%</div><div class="lbl">最大回撤</div></div>
+<div class="card"><div class="val">2.73</div><div class="lbl">夏普比率</div></div>
+<div class="card"><div class="val ok">104.950%</div><div class="lbl">平均盈利</div></div>
+<div class="card"><div class="val bad">-61.035%</div><div class="lbl">平均亏损</div></div>
+</div>
+<div class="chart"><img src="chart_开盘动量突破.png" alt="开盘动量突破 资金曲线"></div>
+<h4 style="font-size:14px;margin:12px 0 6px;">最近交易明细</h4>
+<table><tr><th>日期</th><th>方向</th><th>买入价</th><th>卖出价</th><th>盈亏%</th><th>盈亏额</th><th>时间</th></tr>
+<tr><td>2026-04-02 00:00:00</td><td>BUY</td><td>1.1065</td><td>1.1207</td><td style="color:var(--ok)">+1.287%</td><td style="color:var(--ok)">¥+230.16</td><td>13:30→14:15</td></tr>
+<tr><td>2026-04-10 00:00:00</td><td>SELL</td><td>1.1567</td><td>1.1459</td><td style="color:var(--bad)">-0.936%</td><td style="color:var(--bad)">¥-174.13</td><td>09:11→10:17</td></tr>
+<tr><td>2026-04-17 00:00:00</td><td>BUY</td><td>1.1698</td><td>1.1820</td><td style="color:var(--ok)">+1.046%</td><td style="color:var(--ok)">¥+186.58</td><td>13:07→14:34</td></tr>
+<tr><td>2026-04-20 00:00:00</td><td>BUY</td><td>1.1757</td><td>1.1898</td><td style="color:var(--ok)">+1.204%</td><td style="color:var(--ok)">¥+215.63</td><td>12:30→12:29</td></tr>
+<tr><td>2026-04-22 00:00:00</td><td>SELL</td><td>1.1578</td><td>1.1540</td><td style="color:var(--bad)">-0.326%</td><td style="color:var(--bad)">¥-63.20</td><td>13:19→14:20</td></tr>
+<tr><td>2026-04-24 00:00:00</td><td>BUY</td><td>1.1191</td><td>1.1325</td><td style="color:var(--ok)">+1.196%</td><td style="color:var(--ok)">¥+214.56</td><td>12:52→14:16</td></tr>
+<tr><td>2026-04-28 00:00:00</td><td>BUY</td><td>1.0957</td><td>1.1094</td><td style="color:var(--ok)">+1.253%</td><td style="color:var(--ok)">¥+225.45</td><td>09:54→11:27</td></tr>
+<tr><td>2026-04-29 00:00:00</td><td>SELL</td><td>1.1086</td><td>1.1025</td><td style="color:var(--bad)">-0.546%</td><td style="color:var(--bad)">¥-103.74</td><td>12:58→12:45</td></tr>
+<tr><td>2026-04-30 00:00:00</td><td>BUY</td><td>1.0939</td><td>1.1000</td><td style="color:var(--ok)">+0.561%</td><td style="color:var(--ok)">¥+98.92</td><td>12:23→13:22</td></tr>
+<tr><td>2026-05-08 00:00:00</td><td>SELL</td><td>1.1526</td><td>1.1431</td><td style="color:var(--bad)">-0.822%</td><td style="color:var(--bad)">¥-154.19</td><td>09:36→10:47</td></tr>
+<tr><td>2026-05-11 00:00:00</td><td>SELL</td><td>1.1431</td><td>1.1357</td><td style="color:var(--bad)">-0.641%</td><td style="color:var(--bad)">¥-120.90</td><td>10:16→10:13</td></tr>
+<tr><td>2026-05-12 00:00:00</td><td>SELL</td><td>1.1382</td><td>1.1271</td><td style="color:var(--bad)">-0.973%</td><td style="color:var(--bad)">¥-181.43</td><td>11:29→12:52</td></tr>
+<tr><td>2026-05-14 00:00:00</td><td>BUY</td><td>1.1479</td><td>1.1554</td><td style="color:var(--ok)">+0.649%</td><td style="color:var(--ok)">¥+114.76</td><td>11:47→13:45</td></tr>
+<tr><td>2026-05-19 00:00:00</td><td>SELL</td><td>1.0897</td><td>1.0820</td><td style="color:var(--bad)">-0.706%</td><td style="color:var(--bad)">¥-132.57</td><td>12:29→14:14</td></tr>
+<tr><td>2026-05-22 00:00:00</td><td>BUY</td><td>1.0384</td><td>1.0470</td><td style="color:var(--ok)">+0.833%</td><td style="color:var(--ok)">¥+148.16</td><td>10:04→12:35</td></tr>
+<tr><td>2026-05-29 00:00:00</td><td>BUY</td><td>0.9946</td><td>1.0048</td><td style="color:var(--ok)">+1.021%</td><td style="color:var(--ok)">¥+182.84</td><td>12:16→13:04</td></tr>
+<tr><td>2026-06-01 00:00:00</td><td>BUY</td><td>1.0110</td><td>1.0204</td><td style="color:var(--ok)">+0.923%</td><td style="color:var(--ok)">¥+165.23</td><td>11:23→11:07</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>SELL</td><td>0.9907</td><td>0.9852</td><td style="color:var(--bad)">-0.559%</td><td style="color:var(--bad)">¥-106.09</td><td>13:12→14:10</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>BUY</td><td>0.9783</td><td>0.9900</td><td style="color:var(--ok)">+1.192%</td><td style="color:var(--ok)">¥+214.54</td><td>13:18→13:54</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>SELL</td><td>0.9730</td><td>0.9689</td><td style="color:var(--bad)">-0.417%</td><td style="color:var(--bad)">¥-80.08</td><td>13:45→14:39</td></tr>
+</table>
+</div>
+<div class="strategy-section">
+<h3>日内做T</h3>
+<div class="grid">
+<div class="card"><div class="val">155</div><div class="lbl">总交易次数</div></div>
+<div class="card"><div class="val bad">51.0%</div><div class="lbl">胜率</div></div>
+<div class="card"><div class="val ok">¥+2,574.53</div><div class="lbl">总盈亏</div></div>
+<div class="card"><div class="val">1.43</div><div class="lbl">盈亏比</div></div>
+<div class="card"><div class="val bad">0.77%</div><div class="lbl">最大回撤</div></div>
+<div class="card"><div class="val">2.67</div><div class="lbl">夏普比率</div></div>
+<div class="card"><div class="val ok">72.200%</div><div class="lbl">平均盈利</div></div>
+<div class="card"><div class="val bad">-52.309%</div><div class="lbl">平均亏损</div></div>
+</div>
+<div class="chart"><img src="chart_日内做T.png" alt="日内做T 资金曲线"></div>
+<h4 style="font-size:14px;margin:12px 0 6px;">最近交易明细</h4>
+<table><tr><th>日期</th><th>方向</th><th>买入价</th><th>卖出价</th><th>盈亏%</th><th>盈亏额</th><th>时间</th></tr>
+<tr><td>2026-05-22 00:00:00</td><td>SELL</td><td>1.0404</td><td>1.0365</td><td style="color:var(--bad)">-0.377%</td><td style="color:var(--bad)">¥-73.06</td><td>13:51→14:20</td></tr>
+<tr><td>2026-05-26 00:00:00</td><td>BUY</td><td>1.0213</td><td>1.0259</td><td style="color:var(--ok)">+0.456%</td><td style="color:var(--ok)">¥+80.26</td><td>12:10→12:38</td></tr>
+<tr><td>2026-05-27 00:00:00</td><td>BUY</td><td>1.0234</td><td>1.0339</td><td style="color:var(--ok)">+1.027%</td><td style="color:var(--ok)">¥+185.34</td><td>13:45→14:35</td></tr>
+<tr><td>2026-05-28 00:00:00</td><td>SELL</td><td>0.9995</td><td>0.9961</td><td style="color:var(--bad)">-0.339%</td><td style="color:var(--bad)">¥-66.31</td><td>12:13→13:09</td></tr>
+<tr><td>2026-05-28 00:00:00</td><td>SELL</td><td>1.0005</td><td>0.9957</td><td style="color:var(--bad)">-0.477%</td><td style="color:var(--bad)">¥-91.59</td><td>11:29→13:45</td></tr>
+<tr><td>2026-05-29 00:00:00</td><td>SELL</td><td>0.9971</td><td>0.9900</td><td style="color:var(--bad)">-0.717%</td><td style="color:var(--bad)">¥-135.68</td><td>09:31→10:30</td></tr>
+<tr><td>2026-06-01 00:00:00</td><td>BUY</td><td>1.0105</td><td>1.0164</td><td style="color:var(--ok)">+0.584%</td><td style="color:var(--ok)">¥+103.72</td><td>09:05→11:11</td></tr>
+<tr><td>2026-06-01 00:00:00</td><td>BUY</td><td>1.0106</td><td>1.0217</td><td style="color:var(--ok)">+1.101%</td><td style="color:var(--ok)">¥+198.82</td><td>09:49→11:08</td></tr>
+<tr><td>2026-06-02 00:00:00</td><td>SELL</td><td>1.0705</td><td>1.0660</td><td style="color:var(--bad)">-0.422%</td><td style="color:var(--bad)">¥-81.48</td><td>10:29→10:02</td></tr>
+<tr><td>2026-06-03 00:00:00</td><td>BUY</td><td>1.0583</td><td>1.0637</td><td style="color:var(--ok)">+0.504%</td><td style="color:var(--ok)">¥+89.13</td><td>13:36→14:21</td></tr>
+<tr><td>2026-06-04 00:00:00</td><td>BUY</td><td>1.0239</td><td>1.0312</td><td style="color:var(--ok)">+0.720%</td><td style="color:var(--ok)">¥+129.18</td><td>11:25→13:54</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>SELL</td><td>1.0160</td><td>1.0090</td><td style="color:var(--bad)">-0.686%</td><td style="color:var(--bad)">¥-130.41</td><td>11:11→12:50</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>BUY</td><td>0.9826</td><td>0.9881</td><td style="color:var(--ok)">+0.553%</td><td style="color:var(--ok)">¥+98.25</td><td>12:51→14:49</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9859</td><td>0.9947</td><td style="color:var(--ok)">+0.897%</td><td style="color:var(--ok)">¥+162.02</td><td>10:36→11:50</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9848</td><td>0.9921</td><td style="color:var(--ok)">+0.737%</td><td style="color:var(--ok)">¥+132.40</td><td>10:12→10:52</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>SELL</td><td>0.9805</td><td>0.9765</td><td style="color:var(--bad)">-0.408%</td><td style="color:var(--bad)">¥-79.31</td><td>11:22→11:32</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9751</td><td>0.9685</td><td style="color:var(--bad)">-0.676%</td><td style="color:var(--bad)">¥-128.72</td><td>09:01→10:45</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9772</td><td>0.9719</td><td style="color:var(--bad)">-0.548%</td><td style="color:var(--bad)">¥-105.12</td><td>12:38→14:47</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>BUY</td><td>0.9722</td><td>0.9784</td><td style="color:var(--ok)">+0.646%</td><td style="color:var(--ok)">¥+115.55</td><td>09:26→09:35</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>SELL</td><td>0.9736</td><td>0.9679</td><td style="color:var(--bad)">-0.579%</td><td style="color:var(--bad)">¥-110.62</td><td>09:18→09:37</td></tr>
+</table>
+</div>
+<div class="strategy-section">
+<h3>综合策略</h3>
+<div class="grid">
+<div class="card"><div class="val">210</div><div class="lbl">总交易次数</div></div>
+<div class="card"><div class="val ok">68.1%</div><div class="lbl">胜率</div></div>
+<div class="card"><div class="val ok">¥+16,130.08</div><div class="lbl">总盈亏</div></div>
+<div class="card"><div class="val">3.52</div><div class="lbl">盈亏比</div></div>
+<div class="card"><div class="val bad">0.39%</div><div class="lbl">最大回撤</div></div>
+<div class="card"><div class="val">11.63</div><div class="lbl">夏普比率</div></div>
+<div class="card"><div class="val ok">85.435%</div><div class="lbl">平均盈利</div></div>
+<div class="card"><div class="val bad">-51.827%</div><div class="lbl">平均亏损</div></div>
+</div>
+<div class="chart"><img src="chart_综合策略.png" alt="综合策略 资金曲线"></div>
+<h4 style="font-size:14px;margin:12px 0 6px;">最近交易明细</h4>
+<table><tr><th>日期</th><th>方向</th><th>买入价</th><th>卖出价</th><th>盈亏%</th><th>盈亏额</th><th>时间</th></tr>
+<tr><td>2026-05-28 00:00:00</td><td>BUY</td><td>0.9880</td><td>0.9975</td><td style="color:var(--ok)">+0.959%</td><td style="color:var(--ok)">¥+194.24</td><td>10:41→11:04</td></tr>
+<tr><td>2026-05-29 00:00:00</td><td>BUY</td><td>0.9951</td><td>1.0070</td><td style="color:var(--ok)">+1.190%</td><td style="color:var(--ok)">¥+242.43</td><td>10:27→11:05</td></tr>
+<tr><td>2026-06-01 00:00:00</td><td>SELL</td><td>1.0182</td><td>1.0131</td><td style="color:var(--bad)">-0.502%</td><td style="color:var(--bad)">¥-108.43</td><td>11:04→13:48</td></tr>
+<tr><td>2026-06-02 00:00:00</td><td>SELL</td><td>1.0659</td><td>1.0600</td><td style="color:var(--bad)">-0.560%</td><td style="color:var(--bad)">¥-120.31</td><td>10:56→11:52</td></tr>
+<tr><td>2026-06-02 00:00:00</td><td>SELL</td><td>1.0644</td><td>1.0539</td><td style="color:var(--bad)">-0.988%</td><td style="color:var(--bad)">¥-209.04</td><td>10:36→11:39</td></tr>
+<tr><td>2026-06-03 00:00:00</td><td>BUY</td><td>1.0582</td><td>1.0645</td><td style="color:var(--ok)">+0.597%</td><td style="color:var(--ok)">¥+119.31</td><td>13:31→14:22</td></tr>
+<tr><td>2026-06-04 00:00:00</td><td>BUY</td><td>1.0208</td><td>1.0354</td><td style="color:var(--ok)">+1.433%</td><td style="color:var(--ok)">¥+292.59</td><td>12:55→13:14</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>SELL</td><td>1.0165</td><td>1.0114</td><td style="color:var(--bad)">-0.505%</td><td style="color:var(--bad)">¥-109.02</td><td>09:05→09:33</td></tr>
+<tr><td>2026-06-05 00:00:00</td><td>BUY</td><td>1.0134</td><td>1.0248</td><td style="color:var(--ok)">+1.134%</td><td style="color:var(--ok)">¥+231.10</td><td>12:57→13:27</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>BUY</td><td>0.9861</td><td>0.9931</td><td style="color:var(--ok)">+0.703%</td><td style="color:var(--ok)">¥+142.00</td><td>13:30→13:05</td></tr>
+<tr><td>2026-06-08 00:00:00</td><td>SELL</td><td>0.9875</td><td>0.9839</td><td style="color:var(--bad)">-0.371%</td><td style="color:var(--bad)">¥-81.32</td><td>13:22→14:57</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9843</td><td>0.9927</td><td style="color:var(--ok)">+0.857%</td><td style="color:var(--ok)">¥+174.02</td><td>10:14→12:19</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9845</td><td>0.9905</td><td style="color:var(--ok)">+0.615%</td><td style="color:var(--ok)">¥+123.59</td><td>12:49→12:53</td></tr>
+<tr><td>2026-06-09 00:00:00</td><td>BUY</td><td>0.9865</td><td>0.9955</td><td style="color:var(--ok)">+0.915%</td><td style="color:var(--ok)">¥+186.08</td><td>10:37→12:39</td></tr>
+<tr><td>2026-06-10 00:00:00</td><td>BUY</td><td>0.9773</td><td>0.9872</td><td style="color:var(--ok)">+1.008%</td><td style="color:var(--ok)">¥+206.15</td><td>10:09→10:25</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>SELL</td><td>0.9784</td><td>0.9731</td><td style="color:var(--bad)">-0.549%</td><td style="color:var(--bad)">¥-118.98</td><td>10:53→10:12</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>BUY</td><td>0.9685</td><td>0.9761</td><td style="color:var(--ok)">+0.781%</td><td style="color:var(--ok)">¥+159.05</td><td>10:47→10:21</td></tr>
+<tr><td>2026-06-11 00:00:00</td><td>BUY</td><td>0.9748</td><td>0.9824</td><td style="color:var(--ok)">+0.773%</td><td style="color:var(--ok)">¥+157.56</td><td>09:44→09:34</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>SELL</td><td>0.9743</td><td>0.9682</td><td style="color:var(--bad)">-0.630%</td><td style="color:var(--bad)">¥-136.23</td><td>11:55→12:55</td></tr>
+<tr><td>2026-06-12 00:00:00</td><td>SELL</td><td>0.9751</td><td>0.9704</td><td style="color:var(--bad)">-0.486%</td><td style="color:var(--bad)">¥-106.05</td><td>10:45→12:00</td></tr>
+</table>
+</div>
+
+<div class="disc">
+<b>免责声明：</b>本报告基于历史数据回测生成，不代表未来收益保证。
+回测使用模拟数据或历史K线，实际交易结果可能因市场条件、滑点、流动性等因素而不同。
+投资有风险，请根据自身情况审慎决策。
+</div>
+</div>
+</body>
+</html>

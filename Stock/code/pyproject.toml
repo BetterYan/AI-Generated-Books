@@ -1,0 +1,15 @@
+[project]
+name = "sh513040"
+version = "0.1.0"
+description = "港股通互联网ETF(513040) T+0 短线交易助手"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "akshare>=1.14.0",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "rich>=13.7.0",
+    "plyer>=2.1.0",
+    "matplotlib>=3.9.0",
+    "customtkinter>=5.2.0",
+]

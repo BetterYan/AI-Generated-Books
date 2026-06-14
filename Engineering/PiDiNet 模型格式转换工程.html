@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiDiNet 模型格式转换 - 代码讲解</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --code-bg: #0d1117;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    padding: 0;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1a1a3e 100%);
+    padding: 60px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    color: var(--text-dim);
+    font-size: 1.1em;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  section { margin-bottom: 56px; }
+  h2 {
+    font-size: 1.6em;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--surface2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .icon { font-size: 1.2em; }
+  h3 {
+    font-size: 1.2em;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+  }
+  h4 {
+    font-size: 1.05em;
+    color: var(--accent3);
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 14px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+  .card-warn {
+    border-left: 4px solid var(--warn);
+  }
+  .card-info {
+    border-left: 4px solid var(--accent);
+  }
+  .card-success {
+    border-left: 4px solid var(--accent3);
+  }
+  .card-err {
+    border-left: 4px solid var(--err);
+  }
+  .card .card-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1.05em;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 12px 0 18px;
+    position: relative;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  }
+  pre code { color: #c9d1d9; }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .cm { color: #8b949e; font-style: italic; }
+  .num { color: #79c0ff; }
+  .cls { color: #ffa657; }
+  .op { color: #ff7b72; }
+  .var { color: #ffa657; }
+  .bi { color: #79c0ff; }
+  p code, li code {
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    color: var(--accent);
+  }
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .pipeline .step {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    flex: 1;
+    min-width: 140px;
+  }
+  .pipeline .step .step-label {
+    font-size: 0.82em;
+    color: var(--text-dim);
+  }
+  .pipeline .step .step-name {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1em;
+  }
+  .pipeline .arrow {
+    color: var(--accent2);
+    font-size: 1.4em;
+    flex-shrink: 0;
+  }
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin-bottom: 40px;
+  }
+  .toc-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--accent);
+  }
+  .toc ol {
+    padding-left: 20px;
+  }
+  .toc li {
+    margin: 6px 0;
+  }
+  .toc a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+  .toc a:hover {
+    text-decoration: underline;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px;
+    font-size: 0.92em;
+  }
+  th, td {
+    border: 1px solid var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  td { background: var(--bg); }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.78em;
+    font-weight: 600;
+  }
+  .tag-blue { background: #1e3a5f; color: var(--accent); }
+  .tag-purple { background: #2e1f5e; color: var(--accent2); }
+  .tag-green { background: #064e3b; color: var(--accent3); }
+  .tag-yellow { background: #713f12; color: var(--warn); }
+  .arch-diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.82em;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--text-dim);
+    margin: 16px 0;
+  }
+  .footnote {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--surface2);
+    color: var(--text-dim);
+    font-size: 0.85em;
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 36px 20px; }
+    .hero h1 { font-size: 1.6em; }
+    .container { padding: 24px 16px; }
+    .pipeline { flex-direction: column; }
+    .pipeline .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>PiDiNet 模型格式转换工程</h1>
+  <p class="subtitle">PyTorch &rarr; ONNX &rarr; TFLite (FP32 / FP16 / INT8) 全链路代码讲解</p>
+</div>
+
+<div class="container">
+
+<!-- 目录 -->
+<div class="toc">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#overview">项目总览：这份代码在做什么</a></li>
+    <li><a href="#architecture">PiDiNet 模型架构解析</a></li>
+    <li><a href="#pipeline">转换流水线详解</a></li>
+    <li><a href="#engineering">工程实践注意点</a></li>
+    <li><a href="#knowledge">延伸知识点</a></li>
+  </ol>
+</div>
+
+<!-- ========== 1. 项目总览 ========== -->
+<section id="overview">
+<h2><span class="icon">01</span> 项目总览：这份代码在做什么</h2>
+
+<p>
+这个项目是一个<strong>深度学习模型格式转换工具</strong>，具体任务是将一个名为 <strong>PiDiNet (Pixel Difference Network)</strong> 的边缘检测模型，从 PyTorch 的 <code>.pth</code> 权重文件，经过多阶段转换，最终生成适用于移动端/嵌入式设备部署的 TFLite 模型。
+</p>
+
+<p>
+PiDiNet 是一种专门用于<strong>图像边缘检测 (Edge Detection)</strong> 的轻量级卷积神经网络，来自论文 <em>"Pixel Difference Networks for Efficient Edge Detection"</em> (ICCV 2021)。它通过特殊的"像素差分卷积"算子来高效提取边缘信息，同时保持较低的计算量。
+</p>
+
+<div class="pipeline">
+  <div class="step">
+    <div class="step-label">Step 1</div>
+    <div class="step-name">PyTorch (.pth)</div>
+  </div>
+  <div class="arrow">&rarr;</div>
+  <div class="step">
+    <div class="step-label">Step 2</div>
+    <div class="step-name">ONNX (.onnx)</div>
+  </div>
+  <div class="arrow">&rarr;</div>
+  <div class="step">
+    <div class="step-label">Step 3</div>
+    <div class="step-name">TFLite FP32</div>
+  </div>
+  <div class="arrow">&rarr;</div>
+  <div class="step">
+    <div class="step-label">Step 4</div>
+    <div class="step-name">TFLite FP16</div>
+  </div>
+  <div class="arrow">&rarr;</div>
+  <div class="step">
+    <div class="step-label">Step 5</div>
+    <div class="step-name">TFLite INT8</div>
+  </div>
+</div>
+
+<p>
+整个工具的核心文件是 <code>convert_pidinet_to_tflite.py</code>，它用 Python 类组织为清晰的模块结构：<code>PiDiNetLoader</code> 负责加载模型，<code>ONNXExporter</code> 负责导出 ONNX，<code>TFLiteConverter</code> 负责转 TFLite，<code>TFLiteValidator</code> 负责验证产出模型是否可用，<code>ModelConverter</code> 则是编排所有步骤的主控类。
+</p>
+
+<p>
+从项目的 <code>pyproject.toml</code> 可以看到，依赖链覆盖了完整的转换路径：PyTorch 用于原始模型，ONNX 用于中间格式验证，onnx2tf + TensorFlow 用于最终转为 TFLite。
+</p>
+</section>
+
+<!-- ========== 2. 模型架构 ========== -->
+<section id="architecture">
+<h2><span class="icon">02</span> PiDiNet 模型架构解析</h2>
+
+<p>
+要理解这个转换工具，首先需要理解它要转换的模型本身。PiDiNet 的网络结构定义在 <code>pidinet/models/pidinet.py</code> 中，是一种典型的<strong>多尺度边缘检测</strong>架构。
+</p>
+
+<h3>2.1 整体结构：四阶段特征提取 + 多尺度融合</h3>
+
+<p>
+PiDiNet 的主干网络分为 4 个 stage，每个 stage 包含若干卷积块，每经过一个 stage，通道数翻倍、空间尺寸减半（通过 stride=2 的 MaxPool），这与 VGG 的结构思路类似：
+</p>
+
+<div class="arch-diagram">
+输入图像 (1, 3, 512, 512)
+       |
+  [init_block] 3x3 Conv, 3 &rarr; 20 channels
+       |
+  [Stage 1] 3x PDCBlock  ─── 20ch  ──┐
+       |                               | &rarr; CDCM + CSAM + MapReduce &rarr; e1
+  [Stage 2] 4x PDCBlock (stride=2)    |
+             20ch &rarr; 40ch  ──────────┐|
+       |                             || &rarr; CDCM + CSAM + MapReduce &rarr; e2
+  [Stage 3] 4x PDCBlock (stride=2)   ||
+             40ch &rarr; 80ch  ─────────┐||
+       |                            ||| &rarr; CDCM + CSAM + MapReduce &rarr; e3
+  [Stage 4] 4x PDCBlock (stride=2)  |||
+             80ch &rarr; 80ch  ────────┐|||
+                                    |||| &rarr; CDCM + CSAM + MapReduce &rarr; e4
+                                    ||||
+            cat(e1, e2, e3, e4) &larr;┘|||
+                   |                  ||
+            [classifier] 1x1 Conv    |
+                   |                  |
+              输出 edge map          ┘
+</div>
+
+<p>
+每个 stage 输出的特征图经过三个组件处理后生成一张边缘图（e1~e4），最终将 4 张边缘图在通道维度拼接，由 1x1 卷积融合为单通道输出。这种<strong>深度监督 (Deep Supervision)</strong> 策略让网络的每个尺度都能直接产生预测，有助于训练稳定性和最终精度。
+</p>
+
+<h3>2.2 核心创新：像素差分卷积 (Pixel Difference Convolution)</h3>
+
+<p>
+PiDiNet 的灵魂在于它的<strong>像素差分卷积</strong>算子，定义在 <code>pidinet/models/ops.py</code> 的 <code>createConvFunc</code> 函数中。它提供了四种卷积类型：
+</p>
+
+<table>
+<tr>
+  <th>类型</th>
+  <th>代号</th>
+  <th>原理</th>
+  <th>作用</th>
+</tr>
+<tr>
+  <td>标准卷积</td>
+  <td><code>cv</code></td>
+  <td>直接调用 <code>F.conv2d</code></td>
+  <td>基础特征提取</td>
+</tr>
+<tr>
+  <td>中心差分卷积</td>
+  <td><code>cd</code></td>
+  <td>先对权重求空间维度的和得到 <code>weights_c</code>，用 1x1 卷积得到中心响应 <code>yc</code>，再用原始权重做 3x3 卷积得到 <code>y</code>，最终输出 <code>y - yc</code></td>
+  <td>捕获中心像素与邻域的差分信息，增强边缘响应</td>
+</tr>
+<tr>
+  <td>角差分卷积</td>
+  <td><code>ad</code></td>
+  <td>将 3x3 权重按顺时针方向做差分：<code>weights - weights[:, :, [3,0,1,6,4,2,7,8,5]]</code>，用差分后的权重做标准卷积</td>
+  <td>捕获角方向的梯度变化，对角线边缘更敏感</td>
+</tr>
+<tr>
+  <td>径向差分卷积</td>
+  <td><code>rd</code></td>
+  <td>将 3x3 权重映射到 5x5 的缓冲区，正权重在外圈、负权重在内圈，等效于拉普拉斯算子</td>
+  <td>捕获径向方向的二阶差分，类似 LoG 边缘检测</td>
+</tr>
+</table>
+
+<p>
+来看代码中<strong>中心差分卷积</strong>的实现，这是最直观的一种：
+</p>
+
+<pre><code><span class="cm"># ops.py 中的 cd (Central Difference) 卷积</span>
+<span class="kw">def</span> <span class="fn">func</span>(x, weights, bias=<span class="num">None</span>, stride=<span class="num">1</span>, padding=<span class="num">0</span>, dilation=<span class="num">1</span>, groups=<span class="num">1</span>):
+    <span class="cm"># 对权重在空间维度 (3x3) 上求和，得到"中心响应"的等效 1x1 权重</span>
+    weights_c = weights.sum(dim=[<span class="num">2</span>, <span class="num">3</span>], keepdim=<span class="num">True</span>)
+    <span class="cm"># 1x1 卷积：提取不含空间结构的"直流分量"</span>
+    yc = F.conv2d(x, weights_c, stride=stride, padding=<span class="num">0</span>, groups=groups)
+    <span class="cm"># 标准 3x3 卷积：提取含空间结构的完整响应</span>
+    y = F.conv2d(x, weights, bias, stride=stride, padding=padding, dilation=dilation, groups=groups)
+    <span class="cm"># 差分：完整响应 - 直流分量 = 边缘响应</span>
+    <span class="kw">return</span> y - yc</code></pre>
+
+<p>
+这个设计的数学直觉是：标准卷积提取的是<strong>带直流分量的特征</strong>（包括平坦区域），而减去中心响应后，剩下的就是<strong>纯变化量</strong>，也就是边缘。这与传统图像处理中 Sobel、Laplacian 等边缘检测算子的思想一脉相承，只是变成了可学习的版本。
+</p>
+
+<h3>2.3 注意力与多尺度模块</h3>
+
+<p>
+每个 stage 的输出在进入融合阶段前，会经过两个增强模块：
+</p>
+
+<p>
+<strong>CDCM (Compact Dilation Convolution Module)</strong>：使用空洞卷积（dilation=5,7,9,11）在多个感受野尺度上提取特征，然后将四个分支的结果相加。这使得模型能在不同尺度上感知边缘——细边缘需要小感受野，粗边缘需要大感受野。
+</p>
+
+<pre><code><span class="cm"># pidinet.py 中的 CDCM 模块</span>
+<span class="kw">class</span> <span class="cls">CDCM</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_channels, out_channels):
+        self.conv2_1 = nn.Conv2d(..., kernel_size=<span class="num">3</span>, dilation=<span class="num">5</span>, padding=<span class="num">5</span>)
+        self.conv2_2 = nn.Conv2d(..., kernel_size=<span class="num">3</span>, dilation=<span class="num">7</span>, padding=<span class="num">7</span>)
+        self.conv2_3 = nn.Conv2d(..., kernel_size=<span class="num">3</span>, dilation=<span class="num">9</span>, padding=<span class="num">9</span>)
+        self.conv2_4 = nn.Conv2d(..., kernel_size=<span class="num">3</span>, dilation=<span class="num">11</span>, padding=<span class="num">11</span>)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.conv1(F.relu(x))
+        <span class="kw">return</span> self.conv2_1(x) + self.conv2_2(x) + self.conv2_3(x) + self.conv2_4(x)</code></pre>
+
+<p>
+<strong>CSAM (Compact Spatial Attention Module)</strong>：一个轻量级空间注意力机制。先用 1x1 卷积降维到 4 通道，再用 3x3 卷积生成单通道注意力图，最后用 Sigmoid 归一化后与原特征相乘。这让模型学会"哪些空间位置更重要"。
+</p>
+
+<pre><code><span class="cm"># pidinet.py 中的 CSAM 模块</span>
+<span class="kw">class</span> <span class="cls">CSAM</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        y = self.relu1(x)
+        y = self.conv1(y)       <span class="cm"># 1x1 降维到 4 通道</span>
+        y = self.conv2(y)       <span class="cm"># 3x3 生成空间注意力图</span>
+        y = self.sigmoid(y)     <span class="cm"># 归一化到 [0, 1]</span>
+        <span class="kw">return</span> x * y            <span class="cm"># 注意力加权</span></code></pre>
+
+<h3>2.4 配置系统：carv4</h3>
+
+<p>
+<code>config.py</code> 中定义了一个 <code>nets</code> 字典，用来指定每个 stage 中每层使用哪种卷积类型。默认配置 <code>carv4</code> 的含义是：每个 stage 的 4 层分别使用 <code>cd</code>(中心差分)、<code>ad</code>(角差分)、<code>rd</code>(径向差分)、<code>cv</code>(标准卷积)，循环 4 次。这种混合策略让模型在不同层级捕获不同方向的边缘信息。
+</p>
+</section>
+
+<!-- ========== 3. 转换流水线 ========== -->
+<section id="pipeline">
+<h2><span class="icon">03</span> 转换流水线详解</h2>
+
+<h3>3.1 Step 1：模型加载 (PiDiNetLoader)</h3>
+
+<p>
+<code>PiDiNetLoader.load()</code> 的职责是从 <code>.pth</code> 文件加载 PyTorch 模型。这个过程有两个工程上值得注意的细节：
+</p>
+
+<h4>处理 DataParallel 训练的权重前缀</h4>
+
+<p>
+当模型使用 <code>nn.DataParallel</code> 在多 GPU 上训练时，保存的权重 key 会带有 <code>module.</code> 前缀（例如 <code>module.block1_1.conv1.weight</code>）。但推理时使用的是单 GPU/CPU 模型，不需要这个前缀。因此加载时需要清理：
+</p>
+
+<pre><code><span class="cm"># convert_pidinet_to_tflite.py 第 86-89 行</span>
+new_state_dict: <span class="bi">dict</span>[<span class="bi">str</span>, torch.Tensor] = {}
+<span class="kw">for</span> k, v <span class="kw">in</span> raw_state_dict.items():
+    name = k.replace(<span class="str">"module."</span>, <span class="str">""</span>) <span class="kw">if</span> k.startswith(<span class="str">"module."</span>) <span class="kw">else</span> k
+    new_state_dict[name] = v</code></pre>
+
+<p>
+这是模型部署中非常常见的模式。如果不做这个处理，<code>load_state_dict()</code> 会因为 key 不匹配而报错。
+</p>
+
+<h4>处理嵌套的 checkpoint 结构</h4>
+
+<pre><code><span class="cm"># 有的 .pth 保存的不只是 state_dict，还包含训练元信息</span>
+<span class="kw">if</span> <span class="bi">isinstance</span>(raw_state_dict, <span class="bi">dict</span>) <span class="kw">and</span> <span class="str">"state_dict"</span> <span class="kw">in</span> raw_state_dict:
+    raw_state_dict = raw_state_dict[<span class="str">"state_dict"</span>]</code></pre>
+
+<p>
+PyTorch 保存模型有两种常见格式：<code>torch.save(model.state_dict(), path)</code> 直接保存权重字典；或者 <code>torch.save({"epoch": N, "state_dict": {...}}, path)</code> 保存包含训练状态的 checkpoint。这里兼容了两种情况。
+</p>
+
+<h3>3.2 Step 2：ONNX 导出 (ONNXExporter)</h3>
+
+<p>
+ONNX (Open Neural Network Exchange) 是一个开放的模型中间表示格式，充当不同框架之间的"桥梁"。<code>torch.onnx.export</code> 的核心原理是<strong>追踪 (tracing)</strong>：给模型喂一个 dummy input，记录所有的计算操作，然后序列化成一个计算图。
+</p>
+
+<pre><code><span class="cm"># convert_pidinet_to_tflite.py 第 128-137 行</span>
+dummy_input = torch.randn(*input_shape)  <span class="cm"># (1, 3, 512, 512)</span>
+torch.onnx.export(
+    self.model,
+    dummy_input,
+    onnx_path,
+    input_names=[<span class="str">"input"</span>],
+    output_names=[<span class="str">"output"</span>],
+    opset_version=self.opset_version,  <span class="cm"># 13</span>
+    do_constant_folding=<span class="num">True</span>,
+    export_params=<span class="num">True</span>,
+)</code></pre>
+
+<div class="card card-warn">
+  <div class="card-title">关键决策：不使用 dynamic_axes</div>
+  <p>
+    代码第 127 行注释明确指出：<em>"不使用 dynamic_axes，避免 onnx2tf 处理动态维度时出错"</em>。这意味着导出的 ONNX 模型的输入尺寸是固定的 512x512。虽然动态维度在理论上更灵活，但在实际部署链路中，下游工具（onnx2tf）对动态维度的支持不完善，因此固定维度是更稳妥的选择。
+  </p>
+</div>
+
+<p>
+<code>opset_version=13</code> 是另一个重要参数。ONNX 的 opset 定义了可用的算子集合，版本越高支持的操作越多，但兼容性可能降低。opset 13 是一个在功能丰富度和工具链兼容性之间取得平衡的选择。
+</p>
+
+<p>
+<code>do_constant_folding=True</code> 表示在导出时预先计算所有常量表达式的值，减少模型运行时的计算量。例如，如果两个常量张量相加，folding 会直接在导出阶段算好结果。
+</p>
+
+<h3>3.3 Step 3-5：TFLite 转换 (TFLiteConverter)</h3>
+
+<p>
+TFLite 的转换使用了一个叫 <strong>onnx2tf</strong> 的第三方工具。这个工具将 ONNX 模型先转为 TensorFlow SavedModel 格式，然后再转为 TFLite。整个过程中有三种精度模式：
+</p>
+
+<table>
+<tr>
+  <th>模式</th>
+  <th>精度</th>
+  <th>模型大小</th>
+  <th>推理速度</th>
+  <th>实现方式</th>
+</tr>
+<tr>
+  <td>FP32</td>
+  <td>最高</td>
+  <td>最大</td>
+  <td>基准</td>
+  <td>直接转换，无量化</td>
+</tr>
+<tr>
+  <td>FP16</td>
+  <td>高</td>
+  <td>约减半</td>
+  <td>较快</td>
+  <td>动态范围量化 (dynamic range)</td>
+</tr>
+<tr>
+  <td>INT8</td>
+  <td>中等</td>
+  <td>约 1/4</td>
+  <td>最快</td>
+  <td>全整数量化，需要校准数据</td>
+</tr>
+</table>
+
+<p>
+FP16 量化只需要设置一个标志位即可，不需要额外数据。但 INT8 量化需要 <strong>representative dataset（校准数据集）</strong>——一组能代表真实输入分布的样本，用于统计各层激活值的动态范围，从而确定量化参数（scale 和 zero-point）。
+</p>
+
+<h3>3.4 模型验证 (TFLiteValidator)</h3>
+
+<p>
+每个 TFLite 模型生成后，都会经过一次"烟雾测试"：用随机数据跑一次推理，确认模型能正常加载和执行。这里有一个重要细节——<strong>NCHW vs NHWC 数据格式差异</strong>：
+</p>
+
+<pre><code><span class="cm"># convert_pidinet_to_tflite.py 第 373-376 行</span>
+<span class="cm"># PyTorch 用 NCHW (Batch, Channel, Height, Width)</span>
+<span class="cm"># TFLite 用 NHWC (Batch, Height, Width, Channel)</span>
+actual_shape = input_details[<span class="num">0</span>][<span class="str">"shape"</span>]  <span class="cm"># 从模型元数据读取实际形状</span>
+input_data = np.random.rand(*actual_shape).astype(np.float32)</code></pre>
+
+<p>
+代码没有硬编码输入形状，而是从 TFLite Interpreter 的元数据中读取，这是一种防御性编程实践——避免了因格式转换导致的形状不匹配问题。
+</p>
+</section>
+
+<!-- ========== 4. 工程实践注意点 ========== -->
+<section id="engineering">
+<h2><span class="icon">04</span> 工程实践注意点</h2>
+
+<h3>4.1 Monkey Patching：修复第三方库的缺陷</h3>
+
+<p>
+代码中有一段非常典型的 <strong>monkey patching</strong> 实践——在运行时动态替换 <code>onnx2tf</code> 内部的一个函数，因为它依赖的远程测试图片下载可能失败：
+</p>
+
+<pre><code><span class="cm"># convert_pidinet_to_tflite.py 第 183-214 行</span>
+<span class="cm"># 保存原始函数引用</span>
+_original_download_cf = _onnx2tf_cf.download_test_image_data
+
+<span class="kw">def</span> <span class="fn">_dummy_test_data</span>() -> np.ndarray:
+    <span class="kw">return</span> np.random.rand(<span class="num">20</span>, <span class="num">128</span>, <span class="num">128</span>, <span class="num">3</span>).astype(np.float32)
+
+<span class="cm"># 替换为本地随机数据生成</span>
+_onnx2tf_cf.download_test_image_data = _dummy_test_data
+
+<span class="kw">try</span>:
+    convert(**kwargs)
+<span class="kw">finally</span>:
+    <span class="cm"># 确保无论成功与否都恢复原始函数</span>
+    _onnx2tf_cf.download_test_image_data = _original_download_cf</code></pre>
+
+<div class="card card-info">
+  <div class="card-title">Monkey Patching 的利与弊</div>
+  <p>
+    这是在无法修改第三方库源码时的实用技巧。关键注意事项是：(1) 必须在 <code>try/finally</code> 中恢复原始函数，防止影响其他代码；(2) 由于 onnx2tf 内部通过 <code>from ... import</code> 导入了这个函数，需要同时 patch 两个模块中的引用。这种"补丁"方式脆弱且依赖内部实现细节，库版本升级后可能失效。
+  </p>
+</div>
+
+<h3>4.2 Fallback 降级策略</h3>
+
+<p>
+INT8 量化的实现展示了优秀的<strong>降级 (fallback)</strong> 设计：
+</p>
+
+<pre><code><span class="cm"># convert_pidinet_to_tflite.py 第 298-309 行</span>
+<span class="kw">try</span>:
+    <span class="cm"># 优先使用 onnx2tf 的 INT8 量化</span>
+    generated = self._run_onnx2tf(Path(tmpdir), quant_type=<span class="str">"int8"</span>)
+    shutil.copy(<span class="bi">str</span>(generated), <span class="bi">str</span>(output_path))
+    <span class="kw">return</span> output_path
+<span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+    logger.warning(<span class="str">f"onnx2tf INT8 量化失败，回退到 TFLite 原生转换器: {e}"</span>)
+
+<span class="cm"># 回退方案：TFLite 原生转换器</span>
+<span class="kw">return</span> self._convert_int8_via_tflite(output_path, representative_dataset)</code></pre>
+
+<p>
+这种"先尝试方案 A，失败后用方案 B"的策略提高了工具的鲁棒性。不同版本的 onnx2tf 对 INT8 的支持不一致，fallback 机制确保在各种环境下都能完成转换。
+</p>
+
+<h3>4.3 临时文件管理</h3>
+
+<p>
+转换过程中会产生大量中间文件（SavedModel 目录、临时 TFLite 等），代码统一使用 <code>tempfile.TemporaryDirectory()</code> 作为上下文管理器：
+</p>
+
+<pre><code><span class="kw">with</span> tempfile.TemporaryDirectory() <span class="kw">as</span> tmpdir:
+    generated = self._run_onnx2tf(Path(tmpdir), quant_type=<span class="num">None</span>)
+    shutil.copy(<span class="bi">str</span>(generated), <span class="bi">str</span>(output_path))
+<span class="cm"># with 块退出后，tmpdir 及其内容自动删除</span></code></pre>
+
+<p>
+这比手动 <code>os.makedirs</code> + <code>shutil.rmtree</code> 更安全——即使发生异常，临时目录也会被清理。
+</p>
+
+<h3>4.4 类型标注与现代 Python 实践</h3>
+
+<p>
+代码大量使用了现代 Python 的类型标注特性：
+</p>
+
+<pre><code><span class="kw">from</span> __future__ <span class="kw">import</span> annotations  <span class="cm"># 延迟求值，允许前向引用</span>
+
+<span class="cm"># 联合类型用 | 代替 Union[]</span>
+<span class="kw">def</span> <span class="fn">load</span>(model_path: <span class="bi">str</span> | Path, ...) -> nn.Module:
+
+<span class="cm"># 泛型容器直接用内置类型</span>
+results: <span class="bi">dict</span>[<span class="bi">str</span>, Path] = {}
+new_state_dict: <span class="bi">dict</span>[<span class="bi">str</span>, torch.Tensor] = {}
+
+<span class="cm"># Callable 和 Generator 类型</span>
+representative_dataset: <span class="bi">Callable</span>[[], <span class="bi">Generator</span>[<span class="bi">list</span>[np.ndarray], <span class="num">None</span>, <span class="num">None</span>]] | <span class="num">None</span></code></pre>
+
+<p>
+<code>from __future__ import annotations</code> 让所有类型注解变为字符串延迟求值，这样可以直接写 <code>str | Path</code> 而不需要 <code>from typing import Union</code>，代码更简洁。项目要求 Python &gt;= 3.13。
+</p>
+
+<h3>4.5 CLI 设计：灵活的多模式入口</h3>
+
+<p>
+<code>argparse</code> 的设计支持多种使用模式，用户不需要每次都跑完整流程：
+</p>
+
+<table>
+<tr>
+  <th>模式</th>
+  <th>参数</th>
+  <th>用途</th>
+</tr>
+<tr>
+  <td>完整流程</td>
+  <td>（默认）</td>
+  <td>从头到尾所有步骤</td>
+</tr>
+<tr>
+  <td>仅 ONNX</td>
+  <td><code>--onnx-only</code></td>
+  <td>调试 ONNX 导出是否正确</td>
+</tr>
+<tr>
+  <td>仅 FP16</td>
+  <td><code>--fp16 --onnx path</code></td>
+  <td>已有 ONNX，只补做 FP16 量化</td>
+</tr>
+<tr>
+  <td>仅 INT8</td>
+  <td><code>--int8 --onnx path</code></td>
+  <td>已有 ONNX，只补做 INT8 量化</td>
+</tr>
+<tr>
+  <td>跳过某些步骤</td>
+  <td><code>--skip-fp16 --skip-int8</code></td>
+  <td>只到 FP32 为止</td>
+</tr>
+</table>
+
+<p>
+这种设计在调试时非常有用——ONNX 导出通常很慢，如果只想测试量化参数，可以直接复用已有的 ONNX 文件。
+</p>
+
+<h3>4.6 生产环境还需注意的问题</h3>
+
+<div class="card card-err">
+  <div class="card-title">模型精度验证缺失</div>
+  <p>
+    当前的 <code>TFLiteValidator</code> 只做了"烟雾测试"（随机输入能否正常推理），但<strong>没有比较转换前后的输出一致性</strong>。在生产环境中，应该用一组真实图片分别跑 PyTorch 和 TFLite，对比输出的最大绝对误差、余弦相似度等指标，确保格式转换没有引入不可接受的精度损失。
+  </p>
+</div>
+
+<div class="card card-err">
+  <div class="card-title">INT8 校准数据不够严谨</div>
+  <p>
+    INT8 量化需要 representative dataset，但代码中 fallback 路径里并没有确保校准数据的质量。实际应用中，应该使用 100-500 张能代表真实场景的图片作为校准集，且应该对量化后的模型做精度评估，确认边缘检测的 F-measure 下降在可接受范围内。
+  </p>
+</div>
+
+<div class="card card-err">
+  <div class="card-title">模型输出的后处理</div>
+  <p>
+    PiDiNet 的 <code>forward()</code> 返回一个<strong>列表</strong>（5 个张量：4 个中间输出 + 1 个最终输出），但 ONNX 导出时 <code>output_names=["output"]</code> 只命名了一个输出。实际导出时 ONNX 会如何处理多输出模型、TFLite 端取到的到底是哪个输出，这些都应该显式验证，而不是依赖默认行为。
+  </p>
+</div>
+</section>
+
+<!-- ========== 5. 延伸知识点 ========== -->
+<section id="knowledge">
+<h2><span class="icon">05</span> 理解这个领域，还需要哪些知识</h2>
+
+<h3>5.1 模型部署全景：为什么需要格式转换</h3>
+
+<p>
+深度学习模型从训练到部署，要经过"研究环境"到"生产环境"的跨越。PyTorch 擅长研究灵活性，但部署需要的是推理效率高、运行时轻量、跨平台兼容。这就催生了一个庞大的<strong>模型部署工具链</strong>生态：
+</p>
+
+<table>
+<tr>
+  <th>目标平台</th>
+  <th>常用格式</th>
+  <th>推理引擎</th>
+</tr>
+<tr>
+  <td>Android / 嵌入式</td>
+  <td>TFLite</td>
+  <td>TFLite Interpreter</td>
+</tr>
+<tr>
+  <td>iOS</td>
+  <td>CoreML (.mlmodel)</td>
+  <td>Core ML Runtime</td>
+</tr>
+<tr>
+  <td>NVIDIA GPU</td>
+  <td>TensorRT (.engine)</td>
+  <td>TensorRT Runtime</td>
+</tr>
+<tr>
+  <td>跨平台 CPU</td>
+  <td>ONNX Runtime</td>
+  <td>ONNX Runtime</td>
+</tr>
+<tr>
+  <td>浏览器</td>
+  <td>TF.js / ONNX.js</td>
+  <td>WebGL / WebAssembly</td>
+</tr>
+</table>
+
+<p>
+ONNX 之所以成为关键的中间格式，是因为它充当了"通用语言"的角色——几乎所有框架都能导出 ONNX，也几乎所有推理引擎都能导入 ONNX。理解这一点，就能理解本项目为什么要走 PyTorch &rarr; ONNX &rarr; TFLite 这条路。
+</p>
+
+<h3>5.2 量化 (Quantization) 的原理</h3>
+
+<p>
+量化是将模型中的浮点数权重和激活值映射到低比特整数表示的过程。理解量化需要了解以下核心概念：
+</p>
+
+<h4>均匀仿射量化公式</h4>
+
+<p style="text-align:center; font-size:1.1em; padding: 12px; background: var(--surface); border-radius: 8px; margin: 12px 0;">
+  q = round(x / scale) + zero_point
+</p>
+
+<p>
+其中 <code>x</code> 是原始浮点值，<code>scale</code> 是缩放因子，<code>zero_point</code> 是零点偏移，<code>q</code> 是量化后的整数值。反量化则是 <code>x_approx = (q - zero_point) * scale</code>。
+</p>
+
+<p>
+<strong>FP16 量化</strong>（也叫动态范围量化）比较简单：将 FP32 权重直接截断为 FP16，推理时再反量化回 FP32 计算。它不需要校准数据，但只能减小模型体积，对推理速度的提升有限。
+</p>
+
+<p>
+<strong>INT8 全整数量化</strong>则更复杂：不仅权重量化为 INT8，激活值也量化为 INT8，推理全程使用整数运算。这需要校准数据来确定每层激活值的 scale 和 zero_point。INT8 在移动 CPU 和 NPU 上通常有显著的速度提升，因为整数运算比浮点运算快得多，且有专用硬件加速。
+</p>
+
+<h4>量化感知训练 (QAT)</h4>
+
+<p>
+除了"训练后量化 (PTQ)"这种事后处理方式，还有一种更精确的方法叫<strong>量化感知训练 (Quantization-Aware Training)</strong>：在训练过程中就模拟量化误差，让模型学会适应低精度。QAT 通常能获得比 PTQ 更好的精度，但需要重新训练。
+</p>
+
+<h3>5.3 ONNX 计算图与 Opset</h3>
+
+<p>
+ONNX 模型本质上是一个<strong>有向无环图 (DAG)</strong>，节点是算子（Conv、Relu、Sigmoid 等），边是张量。每个算子属于特定的 opset 版本。理解 ONNX 需要知道：
+</p>
+
+<p>
+<strong>算子兼容性</strong>是 ONNX 导出的核心挑战。PyTorch 中的某些操作在 ONNX 中可能没有直接对应的算子，需要用多个基础算子组合实现，或者根本不支持。这就是为什么 PiDiNet 中自定义的像素差分卷积（在 <code>ops.py</code> 中用纯 PyTorch 操作实现）能成功导出——因为它们都是用标准的 <code>F.conv2d</code> 和张量操作构建的，这些在 ONNX 中都有对应算子。
+</p>
+
+<p>
+如果模型中使用了 ONNX 不支持的自定义操作，就需要注册自定义符号函数 (<code>torch.onnx.register_custom_op_symbolic</code>)，或者在导出后用 ONNX GraphSurgeon 手动修改计算图。
+</p>
+
+<h3>5.4 数据布局差异：NCHW vs NHWC</h3>
+
+<p>
+这是深度学习部署中最容易踩坑的问题之一：
+</p>
+
+<table>
+<tr>
+  <th>框架</th>
+  <th>默认布局</th>
+  <th>含义</th>
+</tr>
+<tr>
+  <td>PyTorch</td>
+  <td>NCHW</td>
+  <td>(Batch, Channel, Height, Width)</td>
+</tr>
+<tr>
+  <td>TensorFlow / TFLite</td>
+  <td>NHWC</td>
+  <td>(Batch, Height, Width, Channel)</td>
+</tr>
+</table>
+
+<p>
+一个 (1, 3, 512, 512) 的 PyTorch 张量，在 TFLite 中会变成 (1, 512, 512, 3)。onnx2tf 在转换时会自动插入 Transpose 节点来处理这个差异，但这也可能成为性能瓶颈——在边缘设备上，额外的转置操作会消耗内存和时间。某些情况下，需要在训练阶段就让模型兼容 NHWC 输入。
+</p>
+
+<h3>5.5 边缘检测任务本身</h3>
+
+<p>
+理解这个项目还需要一些计算机视觉中边缘检测的背景知识。
+</p>
+
+<p>
+<strong>边缘检测</strong>是计算机视觉的基础任务，目标是找出图像中亮度/颜色发生显著变化的位置。传统方法有 Sobel、Canny、LoG 等算子；深度学习方法则通过 CNN 自动学习边缘特征。PiDiNet 的"像素差分卷积"本质上是将传统边缘检测算子的思想（差分、梯度）融入了可学习的卷积网络中。
+</p>
+
+<p>
+<strong>评估指标</strong>方面，边缘检测常用 ODS (Optimal Dataset Scale) F-measure 和 OIS (Optimal Image Scale) F-measure 来评估，基于 BSDS500 数据集（项目中也包含了该数据集的文件列表）。评估时需要将预测的边缘图与人工标注的 ground truth 进行匹配，计算 Precision 和 Recall 的调和平均。
+</p>
+
+<p>
+<strong>多尺度融合</strong>是边缘检测（以及语义分割、目标检测等密集预测任务）的关键技术。不同尺度的特征图捕获不同粒度的边缘——浅层特征捕获细节边缘，深层特征捕获语义边缘。PiDiNet 的深度监督 + 双线性上采样 + 分类器融合正是这一思想的体现。
+</p>
+
+<h3>5.6 模型转换中的常见陷阱</h3>
+
+<div class="card card-warn">
+  <div class="card-title">算子不支持 (Unsupported Ops)</div>
+  <p>
+    不是所有 PyTorch 操作都能完美导出 ONNX。例如 <code>torch.nn.functional.interpolate</code> 在某些模式和 opset 版本下会有问题。PiDiNet 使用了 <code>mode="bilinear"</code> 的双线性插值，这在 opset 13 中是被支持的，但在更低版本中可能需要替代方案。
+  </p>
+</div>
+
+<div class="card card-warn">
+  <div class="card-title">训练模式 vs 推理模式</div>
+  <p>
+    <code>model.eval()</code> 是导出前的必要步骤。某些层（如 BatchNorm、Dropout）在训练和推理时行为不同。如果忘记切换到 eval 模式，导出的模型会包含训练时的行为（如 BatchNorm 使用 batch 统计量而非 running mean），导致推理结果不正确。
+  </p>
+</div>
+
+<div class="card card-warn">
+  <div class="card-title">Tracing vs Scripting</div>
+  <p>
+    <code>torch.onnx.export</code> 默认使用 tracing 模式——执行一次模型并记录操作。这意味着<strong>数据依赖的控制流</strong>（如 <code>if x.sum() > 0</code>）不会被正确捕获。PiDiNet 的 <code>forward()</code> 中有基于 <code>self.training</code> 的条件判断（虽然已被注释掉），如果被启用，tracing 就无法正确处理。对于复杂控制流，需要使用 <code>torch.jit.script</code>。
+  </p>
+</div>
+
+<h3>5.7 工程化部署的完整链路</h3>
+
+<p>
+从"能转换"到"能上线"，还需要考虑这些方面：
+</p>
+
+<p>
+<strong>模型大小与推理延迟的基准测试</strong>：不同量化模式的精度-速度-大小 trade-off 需要用真实硬件测量。在 ARM CPU 上，INT8 通常比 FP32 快 2-4 倍，但在 x86 CPU 上差距可能很小。
+</p>
+
+<p>
+<strong>输入预处理与输出后处理</strong>：部署时还需要将原始图片进行 resize、normalize、色彩空间转换等预处理，这些步骤也需要在目标平台上高效实现。对于边缘检测，后处理通常包括非极大值抑制 (NMS) 来细化边缘。
+</p>
+
+<p>
+<strong>模型版本管理与 A/B 测试</strong>：在生产环境中，不同版本的模型（PyTorch 原始版、FP32 TFLite、INT8 TFLite）需要同时维护，并在真实流量上比较它们的表现。
+</p>
+</section>
+
+<div class="footnote">
+  <p>
+    本文档基于 <code>ModelFormatTransfer</code> 项目源码自动生成，涵盖 <code>convert_pidinet_to_tflite.py</code> 主转换脚本及 <code>pidinet/models/</code> 下的模型定义。PiDiNet 原始论文：Zhuo Su, Wenzhe Liu, "Pixel Difference Networks for Efficient Edge Detection", ICCV 2021.
+  </p>
+</div>
+
+</div>
+</body>
+</html>

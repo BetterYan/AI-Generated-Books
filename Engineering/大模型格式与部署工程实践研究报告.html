@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大模型格式与部署工程实践研究报告</title>
+    <style>
+        :root {
+            --bg-primary: #0f1117;
+            --bg-secondary: #1a1d29;
+            --bg-card: #222636;
+            --bg-code: #161821;
+            --border: #2a2e42;
+            --text-primary: #e4e6f0;
+            --text-secondary: #9ba3c2;
+            --text-muted: #6b7280;
+            --accent-blue: #60a5fa;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-purple: #a78bfa;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1d29 0%, #0f1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 60px 40px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-purple));
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header .meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* Sidebar TOC */
+        .sidebar {
+            position: sticky;
+            top: 30px;
+            height: fit-content;
+        }
+
+        .toc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .toc-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .toc-card a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+            padding-left: 12px;
+            margin-left: -12px;
+            transition: all 0.2s;
+        }
+
+        .toc-card a:hover {
+            color: var(--accent-cyan);
+            border-left-color: var(--accent-cyan);
+        }
+
+        .toc-card a.level-1 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 8px;
+        }
+
+        .toc-card a.level-2 {
+            padding-left: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-width: 0;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            opacity: 0.6;
+        }
+
+        .card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card h2 .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin: 28px 0 14px;
+            color: var(--accent-cyan);
+        }
+
+        .card h4 {
+            font-size: 1rem;
+            margin: 20px 0 10px;
+            color: var(--accent-orange);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .data-table .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+        .badge-green { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+        .badge-orange { background: rgba(251,146,60,0.15); color: var(--accent-orange); }
+        .badge-red { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+        .badge-purple { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+
+        /* Code Blocks */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        code.inline {
+            background: rgba(255,255,255,0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+        }
+
+        .code-block .filename {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .code-block pre {
+            border-radius: 0 0 8px 8px;
+            margin-top: 0;
+        }
+
+        /* Syntax highlighting */
+        .kw { color: var(--accent-purple); }
+        .fn { color: var(--accent-blue); }
+        .str { color: var(--accent-green); }
+        .num { color: var(--accent-orange); }
+        .cmt { color: var(--text-muted); }
+
+        /* Lists */
+        ul, ol {
+            margin: 14px 0;
+            padding-left: 24px;
+        }
+
+        li {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding-left: 32px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: '\2610';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-size: 1.1rem;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: rgba(96,165,250,0.08);
+            border-left: 3px solid var(--accent-blue);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .warn-box {
+            background: rgba(251,146,60,0.08);
+            border-left: 3px solid var(--accent-orange);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .danger-box {
+            background: rgba(248,113,113,0.08);
+            border-left: 3px solid var(--accent-red);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .tip-box {
+            background: rgba(52,211,153,0.08);
+            border-left: 3px solid var(--accent-green);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .info-box strong, .warn-box strong, .danger-box strong, .tip-box strong {
+            color: var(--text-primary);
+        }
+
+        /* Flow diagram */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 24px 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .flow-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .flow-arrow {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        /* Grid of cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .mini-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .mini-card h4 {
+            margin-top: 0;
+            font-size: 0.95rem;
+        }
+
+        .mini-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+
+        /* Section anchors */
+        .section-anchor {
+            scroll-margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>大模型格式与部署工程实践研究报告</h1>
+        <p class="subtitle">从训练格式到端侧部署：PyTorch/ONNX/TFLite 全链路工程指南</p>
+        <p class="meta">生成时间：2026年6月14日 | 技术领域：深度学习工程化部署</p>
+    </header>
+
+    <div class="container two-col">
+        <aside class="sidebar">
+            <div class="toc-card">
+                <h3>目录</h3>
+                <nav>
+                    <a href="#sec1" class="level-1">1. 大模型格式全景图</a>
+                    <a href="#sec1-1" class="level-2">1.1 PyTorch 生态格式</a>
+                    <a href="#sec1-2" class="level-2">1.2 TensorFlow 生态格式</a>
+                    <a href="#sec1-3" class="level-2">1.3 通用交换格式</a>
+                    <a href="#sec1-4" class="level-2">1.4 端侧专用格式</a>
+                    <a href="#sec2" class="level-1">2. 服务端部署方案</a>
+                    <a href="#sec3" class="level-1">3. 端侧部署实战</a>
+                    <a href="#sec3-1" class="level-2">3.1 移动端部署</a>
+                    <a href="#sec3-2" class="level-2">3.2 嵌入式与 IoT</a>
+                    <a href="#sec4" class="level-1">4. 模型格式转换</a>
+                    <a href="#sec4-1" class="level-2">4.1 PTH → ONNX</a>
+                    <a href="#sec4-2" class="level-2">4.2 ONNX → TFLite</a>
+                    <a href="#sec5" class="level-1">5. 转换注意事项</a>
+                    <a href="#sec6" class="level-1">6. Python 代码检查清单</a>
+                    <a href="#sec7" class="level-1">7. 工程实践案例</a>
+                    <a href="#sec8" class="level-1">8. 工程经验总结</a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Section 1 -->
+            <section id="sec1" class="card section-anchor">
+                <h2><span class="icon">&#128451;</span>1. 大模型格式全景图</h2>
+                <p>深度学习模型的存储格式经历了从框架专属到通用交换、再到端侧优化的演进。理解每种格式的设计目标和技术约束，是部署工作的第一步。</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>格式</th>
+                            <th>所属生态</th>
+                            <th>设计目标</th>
+                            <th>典型场景</th>
+                            <th>端侧友好</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">.pth / .pt</code></td>
+                            <td>PyTorch</td>
+                            <td>训练 checkpoint</td>
+                            <td>模型训练、研究</td>
+                            <td><span class="badge badge-red">否</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.ckpt</code></td>
+                            <td>PyTorch Lightning</td>
+                            <td>完整训练状态</td>
+                            <td>实验管理</td>
+                            <td><span class="badge badge-red">否</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.safetensors</code></td>
+                            <td>Hugging Face</td>
+                            <td>安全、高效的权重存储</td>
+                            <td>模型分发、加载</td>
+                            <td><span class="badge badge-orange">有限</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.onnx</code></td>
+                            <td>开放标准</td>
+                            <td>跨框架交换</td>
+                            <td>部署中间格式</td>
+                            <td><span class="badge badge-orange">有限</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.tflite</code></td>
+                            <td>TensorFlow Lite</td>
+                            <td>移动端/嵌入式推理</td>
+                            <td>Android/iOS/IoT</td>
+                            <td><span class="badge badge-green">是</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.gguf</code></td>
+                            <td>llama.cpp</td>
+                            <td>大语言模型量化</td>
+                            <td>本地 LLM 部署</td>
+                            <td><span class="badge badge-green">是</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.trt / .engine</code></td>
+                            <td>TensorRT</td>
+                            <td>GPU 极致优化</td>
+                            <td>NVIDIA 生产环境</td>
+                            <td><span class="badge badge-red">否</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.mlpackage</code></td>
+                            <td>Core ML</td>
+                            <td>Apple 生态部署</td>
+                            <td>iOS/macOS</td>
+                            <td><span class="badge badge-green">是</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="sec1-1">1.1 PyTorch 生态格式详解</h3>
+                <p>PyTorch 原生使用 Python <code class="inline">pickle</code> 协议序列化模型，这是最灵活但也最危险的格式：</p>
+                
+                <div class="code-block">
+                    <div class="filename">torch.save 的底层结构</div>
+                    <pre><span class="cmt"># PyTorch .pth 文件本质是一个 pickle 序列化的 dict</span>
+{
+    <span class="str">'model_state_dict'</span>: OrderedDict([           <span class="cmt"># 模型参数</span>
+        (<span class="str">'conv1.weight'</span>, tensor([...])),      <span class="cmt"># 权重张量</span>
+        (<span class="str">'conv1.bias'</span>, tensor([...])),        <span class="cmt"># 偏置张量</span>
+        <span class="cmt"># ...</span>
+    ]),
+    <span class="str">'optimizer_state_dict'</span>: {...},             <span class="cmt"># 优化器状态（训练用）</span>
+    <span class="str">'epoch'</span>: <span class="num">100</span>,                           <span class="cmt"># 训练轮次</span>
+    <span class="str">'loss'</span>: <span class="num">0.0234</span>                          <span class="cmt"># 损失值</span>
+}</pre>
+                </div>
+
+                <div class="danger-box">
+                    <strong>安全风险：</strong><code>.pth</code> 基于 pickle，加载时会执行任意 Python 代码。切勿加载不可信来源的 .pth 文件。生产环境应使用 <code>.safetensors</code> 替代。
+                </div>
+
+                <h3 id="sec1-2">1.2 TensorFlow 生态格式</h3>
+                <div class="grid-2">
+                    <div class="mini-card">
+                        <h4>SavedModel</h4>
+                        <p>目录格式，包含 <code>saved_model.pb</code>（计算图）和 <code>variables/</code>（权重）。TensorFlow 2.x 的标准保存格式，支持签名定义便于 Serving。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>Keras H5</h4>
+                        <p>单文件 HDF5 格式，存储结构和权重。仅适用于 Keras 模型，不推荐使用于生产部署，建议迁移到 SavedModel。</p>
+                    </div>
+                </div>
+
+                <h3 id="sec1-3">1.3 通用交换格式：ONNX</h3>
+                <p>ONNX（Open Neural Network Exchange）是跨框架部署的事实标准中间格式。它将计算图序列化为 protobuf，定义了 100+ 标准算子。</p>
+
+                <div class="info-box">
+                    <strong>ONNX 核心优势：</strong>一次转换，多处运行。PyTorch → ONNX → TensorRT / ONNX Runtime / OpenVINO / Core ML / TFLite，实现部署生态解耦。
+                </div>
+
+                <h3 id="sec1-4">1.4 端侧专用格式对比</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>维度</th>
+                            <th>TFLite</th>
+                            <th>Core ML</th>
+                            <th>ONNX Runtime Mobile</th>
+                            <th>GGUF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>目标平台</td>
+                            <td>Android / iOS / MCU</td>
+                            <td>iOS / macOS / watchOS</td>
+                            <td>跨平台</td>
+                            <td>桌面 / 移动端 LLM</td>
+                        </tr>
+                        <tr>
+                            <td>量化支持</td>
+                            <td>INT8 / FP16</td>
+                            <td>INT8 / FP16</td>
+                            <td>INT8 / FP16</td>
+                            <td>Q4 / Q5 / Q8</td>
+                        </tr>
+                        <tr>
+                            <td>算子覆盖</td>
+                            <td>受限（~150个）</td>
+                            <td>中等</td>
+                            <td>较全</td>
+                            <td>LLM 专用</td>
+                        </tr>
+                        <tr>
+                            <td>模型大小优化</td>
+                            <td>4x 压缩（INT8）</td>
+                            <td>2-4x 压缩</td>
+                            <td>2-4x 压缩</td>
+                            <td>4-8x 压缩</td>
+                        </tr>
+                        <tr>
+                            <td>NPU 加速</td>
+                            <td>Hexagon / Edge TPU</td>
+                            <td>Neural Engine</td>
+                            <td>依赖后端</td>
+                            <td>GPU / NPU（有限）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 2 -->
+            <section id="sec2" class="card section-anchor">
+                <h2><span class="icon">&#128187;</span>2. 服务端部署方案</h2>
+                <p>服务端部署的核心矛盾是<strong>吞吐量 vs 延迟</strong>。GPU 资源昂贵，必须通过批处理、动态批处理、KV Cache 复用等手段榨取硬件潜力。</p>
+
+                <h3>2.1 主流服务端推理框架</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>框架</th>
+                            <th>后端</th>
+                            <th>核心特性</th>
+                            <th>适用模型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TensorRT-LLM</td>
+                            <td>NVIDIA GPU</td>
+                            <td>FP8/INT8 量化、PagedAttention、 inflight batching</td>
+                            <td>LLM（Llama、GPT 等）</td>
+                        </tr>
+                        <tr>
+                            <td>vLLM</td>
+                            <td>NVIDIA / AMD GPU</td>
+                            <td>PagedAttention、连续批处理、高吞吐</td>
+                            <td>LLM 服务化</td>
+                        </tr>
+                        <tr>
+                            <td>ONNX Runtime</td>
+                            <td>CPU / GPU / 多种加速器</td>
+                            <td>跨硬件、图优化、量化</td>
+                            <td>CNN / Transformer / 传统 ML</td>
+                        </tr>
+                        <tr>
+                            <td>TorchServe</td>
+                            <td>CPU / GPU</td>
+                            <td>原生 PyTorch、A/B 测试、模型版本管理</td>
+                            <td>PyTorch 训练模型</td>
+                        </tr>
+                        <tr>
+                            <td>Triton Inference Server</td>
+                            <td>多后端</td>
+                            <td>多框架并发、动态批处理、模型编排</td>
+                            <td>异构模型服务</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2.2 服务端部署典型架构</h3>
+                <div class="flow-container">
+                    <div class="flow-step">负载均衡器</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">API Gateway</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">推理服务</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">TensorRT/vLLM</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">GPU Cluster</div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>工程经验：</strong>LLM 推理优先选择 vLLM 或 TensorRT-LLM。对于视觉模型（YOLO、ResNet），ONNX Runtime 或 TensorRT 通常更轻量。不要为用不到的特性支付复杂度成本。
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section id="sec3" class="card section-anchor">
+                <h2><span class="icon">&#128241;</span>3. 端侧部署实战</h2>
+                <p>端侧部署的核心约束：<strong>算力有限、内存紧张、功耗敏感、延迟要求高</strong>。必须在精度损失可接受的前提下，最大化压缩模型。</p>
+
+                <h3 id="sec3-1">3.1 移动端部署：Android 与 iOS</h3>
+                
+                <h4>Android：TensorFlow Lite 方案</h4>
+                <p>TensorFlow Lite 是 Android 端侧推理的首选。Google 提供了完整的工具链：模型转换、量化、基准测试、委托（Delegate）加速。</p>
+
+                <div class="code-block">
+                    <div class="filename">Android Kotlin — TFLite 推理示例</div>
+                    <pre><span class="kw">import</span> org.tensorflow.lite.Interpreter
+<span class="kw">import</span> org.tensorflow.lite.gpu.GpuDelegate
+
+<span class="cmt">// 1. 加载模型（assets 或本地文件）</span>
+<span class="kw">val</span> model = File(context.filesDir, <span class="str">"model.tflite"</span>)
+
+<span class="cmt">// 2. 配置 Interpreter（可选 GPU 加速）</span>
+<span class="kw">val</span> options = Interpreter.Options().apply {
+    <span class="cmt">// 使用 GPU 委托（Adreno / Mali）</span>
+    addDelegate(GpuDelegate())
+    <span class="cmt">// 或使用 NNAPI（Android 8.1+，NPU 加速）</span>
+    <span class="cmt">// setUseNNAPI(true)</span>
+    setNumThreads(<span class="num">4</span>)
+}
+
+<span class="kw">val</span> interpreter = Interpreter(model, options)
+
+<span class="cmt">// 3. 准备输入（ByteBuffer 或 Multi-dimensional Array）</span>
+<span class="kw">val</span> inputBuffer = ByteBuffer.allocateDirect(<span class="num">1</span> * <span class="num">224</span> * <span class="num">224</span> * <span class="num">3</span> * <span class="num">4</span>)
+inputBuffer.order(ByteOrder.nativeOrder())
+<span class="cmt">// ... 填充归一化后的图像数据</span>
+
+<span class="cmt">// 4. 执行推理</span>
+<span class="kw">val</span> output = Array(<span class="num">1</span>) { FloatArray(<span class="num">1000</span>) }
+interpreter.run(inputBuffer, output)
+
+<span class="cmt">// 5. 释放资源（重要！）</span>
+interpreter.close()</pre>
+                </div>
+
+                <h4>iOS：Core ML 与 TFLite 双轨</h4>
+                <p>Apple 生态优先使用 Core ML，可充分利用 Neural Engine（A11 及以后芯片）。跨平台需求可使用 TFLite iOS。</p>
+
+                <div class="code-block">
+                    <div class="filename">iOS Swift — Core ML 推理示例</div>
+                    <pre><span class="kw">import</span> CoreML
+<span class="kw">import</span> Vision
+
+<span class="cmt">// 1. 加载 .mlpackage 模型</span>
+<span class="kw">guard</span> <span class="kw">let</span> modelURL = Bundle.main.url(forResource: <span class="str">"MyModel"</span>, withExtension: <span class="str">"mlpackage"</span>),
+      <span class="kw">let</span> model = <span class="kw">try</span>? MLModel(contentsOf: modelURL) <span class="kw">else</span> {
+    <span class="kw">fatalError</span>(<span class="str">"模型加载失败"</span>)
+}
+
+<span class="cmt">// 2. 创建 Vision 请求（图像分类/检测）</span>
+<span class="kw">let</span> request = VNCoreMLRequest(model: <span class="kw">try</span> VNCoreMLModel(for: model)) { request, error <span class="kw">in</span>
+    <span class="kw">guard</span> <span class="kw">let</span> results = request.results <span class="kw">as</span>? [VNClassificationObservation] <span class="kw">else</span> { <span class="kw">return</span> }
+    <span class="cmt">// 处理推理结果</span>
+}
+
+<span class="cmt">// 3. 执行</span>
+<span class="kw">let</span> handler = VNImageRequestHandler(ciImage: image)
+<span class="kw">try</span>? handler.perform([request])</pre>
+                </div>
+
+                <div class="info-box">
+                    <strong>NNAPI vs GPU Delegate：</strong>NNAPI 在搭载 NPU 的新设备上（如 Pixel、Samsung Galaxy）性能优于 GPU Delegate；但在旧设备或 GPU 更强劲的设备上，GPU Delegate 可能反超。建议运行时基准测试决定。
+                </div>
+
+                <h3 id="sec3-2">3.2 嵌入式与 IoT 部署</h3>
+                <p>MCU 级设备（STM32、ESP32、Raspberry Pi Pico）资源极度受限，通常使用 TensorFlow Lite for Microcontrollers（TFLM）。</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>平台</th>
+                            <th>内存限制</th>
+                            <th>推荐格式</th>
+                            <th>关键约束</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>STM32H7</td>
+                            <td>1MB SRAM</td>
+                            <td>TFLM C 数组</td>
+                            <td>模型必须 < 500KB，无动态内存</td>
+                        </tr>
+                        <tr>
+                            <td>Raspberry Pi 4</td>
+                            <td>2-8GB RAM</td>
+                            <td>ONNX / TFLite</td>
+                            <td>可用 ONNX Runtime，支持 FP16</td>
+                        </tr>
+                        <tr>
+                            <td>NVIDIA Jetson</td>
+                            <td>8-64GB</td>
+                            <td>TensorRT Engine</td>
+                            <td>GPU 加速，支持 INT8 量化</td>
+                        </tr>
+                        <tr>
+                            <td>RK3588</td>
+                            <td>8-32GB</td>
+                            <td>RKNN</td>
+                            <td>NPU 加速，需 RKNN-Toolkit 转换</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 4 -->
+            <section id="sec4" class="card section-anchor">
+                <h2><span class="icon">&#128260;</span>4. 模型格式转换全流程</h2>
+                <p>从训练环境到生产环境的典型路径是：<strong>PyTorch (.pth) → ONNX → TFLite / TensorRT / Core ML</strong>。本节给出每一步的精确命令和代码。</p>
+
+                <h3 id="sec4-1">4.1 PTH → ONNX 转换</h3>
+                <p>这是整个部署链路中最关键的一步。ONNX 作为中间表示，决定了后续所有部署路径的可行性。</p>
+
+                <div class="code-block">
+                    <div class="filename">export_to_onnx.py — PyTorch 导出 ONNX</div>
+                    <pre><span class="kw">import</span> torch
+<span class="kw">import</span> torch.onnx
+
+<span class="cmt"># 1. 加载 PyTorch 模型</span>
+model = MyModel()
+model.load_state_dict(torch.load(<span class="str">"model.pth"</span>, map_location=<span class="str">"cpu"</span>))
+model.eval()
+
+<span class="cmt"># 2. 定义 dummy input（形状必须与真实输入一致）</span>
+dummy_input = torch.randn(<span class="num">1</span>, <span class="num">3</span>, <span class="num">224</span>, <span class="num">224</span>)
+
+<span class="cmt"># 3. 导出 ONNX</span>
+torch.onnx.export(
+    model,                              <span class="cmt"># 要导出的模型</span>
+    dummy_input,                        <span class="cmt"># 示例输入</span>
+    <span class="str">"model.onnx"</span>,                      <span class="cmt"># 输出路径</span>
+    export_params=<span class="kw">True</span>,               <span class="cmt"># 存储权重</span>
+    opset_version=<span class="num">17</span>,                 <span class="cmt"># ONNX 算子集版本（建议 14+）</span>
+    do_constant_folding=<span class="kw">True</span>,         <span class="cmt"># 常量折叠优化</span>
+    input_names=[<span class="str">"input"</span>],             <span class="cmt"># 输入节点名</span>
+    output_names=[<span class="str">"output"</span>],           <span class="cmt"># 输出节点名</span>
+    dynamic_axes={                      <span class="cmt"># 动态维度（批大小可变）</span>
+        <span class="str">"input"</span>: {<span class="num">0</span>: <span class="str">"batch_size"</span>},
+        <span class="str">"output"</span>: {<span class="num">0</span>: <span class="str">"batch_size"</span>}
+    }
+)</pre>
+                </div>
+
+                <div class="warn-box">
+                    <strong>常见失败原因：</strong>控制流（if/for 依赖张量值）、列表/字典输出、自定义算子、原地操作（in-place ops，如 <code>x += 1</code>）。这些问题在 <code>torch.onnx.export</code> 时会产生警告或错误。
+                </div>
+
+                <h3>ONNX 模型验证与简化</h3>
+                <div class="code-block">
+                    <div class="filename">validate_onnx.py — 验证与简化</div>
+                    <pre><span class="kw">import</span> onnx
+<span class="kw">from</span> onnxsim <span class="kw">import</span> simplify
+
+<span class="cmt"># 1. 加载并检查模型</span>
+model = onnx.load(<span class="str">"model.onnx"</span>)
+onnx.checker.check_model(model)          <span class="cmt"># 抛出异常表示结构有问题</span>
+
+<span class="cmt"># 2. 使用 onnxsim 简化（消除冗余节点）</span>
+model_simp, check = simplify(model)
+<span class="kw">assert</span> check, <span class="str">"简化后的模型验证失败"</span>
+onnx.save(model_simp, <span class="str">"model_simplified.onnx"</span>)
+
+<span class="cmt"># 3. 使用 ONNX Runtime 验证数值一致性</span>
+<span class="kw">import</span> onnxruntime <span class="kw">as</span> ort
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+sess = ort.InferenceSession(<span class="str">"model_simplified.onnx"</span>)
+input_name = sess.get_inputs()[<span class="num">0</span>].name
+np_input = np.random.randn(<span class="num">1</span>, <span class="num">3</span>, <span class="num">224</span>, <span class="num">224</span>).astype(np.float32)
+
+<span class="cmt"># PyTorch 结果</span>
+with torch.no_grad():
+    pt_out = model(torch.from_numpy(np_input)).numpy()
+
+<span class="cmt"># ONNX 结果</span>
+onnx_out = sess.run(<span class="kw">None</span>, {input_name: np_input})[<span class="num">0</span>]
+
+<span class="cmt"># 数值差异检查</span>
+np.testing.assert_allclose(pt_out, onnx_out, rtol=<span class="num">1e-5</span>, atol=<span class="num">1e-6</span>)
+<span class="fn">print</span>(<span class="str">"数值一致性验证通过"</span>)</pre>
+                </div>
+
+                <h3 id="sec4-2">4.2 ONNX → TFLite 转换</h3>
+                <p>TFLite 转换通常有两条路径：ONNX → TFLite（直接）或 ONNX → TensorFlow SavedModel → TFLite（间接）。推荐使用 <code>onnx2tf</code> 工具，转换成功率最高。</p>
+
+                <div class="code-block">
+                    <div class="filename">CLI — 使用 onnx2tf 转换</div>
+                    <pre><span class="cmt"># 安装转换工具</span>
+pip install onnx2tf onnx_graphsurgeon sng4onnx
+
+<span class="cmt"># 基础转换（含优化）</span>
+onnx2tf -i model.onnx -o model_tflite
+
+<span class="cmt"># 带 INT8 量化（需要代表性数据集）</span>
+onnx2tf \
+    -i model.onnx \
+    -o model_int8.tflite \
+    -oiqt \
+    -qt per-tensor</pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="filename">Python — 完整量化校准流程</div>
+                    <pre><span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+
+<span class="cmt"># 1. 加载 SavedModel（由 onnx2tf 生成）</span>
+converter = tf.lite.TFLiteConverter.from_saved_model(<span class="str">"model_tflite"</span>)
+
+<span class="cmt"># 2. 配置量化</span>
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+<span class="cmt"># 3. 代表性数据集（用于确定量化范围）</span>
+<span class="kw">def</span> <span class="fn">representative_dataset</span>():
+    <span class="kw">for</span> image <span class="kw">in</span> calibration_dataset:    <span class="cmt"># 约 100-500 张样本</span>
+        image = np.expand_dims(image, axis=<span class="num">0</span>).astype(np.float32)
+        <span class="kw">yield</span> [image]
+
+converter.representative_dataset = representative_dataset
+converter.target_spec.supported_ops = [
+    tf.lite.OpsSet.TFLITE_BUILTINS_INT8    <span class="cmt"># 强制 INT8</span>
+]
+converter.inference_input_type = tf.uint8    <span class="cmt"># 输入 uint8（加速推理）</span>
+converter.inference_output_type = tf.float32 <span class="cmt"># 输出保持 float</span>
+
+<span class="cmt"># 4. 转换</span>
+tflite_model = converter.convert()
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"model_quantized.tflite"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+    f.write(tflite_model)</pre>
+                </div>
+
+                <h3>4.3 ONNX → TensorRT 转换（GPU 极致优化）</h3>
+                <div class="code-block">
+                    <div class="filename">convert_to_trt.py — TensorRT Engine 构建</div>
+                    <pre><span class="kw">import</span> tensorrt <span class="kw">as</span> trt
+
+TRT_LOGGER = trt.Logger(trt.Logger.WARNING)
+
+<span class="kw">def</span> <span class="fn">build_engine</span>(onnx_path, engine_path, fp16=<span class="kw">True</span>, int8=<span class="kw">False</span>):
+    builder = trt.Builder(TRT_LOGGER)
+    network = builder.create_network(
+        <span class="num">1</span> << <span class="fn">int</span>(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    )
+    parser = trt.OnnxParser(network, TRT_LOGGER)
+
+    <span class="kw">with</span> <span class="fn">open</span>(onnx_path, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">if</span> <span class="kw">not</span> parser.parse(f.read()):
+            <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(parser.num_errors):
+                <span class="fn">print</span>(parser.get_error(i))
+            <span class="kw">raise</span> RuntimeError(<span class="str">"ONNX 解析失败"</span>)
+
+    config = builder.create_builder_config()
+    config.max_workspace_size = <span class="num">4</span> * <span class="num">1024</span> * <span class="num">1024</span> * <span class="num">1024</span>  <span class="cmt"># 4GB</span>
+
+    <span class="kw">if</span> fp16:
+        config.set_flag(trt.BuilderFlag.FP16)
+    <span class="kw">if</span> int8:
+        config.set_flag(trt.BuilderFlag.INT8)
+        <span class="cmt"># 需配置 INT8 校准器...</span>
+
+    <span class="cmt"># 构建 serialized engine（耗时操作）</span>
+    engine = builder.build_engine(network, config)
+
+    <span class="kw">with</span> <span class="fn">open</span>(engine_path, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+        f.write(engine.serialize())
+
+build_engine(<span class="str">"model.onnx"</span>, <span class="str">"model.trt"</span>, fp16=<span class="kw">True</span>)</pre>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section id="sec5" class="card section-anchor">
+                <h2><span class="icon">&#9888;</span>5. 模型转换关键注意事项</h2>
+                <p>转换失败是部署工作的最大时间杀手。以下经验来自数十次实际项目的踩坑总结。</p>
+
+                <h3>5.1 PyTorch → ONNX 阶段</h3>
+                <ul>
+                    <li><strong>opset_version：</strong>使用尽可能高的 opset（推荐 14+），低版本可能不支持新算子。</li>
+                    <li><strong>控制流：</strong><code>torch.jit.script</code> 中的控制流可以导出，但 <code>trace</code> 模式下不行。建议先用 <code>torch.jit.script</code> 包装模型。</li>
+                    <li><strong>动态轴：</strong>如果批大小固定为 1，不要声明 dynamic_axes，有助于后续 TensorRT 优化。</li>
+                    <li><strong>原地操作：</strong><code>x += 1</code>、<code>x[0] = 1</code> 等原地操作在 ONNX 中可能导致 graph 错误，应替换为 <code>x = x + 1</code>。</li>
+                    <li><strong>列表输出：</strong>ONNX 原生不支持 Python list/dict 输出。需改为 tuple 或拼接为单个张量。</li>
+                </ul>
+
+                <h3>5.2 ONNX → TFLite 阶段</h3>
+                <ul>
+                    <li><strong>算子兼容性：</strong>TFLite 的算子集是 ONNX 的子集。TFLite 不支持 NMS（非极大值抑制）、部分激活函数、某些 Padding 模式。</li>
+                    <li><strong>维度对齐：</strong>TFLite 偏好 NHWC（通道在后），而 PyTorch/ONNX 默认 NCHW（通道在前）。转换工具会自动插入 Transpose，但可能引入额外开销。</li>
+                    <li><strong>归一化层：</strong>BatchNorm 与 Conv 融合（fuse）是常见的图优化，但在量化模型中融合顺序错误会导致精度崩溃。</li>
+                    <li><strong>动态形状：</strong>TFLite 对动态形状支持有限。如果模型有变长输入（如文本），需固定为最大长度或按批次拆分。</li>
+                </ul>
+
+                <div class="danger-box">
+                    <strong>精度回退陷阱：</strong>某些算子在 INT8 量化下精度损失极大（如 Softmax、Sigmoid）。TFLite 的混合量化（部分算子 FP32、部分 INT8）是默认行为，不要强行将所有算子压到 INT8。
+                </div>
+
+                <h3>5.3 量化特别注意事项</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>量化类型</th>
+                            <th>压缩比</th>
+                            <th>精度损失</th>
+                            <th>适用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>FP32 → FP16</td>
+                            <td>2x</td>
+                            <td>几乎无</td>
+                            <td>GPU 推理（TensorRT、Core ML）</td>
+                        </tr>
+                        <tr>
+                            <td>FP32 → INT8（PTQ）</td>
+                            <td>4x</td>
+                            <td>低-中（1-3% mAP 下降）</td>
+                            <td>视觉模型、ARM CPU</td>
+                        </tr>
+                        <tr>
+                            <td>FP32 → INT8（QAT）</td>
+                            <td>4x</td>
+                            <td>极低</td>
+                            <td>对精度要求高的场景</td>
+                        </tr>
+                        <tr>
+                            <td>LLM → INT4/INT5（GPTQ/AWQ）</td>
+                            <td>8x</td>
+                            <td>中（可感知）</td>
+                            <td>大语言模型本地运行</td>
+                        </tr>
+                </tbody>
+                </table>
+
+                <div class="tip-box">
+                    <strong>量化经验法则：</strong>PTQ（训练后量化）对 CNN 友好，对 Transformer 一般，对 LLM 很差。LLM 量化务必使用 GPTQ、AWQ 或 GGUF 的专用量化方案，而非通用 TFLite 量化。
+                </div>
+            </section>
+
+            <!-- Section 6 -->
+            <section id="sec6" class="card section-anchor">
+                <h2><span class="icon">&#128203;</span>6. Python 代码审查检查清单</h2>
+                <p>在阅读和审查模型相关 Python 代码时，以下检查点可帮助快速定位部署风险。</p>
+
+                <h3>6.1 模型定义文件（model.py）</h3>
+                <ul class="checklist">
+                    <li><strong>输入形状硬编码：</strong>检查 forward 中是否有 <code>x.size(0)</code> 决定控制流，这会导致 ONNX 导出失败。</li>
+                    <li><strong> device 硬编码：</strong>搜索 <code>.cuda()</code>、<code>.to('cuda')</code>，确保导出代码使用 <code>map_location='cpu'</code> 加载。</li>
+                    <li><strong>自定义算子：</strong>检查是否有 <code>torch.autograd.Function</code> 或 C++ 扩展，这些通常无法导出。</li>
+                    <li><strong>条件判断：</strong>检查 <code>if self.training:</code> 分支，导出时应调用 <code>model.eval()</code> 锁定到推理分支。</li>
+                    <li><strong>归一化位置：</strong>确认预处理中的 mean/std 归一化是在 Python 端还是已内嵌到模型中。TFLite 通常希望归一化内嵌。</li>
+                </ul>
+
+                <h3>6.2 导出脚本（export.py）</h3>
+                <ul class="checklist">
+                    <li><strong>dummy_input 代表性：</strong>dummy input 的值范围应覆盖真实输入（如 [0,1] 或 [-1,1]），否则量化校准会出错。</li>
+                    <li><strong>torch.no_grad()：</strong>导出过程是否包裹在 <code>with torch.no_grad():</code> 中。</li>
+                    <li><strong>状态一致性：</strong>确认导出前调用了 <code>model.eval()</code>，BatchNorm 和 Dropout 行为与推理一致。</li>
+                    <li><strong>ONNX 验证：</strong>导出后是否执行了 <code>onnx.checker.check_model()</code> 和数值比对。</li>
+                </ul>
+
+                <h3>6.3 推理代码（inference.py / app 端）</h3>
+                <ul class="checklist">
+                    <li><strong>预处理对齐：</strong>确认 resize、normalize、permute 顺序与训练时完全一致。90% 的部署精度问题来自预处理不匹配。</li>
+                    <li><strong>输出解析：</strong>检查 NMS 阈值、置信度阈值、top-k 等后处理参数是否与训练评估时一致。</li>
+                    <li><strong>内存泄漏：</strong>端侧代码中是否及时释放 interpreter / session 资源。</li>
+                    <li><strong>线程安全：</strong>TensorFlow Interpreter 和 ONNX Session 是否被多线程共享（通常不安全）。</li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="filename">preprocess_alignment_check.py — 预处理对齐验证</div>
+                    <pre><span class="cmt"># 这是部署调试中最有价值的代码片段</span>
+<span class="cmt"># 同时运行 PyTorch 和 TFLite 预处理，对比像素级差异</span>
+
+<span class="kw">def</span> <span class="fn">compare_preprocessing</span>(image_path):
+    <span class="cmt"># PyTorch 路径（训练时）</span>
+    img_pt = Image.open(image_path).convert(<span class="str">'RGB'</span>)
+    img_pt = img_pt.resize((<span class="num">224</span>, <span class="num">224</span>))
+    tensor_pt = transforms.ToTensor()(img_pt)           <span class="cmt"># [0,1]</span>
+    tensor_pt = transforms.Normalize(
+        mean=[<span class="num">0.485</span>, <span class="num">0.456</span>, <span class="num">0.406</span>],
+        std=[<span class="num">0.229</span>, <span class="num">0.224</span>, <span class="num">0.225</span>]
+    )(tensor_pt)
+
+    <span class="cmt"># TFLite 路径（Android/iOS 端常见）</span>
+    img_tf = Image.open(image_path).convert(<span class="str">'RGB'</span>)
+    img_tf = img_tf.resize((<span class="num">224</span>, <span class="num">224</span>))
+    arr_tf = np.array(img_tf).astype(np.float32) / <span class="num">255.0</span>  <span class="cmt"># [0,1]</span>
+    arr_tf = (arr_tf - [<span class="num">0.485</span>, <span class="num">0.456</span>, <span class="num">0.406</span>]) / [<span class="num">0.229</span>, <span class="num">0.224</span>, <span class="num">0.225</span>]
+    arr_tf = np.expand_dims(arr_tf, axis=<span class="num">0</span>)           <span class="cmt"># NHWC</span>
+    <span class="cmt"># TFLite 通常需要 NHWC，而 PyTorch 是 NCHW！</span>
+    arr_tf = np.transpose(arr_tf, (<span class="num">0</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="num">2</span>))         <span class="cmt"># 转为 NCHW 对比</span>
+
+    <span class="cmt"># 对比（差异应 < 1e-5）</span>
+    diff = np.abs(tensor_pt.numpy() - arr_tf)
+    <span class="fn">print</span>(<span class="str">f"Max diff: {diff.max():.8f}"</span>)
+    <span class="fn">print</span>(<span class="str">f"Mean diff: {diff.mean():.8f}"</span>)
+    <span class="kw">assert</span> diff.max() &lt; <span class="num">1e-5</span>, <span class="str">"预处理不一致！"</span></pre>
+                </div>
+            </section>
+
+            <!-- Section 7 -->
+            <section id="sec7" class="card section-anchor">
+                <h2><span class="icon">&#128295;</span>7. 工程实践案例</h2>
+
+                <h3>案例一：YOLOv8 视觉模型端侧部署（Android）</h3>
+                <p><strong>背景：</strong>将 YOLOv8s 目标检测模型部署到 Android App，要求单帧推理 < 100ms。</p>
+
+                <div class="flow-container">
+                    <div class="flow-step">YOLOv8s (FP32)</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">导出 ONNX</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">onnx2tf</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">INT8 量化</div>
+                    <span class="flow-arrow">&#10132;</span>
+                    <div class="flow-step">TFLite + GPU Delegate</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="filename">yolov8_export.py</div>
+                    <pre><span class="kw">from</span> ultralytics <span class="kw">import</span> YOLO
+
+<span class="cmt"># 1. 加载并导出 ONNX（Ultralytics 内置导出）</span>
+model = YOLO(<span class="str">"yolov8s.pt"</span>)
+model.export(format=<span class="str">"onnx"</span>, imgsz=<span class="num">640</span>, opset=<span class="num">12</span>)
+
+<span class="cmt"># 2. 使用 onnx2tf 转换为 TFLite（含 INT8）</span>
+<span class="cmt"># onnx2tf -i yolov8s.onnx -o yolov8s.tflite -oiqt</span>
+
+<span class="cmt"># 3. Android 端推理关键配置</span>
+<span class="cmt"># - 输入: [1, 640, 640, 3] uint8 NHWC</span>
+<span class="cmt"># - 输出: [1, 84, 8400] float32（YOLOv8 输出格式）</span>
+<span class="cmt"># - 后处理: 在 Kotlin 中实现 NMS（阈值 0.45）</span></pre>
+                </div>
+
+                <div class="tip-box">
+                    <strong>实践要点：</strong>YOLOv8 的 NMS 算子在 TFLite 中不被支持，因此导出时应设置 <code>nms=False</code>（或手动实现 NMS），将 NMS 放在客户端代码中执行。这是目标检测模型端侧部署的通用模式。
+                </div>
+
+                <h3>案例二：边缘检测模型 PiDiNet-Tiny 部署（Android + LiteRT）</h3>
+                <p><strong>背景：</strong>将轻量级边缘检测模型 PiDiNet-Tiny 部署到 Android，使用 Google LiteRT（原 TFLite）框架。</p>
+
+                <div class="code-block">
+                    <div class="filename">pidi_net_export.py — 完整导出流程</div>
+                    <pre><span class="kw">import</span> torch
+<span class="kw">import</span> torch.onnx
+
+<span class="cmt"># 1. 加载模型权重</span>
+model = PiDiNetTiny()
+checkpoint = torch.load(<span class="str">"pidi_tiny.pth"</span>, map_location=<span class="str">"cpu"</span>)
+model.load_state_dict(checkpoint[<span class="str">'state_dict'</span>])
+model.eval()
+
+<span class="cmt"># 2. 调整 forward：确保输出为单张量</span>
+<span class="cmt"># 原始模型可能输出 list 或 dict，需包装</span>
+<span class="kw">class</span> <span class="fn">WrappedPiDiNet</span>(torch.nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, model):
+        <span class="fn">super</span>().__init__()
+        self.model = model
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        outputs = self.model(x)
+        <span class="cmt"># 如果输出是 list，取最后一个或拼接</span>
+        <span class="kw">if</span> <span class="fn">isinstance</span>(outputs, (<span class="fn">list</span>, <span class="fn">tuple</span>)):
+            <span class="kw">return</span> outputs[-<span class="num">1</span>]
+        <span class="kw">return</span> outputs
+
+wrapped = WrappedPiDiNet(model)
+
+<span class="cmt"># 3. 导出 ONNX</span>
+dummy = torch.randn(<span class="num">1</span>, <span class="num">3</span>, <span class="num">512</span>, <span class="num">512</span>)
+torch.onnx.export(wrapped, dummy, <span class="str">"pidi_tiny.onnx"</span>,
+                  opset_version=<span class="num">14</span>,
+                  input_names=[<span class="str">"input"</span>],
+                  output_names=[<span class="str">"edge_map"</span>])
+
+<span class="cmt"># 4. 简化并验证</span>
+<span class="cmt"># python -m onnxsim pidi_tiny.onnx pidi_tiny_sim.onnx</span>
+
+<span class="cmt"># 5. 转换为 TFLite</span>
+<span class="cmt"># onnx2tf -i pidi_tiny_sim.onnx -o pidi_tiny_fp16.tflite</span></pre>
+                </div>
+
+                <h3>案例三：大语言模型本地部署（GGUF 格式）</h3>
+                <p><strong>背景：</strong>将 Llama-2-7B 部署到本地 PC（无高端 GPU），使用 CPU 推理。</p>
+
+                <div class="code-block">
+                    <div class="filename">llama_cpp_deploy.sh — GGUF 转换与推理</div>
+                    <pre><span class="cmt"># 1. 克隆 llama.cpp 并编译</span>
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp && make
+
+<span class="cmt"># 2. 将 Hugging Face 模型转换为 GGUF</span>
+python convert_hf_to_gguf.py \
+    ../Llama-2-7b-chat-hf/ \
+    --outfile llama-2-7b-q4.gguf \
+    --outtype q4_0                    <span class="cmt"># 4-bit 量化</span>
+
+<span class="cmt"># 3. 本地推理</span>
+./llama-cli \
+    -m llama-2-7b-q4.gguf \
+    -p <span class="str">"请解释什么是深度学习"</span> \
+    -n <span class="num">256</span> \
+    -t <span class="num">8</span>                            <span class="cmt"># 8 线程</span>
+    --temp <span class="num">0.7</span>                      <span class="cmt"># temperature</span></pre>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>量化类型</th>
+                            <th>模型大小</th>
+                            <th>推理速度（i7-12700）</th>
+                            <th>质量评估</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>FP16</td>
+                            <td>13.5 GB</td>
+                            <td>~2 tok/s</td>
+                            <td>基准</td>
+                        </tr>
+                        <tr>
+                            <td>Q4_0</td>
+                            <td>3.8 GB</td>
+                            <td>~8 tok/s</td>
+                            <td>可接受（轻微质量下降）</td>
+                        </tr>
+                        <tr>
+                            <td>Q5_K_M</td>
+                            <td>4.7 GB</td>
+                            <td>~7 tok/s</td>
+                            <td>推荐（质量接近 FP16）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 8 -->
+            <section id="sec8" class="card section-anchor">
+                <h2><span class="icon">&#128161;</span>8. 工程实践经验总结</h2>
+
+                <h3>8.1 部署路径决策树</h3>
+                <p>根据目标平台和模型类型，选择最优部署路径：</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>目标平台</th>
+                            <th>视觉模型 (CNN)</th>
+                            <th>语言模型 (LLM)</th>
+                            <th>多模态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>NVIDIA GPU 服务器</td>
+                            <td>ONNX → TensorRT</td>
+                            <td>TensorRT-LLM / vLLM</td>
+                            <td>TensorRT</td>
+                        </tr>
+                        <tr>
+                            <td>通用 CPU 服务器</td>
+                            <td>ONNX Runtime</td>
+                            <td>llama.cpp (GGUF)</td>
+                            <td>ONNX Runtime</td>
+                        </tr>
+                        <tr>
+                            <td>Android</td>
+                            <td>TFLite + GPU Delegate</td>
+                            <td>MLC-LLM / llama.cpp Android</td>
+                            <td>TFLite</td>
+                        </tr>
+                        <tr>
+                            <td>iOS</td>
+                            <td>Core ML / TFLite</td>
+                            <td>llama.cpp iOS / MLX (Apple Silicon)</td>
+                            <td>Core ML</td>
+                        </tr>
+                        <tr>
+                            <td>浏览器</td>
+                            <td>ONNX Runtime Web</td>
+                            <td>WebLLM (WebGPU)</td>
+                            <td>ONNX Runtime Web</td>
+                        </tr>
+                        <tr>
+                            <td>MCU / 嵌入式</td>
+                            <td>TFLite Micro</td>
+                            <td>不适用（模型过大）</td>
+                            <td>不适用</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>8.2 核心经验法则</h3>
+                <div class="grid-2">
+                    <div class="mini-card">
+                        <h4>&#10003; 总是验证数值一致性</h4>
+                        <p>每次转换后，用同一批输入对比原始模型和转换后模型的输出。设置 rtol=1e-5 的严格阈值。数值不一致是部署 Bug 的首要来源。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>&#10003; 预处理是最大陷阱</h4>
+                        <p>训练端的预处理（归一化、resize、channel 顺序）必须与推理端逐像素对齐。建议将预处理内嵌到模型图中（ONNX/TFLite）。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>&#10003; 动态批大小是性能杀手</h4>
+                        <p>端侧模型固定 batch=1。服务端 LLM 推理使用 continuous batching（vLLM）或 inflight batching（TensorRT-LLM），而非静态批处理。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>&#10003; 量化不是万能药</h4>
+                        <p>PTQ 对 CNN 有效，对 Transformer 需谨慎，对 LLM 必须使用专用量化方案（GPTQ/AWQ/GGUF）。量化后的模型必须重新跑评估指标。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>&#10003; 算子覆盖检查先行</h4>
+                        <p>在模型设计阶段就查询目标推理框架的算子支持列表。一个不受支持的算子可能导致整图无法执行或大幅降速。</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>&#10003; 版本锁定工具链</h4>
+                        <p>ONNX opset、TensorFlow 版本、CUDA 版本之间的兼容性极其脆弱。将转换环境的版本写入 requirements.txt，并在 CI 中复现。</p>
+                    </div>
+                </div>
+
+                <h3>8.3 推荐工具链组合</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>环节</th>
+                            <th>推荐工具</th>
+                            <th>版本建议</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PyTorch 导出 ONNX</td>
+                            <td>torch.onnx.export + onnxsim</td>
+                            <td>PyTorch 2.1+, ONNX 1.15+</td>
+                        </tr>
+                        <tr>
+                            <td>ONNX → TFLite</td>
+                            <td>onnx2tf</td>
+                            <td>onnx2tf 1.20+</td>
+                        </tr>
+                        <tr>
+                            <td>ONNX → TensorRT</td>
+                            <td>trtexec / polygraphy</td>
+                            <td>TensorRT 8.6+</td>
+                        </tr>
+                        <tr>
+                            <td>LLM 量化</td>
+                            <td>AutoGPTQ / AutoAWQ / llama.cpp</td>
+                            <td>根据模型选择</td>
+                        </tr>
+                        <tr>
+                            <td>端侧基准测试</td>
+                            <td>TFLite Benchmark / ONNX Runtime Profiling</td>
+                            <td>随框架版本</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tip-box">
+                    <strong>最后一条建议：</strong>部署工作不是一次性任务，而是一个持续优化的过程。建立从训练到部署的自动化流水线（MLOps），每次模型迭代自动触发转换、验证、基准测试和回归测试，是规模化部署的唯一可行路径。
+                </div>
+            </section>
+
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem;">
+                <p>— 报告完 —</p>
+                <p style="margin-top: 8px;">本报告基于公开技术文档与工程实践编写，仅供技术参考</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

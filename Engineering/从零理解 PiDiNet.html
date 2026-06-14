@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiDiNet 深度学习讲解 - 费曼学习法</title>
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --surface2: #f0ece6;
+    --border: #d6cfc5;
+    --text: #2c2c2c;
+    --text-dim: #6b6560;
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --warn: #d97706;
+    --err: #dc2626;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --feynman-bg: #eff6ff;
+    --feynman-border: #93c5fd;
+    --insight-bg: #f0fdf4;
+    --insight-border: #86efac;
+    --pytorch-bg: #fdf4ff;
+    --pytorch-border: #d8b4fe;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    font-size: 16.5px;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a1a3e 60%, #2d1b4e 100%);
+    padding: 64px 40px;
+    text-align: center;
+    color: #e2e8f0;
+  }
+  .hero h1 {
+    font-size: 2.2em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .subtitle {
+    color: #94a3b8;
+    font-size: 1.05em;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 28px;
+  }
+  section { margin-bottom: 60px; }
+  h2 {
+    font-size: 1.55em;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  h2 .num {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    width: 32px; height: 32px;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 50%;
+    font-size: 0.72em;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  h3 {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 32px 0 14px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  h4 {
+    font-size: 1.02em;
+    font-weight: 600;
+    color: var(--accent3);
+    margin: 22px 0 10px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  p { margin-bottom: 16px; }
+  strong { font-weight: 600; }
+
+  /* Feynman explanation boxes */
+  .feynman {
+    background: var(--feynman-bg);
+    border: 1px solid var(--feynman-border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .feynman::before {
+    content: "Feynman";
+    position: absolute;
+    top: -11px;
+    left: 18px;
+    background: var(--feynman-bg);
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .feynman p:last-child { margin-bottom: 0; }
+
+  /* Insight boxes */
+  .insight {
+    background: var(--insight-bg);
+    border: 1px solid var(--insight-border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .insight::before {
+    content: "Insight";
+    position: absolute;
+    top: -11px;
+    left: 18px;
+    background: var(--insight-bg);
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: var(--accent3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .insight p:last-child { margin-bottom: 0; }
+
+  /* PyTorch knowledge boxes */
+  .pytorch-box {
+    background: var(--pytorch-bg);
+    border: 1px solid var(--pytorch-border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .pytorch-box::before {
+    content: "PyTorch";
+    position: absolute;
+    top: -11px;
+    left: 18px;
+    background: var(--pytorch-bg);
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .pytorch-box p:last-child { margin-bottom: 0; }
+
+  .warn-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin: 20px 0;
+  }
+  .warn-box .warn-title {
+    font-weight: 700;
+    color: var(--warn);
+    margin-bottom: 6px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border-radius: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-size: 0.84em;
+    line-height: 1.65;
+    margin: 14px 0 20px;
+    color: var(--code-text);
+  }
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  }
+  p code, li code {
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.87em;
+    color: var(--accent);
+  }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+  .num { color: #fab387; }
+  .cls { color: #f9e2af; }
+  .op { color: #f38ba8; }
+  .var { color: #f9e2af; }
+  .bi { color: #89dceb; }
+  .decor { color: #f38ba8; }
+
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 32px;
+    margin-bottom: 48px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  .toc-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+    font-size: 1.05em;
+  }
+  .toc ol { padding-left: 22px; }
+  .toc li { margin: 7px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .sub { padding-left: 20px; list-style-type: disc; }
+  .toc .sub li { margin: 3px 0; font-size: 0.94em; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px;
+    font-size: 0.92em;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th {
+    background: var(--surface2);
+    font-weight: 600;
+    color: var(--accent);
+  }
+  td { background: var(--surface); }
+
+  .ascii-art {
+    background: var(--code-bg);
+    color: #a6adc8;
+    border-radius: 10px;
+    padding: 24px 28px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.78em;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 16px 0 22px;
+  }
+
+  .knowledge-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 18px 0;
+  }
+  .knowledge-card .kc-title {
+    font-weight: 700;
+    font-size: 1.05em;
+    margin-bottom: 10px;
+    color: var(--accent2);
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .knowledge-card .kc-title .kc-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: var(--accent2);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.72em;
+    flex-shrink: 0;
+  }
+  .knowledge-card p:last-child { margin-bottom: 0; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .tag-basic { background: #dbeafe; color: #1d4ed8; }
+  .tag-core { background: #ede9fe; color: #6d28d9; }
+  .tag-adv { background: #fce7f3; color: #be185d; }
+
+  .footnote {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85em;
+  }
+  /* Exercise & answer styles */
+  .exercise-section {
+    margin-top: 48px;
+  }
+  .exercise-section h3 {
+    font-size: 1.3em;
+    color: #b45309;
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  .example, .exercise {
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 22px 0;
+    position: relative;
+  }
+  .example {
+    background: #fefce8;
+    border: 1px solid #fde047;
+  }
+  .example::before {
+    content: "Worked Example";
+    position: absolute;
+    top: -11px; left: 18px;
+    background: #fefce8;
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: #b45309;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .exercise {
+    background: #f0f9ff;
+    border: 1px solid #7dd3fc;
+  }
+  .exercise::before {
+    content: "Exercise";
+    position: absolute;
+    top: -11px; left: 18px;
+    background: #f0f9ff;
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: #0369a1;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .exercise .ex-title, .example .ex-title {
+    font-weight: 700;
+    font-size: 1.02em;
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
+  .exercise .ex-title { color: #0369a1; }
+  .example .ex-title { color: #b45309; }
+  details {
+    margin-top: 14px;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+  }
+  details summary {
+    cursor: pointer;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 0.92em;
+    color: var(--accent);
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+    user-select: none;
+  }
+  details summary:hover { background: rgba(0,0,0,0.03); }
+  details[open] summary { border-bottom: 1px solid var(--border); }
+  details .answer-body {
+    padding: 16px 20px;
+  }
+  details .answer-body p:first-child { margin-top: 0; }
+  details .answer-body p:last-child { margin-bottom: 0; }
+  .difficulty {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 0.72em;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .diff-easy { background: #dcfce7; color: #166534; }
+  .diff-mid { background: #fef3c7; color: #92400e; }
+  .diff-hard { background: #fee2e2; color: #991b1b; }
+
+  @media (max-width: 600px) {
+    .hero { padding: 40px 20px; }
+    .hero h1 { font-size: 1.5em; }
+    .container { padding: 28px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>从零理解 <em>PiDiNet</em></h1>
+  <p class="subtitle">用费曼学习法，把一个深度学习项目讲到你能教给别人</p>
+</div>
+
+<div class="container">
+
+<!-- 目录 -->
+<div class="toc">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#ch1">神经网络是什么 —— 从一个比喻开始</a></li>
+    <li><a href="#ch2">卷积神经网络 —— 让机器"看"图片</a></li>
+    <li><a href="#ch3">PiDiNet 的架构 —— 逐层拆解</a></li>
+    <li><a href="#ch4">像素差分卷积 —— PiDiNet 的灵魂</a></li>
+    <li><a href="#ch5">多尺度融合与深度监督</a></li>
+    <li><a href="#ch6">你能从 PiDiNet 中获得的启示</a></li>
+    <li><a href="#ch7">用 PyTorch 构建同样的模型：完整知识图谱</a></li>
+  </ol>
+</div>
+
+
+<!-- ========== Chapter 1 ========== -->
+<section id="ch1">
+<h2><span class="num">1</span>神经网络是什么 —— 从一个比喻开始</h2>
+
+<div class="feynman">
+<p>
+想象你是一个从未见过猫的人。有人给你看了 1000 张猫的照片，每张照片下面写着"这是猫"。又给你看了 1000 张不是猫的照片，写着"这不是猫"。看够了之后，你的大脑自动总结出了一些规则——"有尖耳朵的"、"有胡须的"、"毛茸茸的"——于是你再看到一张新照片，就能判断它是不是猫。
+</p>
+<p>
+神经网络做的事情和这个过程一模一样。它是一个<strong>由大量简单计算单元组成的数学函数</strong>，你给它看大量的"输入-正确答案"对，它通过一个叫<strong>训练</strong>的过程自动调整内部的参数，使得以后看到新的输入时，能给出接近正确的答案。
+</p>
+</div>
+
+<h3>1.1 最小单元：一个神经元的数学</h3>
+
+<p>
+一个神经元做的事情极其简单：接收几个数字，各自乘以一个权重，加起来，通过一个非线性函数，输出一个数字。用数学表达：
+</p>
+
+<p style="text-align:center; font-size:1.15em; padding:14px; background:var(--surface2); border-radius:8px; margin:14px 0;">
+  output = f(w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + ... + w<sub>n</sub>x<sub>n</sub> + b)
+</p>
+
+<p>
+其中 <code>x</code> 是输入，<code>w</code> 是权重（每个输入的"重要性"），<code>b</code> 是偏置（一个可调的基线值），<code>f</code> 是激活函数（引入非线性，让网络能拟合复杂的映射关系）。
+</p>
+
+<div class="feynman">
+<p>
+打个比方：你决定今天要不要出门。你考虑三个因素：天气好不好（x<sub>1</sub>）、有没有事要办（x<sub>2</sub>）、心情如何（x<sub>3</sub>）。每个因素在你心中的"权重"不同——如果有急事（x<sub>2</sub> 的权重很高），哪怕天气不好也会出门；如果只是随便逛逛（x<sub>2</sub> 权重低），可能天气差就不去了。最后你的大脑对这些因素综合打分，超过某个阈值就决定出门。这就是一个神经元。
+</p>
+</div>
+
+<h3>1.2 从神经元到网络</h3>
+
+<p>
+把很多神经元排成一层，再把多层串起来，就构成了神经网络。<strong>训练</strong>的过程就是：给网络输入一张图片，让它输出一个预测，把预测和正确答案做对比（计算<strong>损失函数</strong>），然后用<strong>反向传播算法</strong>算出"每个权重应该往哪个方向调多少"，最后用<strong>梯度下降</strong>更新所有权重。这个过程重复成千上万次，网络就逐渐学会了。
+</p>
+
+<p>
+在 PyTorch 中，整个过程的骨架是这样的：
+</p>
+
+<pre><code><span class="cm"># 训练的伪代码骨架</span>
+model = MyNetwork()
+optimizer = torch.optim.Adam(model.parameters(), lr=<span class="num">0.001</span>)
+loss_fn = nn.BCELoss()
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="bi">range</span>(<span class="num">100</span>):              <span class="cm"># 重复 100 轮</span>
+    <span class="kw">for</span> image, label <span class="kw">in</span> dataset:     <span class="cm"># 遍历所有训练数据</span>
+        prediction = model(image)     <span class="cm"># 前向传播：让模型猜</span>
+        loss = loss_fn(prediction, label)  <span class="cm"># 计算"猜得有多离谱"</span>
+        loss.backward()              <span class="cm"># 反向传播：算梯度</span>
+        optimizer.step()             <span class="cm"># 梯度下降：更新权重</span>
+        optimizer.zero_grad()        <span class="cm"># 清零梯度，准备下一轮</span></code></pre>
+
+<p>
+这段代码里有三个关键概念需要深入理解：<strong>损失函数</strong>、<strong>反向传播</strong>和<strong>梯度下降</strong>。让我们逐一拆解。
+</p>
+
+<h4>损失函数：衡量"猜得有多离谱"</h4>
+
+<div class="feynman">
+<p>
+想象你在练习投篮。每次投完，你都会问教练："我这次投得怎么样？"教练会给你一个反馈——"偏左了 10 厘米"、"力度不够"、"完美！"。损失函数就是这个教练，它把模型的预测和正确答案做比较，输出一个数字：<strong>损失值越小，说明模型猜得越准</strong>。
+</p>
+</div>
+
+<p>
+边缘检测是一个二分类任务（每个像素要么是边缘，要么不是）。PiDiNet 输出的每张图都是概率值（0~1），对应的标签也是 0 或 1。常用的损失函数是<strong>二元交叉熵 (Binary Cross Entropy)</strong>：
+</p>
+
+<p style="text-align:center; font-size:1.1em; padding:14px; background:var(--surface2); border-radius:8px; margin:14px 0;">
+  BCE = - [ y &middot; log(p) + (1-y) &middot; log(1-p) ]
+</p>
+
+<p>
+其中 <code>y</code> 是正确答案（0 或 1），<code>p</code> 是模型的预测概率。直觉是：如果正确答案是 1（这里是边缘），而模型预测 <code>p=0.9</code>（很有信心是边缘），那 <code>log(0.9)</code> 接近 0，损失很小；如果模型预测 <code>p=0.1</code>（觉得不是边缘），那 <code>log(0.1)</code> 是个很大的负数，取反后损失很大。这个函数会自动惩罚"猜错且很有信心"的情况。
+</p>
+
+<p>
+但边缘检测还有一个特殊问题：一张图中，边缘像素可能只占 5%，非边缘占 95%。如果模型"偷懒"——对所有像素都预测 0（不是边缘），准确率就有 95%，但显然没有学到任何东西。因此 PiDiNet 使用<strong>加权交叉熵</strong>，给边缘像素更大的权重，强迫模型认真对待少数类。
+</p>
+
+<h4>梯度下降：沿着"下山"的方向走</h4>
+
+<div class="feynman">
+<p>
+想象你蒙着眼睛站在一座山上，目标是走到山谷（损失最低点）。你看不见路，但能感受到脚下的坡度。你的策略是：<strong>哪边更陡就往哪边走，每一步都往下坡方向走</strong>。这就是梯度下降。
+</p>
+<p>
+数学上，"坡度"用<strong>梯度 (gradient)</strong> 来描述。梯度是一个向量，指向损失函数增长最快的方向。所以我们要沿着<strong>梯度的反方向</strong>走，这样损失就会减小。
+</p>
+</div>
+
+<p>
+具体来说，对于一个权重 <code>w</code>，更新公式是：
+</p>
+
+<p style="text-align:center; font-size:1.1em; padding:14px; background:var(--surface2); border-radius:8px; margin:14px 0;">
+  w<sub>new</sub> = w<sub>old</sub> - lr &times; (&part;Loss / &part;w)
+</p>
+
+<p>
+其中 <code>&part;Loss / &part;w</code> 是损失对权重 <code>w</code> 的偏导数（也就是梯度在这个权重方向上的分量），<code>lr</code> 是<strong>学习率</strong>——控制每步走多大。学习率太大，会走过头在山谷两侧来回震荡；学习率太小，会走得极慢，训练时间过长。
+</p>
+
+<div class="feynman">
+<p>
+为什么学习率的选择这么重要？想象两种极端情况：如果你每步跨 10 米，可能一步就从山顶跨到了对面的山坡上，然后又跨回来，永远到不了谷底；如果你每步只挪 1 毫米，可能要走一年。聪明的做法是<strong>自适应学习率</strong>——开始大步快走（快速接近目标），快到谷底时自动放慢脚步（精细调整）。这就是 Adam 优化器的核心思想，也是 PiDiNet 训练代码中 <code>torch.optim.Adam</code> 的作用。
+</p>
+</div>
+
+<h4>反向传播：链式法则的工程实现</h4>
+
+<p>
+现在我们知道了"沿梯度反方向走"可以减小损失，但问题是：<strong>怎么计算梯度？</strong>神经网络有几十万甚至几百万个权重，难道要对每个权重都算一次偏导数？
+</p>
+
+<p>
+答案是<strong>反向传播算法 (Backpropagation)</strong>，它基于微积分中的<strong>链式法则</strong>，可以高效地一次性算出所有权重对应的梯度。
+</p>
+
+<div class="feynman">
+<p>
+想象一条流水线：原料 A 经过工序 B 变成半成品 C，再经过工序 D 变成成品 E。你发现 E 有瑕疵，想找出"每道工序应该调整多少"来改善 E。
+</p>
+<p>
+<strong>正向检查</strong>（前向传播）：A → B → C → D → E，正常生产。
+</p>
+<p>
+<strong>反向追溯</strong>（反向传播）：先看 D 对 E 的影响有多大（D 多加工一点，E 会怎么变？）；再看 C 对 E 的影响——但 C 对 E 的影响必须经过 D，所以 <code>C对E的影响 = C对D的影响 × D对E的影响</code>；以此类推，B 对 E 的影响 = B 对 C 的影响 × C 对 E 的影响...
+</p>
+<p>
+这个"乘法链"就是链式法则。它让你只需要<strong>一遍</strong>从后往前的扫描，就能算出每道工序（每个权重）对最终结果的影响——而不是对几百万个权重逐个计算。
+</p>
+</div>
+
+<p>
+用一个具体的数值例子来看链式法则是怎么工作的：
+</p>
+
+<div class="ascii-art">
+前向传播 (Forward Pass)              反向传播 (Backward Pass)
+
+输入 x = 2                           ∂L/∂y = 1  (损失对 y 的梯度)
+  │                                    │
+  ▼                                    ▼
+  w₁ = 3                              w₁ = 3
+  │                                    │
+  ▼                                    ▼
+  z = x × w₁ = 6                     ∂L/∂z = ∂L/∂y × ∂y/∂z
+  │                                      = 1 × w₂ = 4
+  ▼                                    │
+  w₂ = 4                              ▼
+  │                                  ∂L/∂w₂ = ∂L/∂y × ∂y/∂w₂
+  ▼                                      = 1 × z = 6
+  y = z × w₂ = 24                      │
+  │                                  ▼
+  ▼                                  ∂L/∂w₁ = ∂L/∂z × ∂z/∂w₁
+  损失 L = (y - 目标)²                       = 4 × x = 8
+                                         │
+                                       ▼
+                                     用梯度更新权重:
+                                     w₁ = 3 - lr × 8
+                                     w₂ = 4 - lr × 6</div>
+
+<p>
+关键洞察：<strong>反向传播只做一遍反向扫描，就同时算出了所有权重的梯度</strong>。如果不用链式法则，每个权重都要独立计算，几百万个权重就需要几百万次扫描——计算量完全不可接受。链式法则让梯度的计算量和前向传播差不多，这就是反向传播算法的威力。
+</p>
+
+<h4>PyTorch 的自动微分：你只需要写 forward</h4>
+
+<p>
+好消息是：在 PyTorch 中，你不需要手动实现反向传播。PyTorch 的<strong>自动微分引擎 (autograd)</strong> 会在你写 <code>forward()</code> 的时候，自动记录所有操作的计算图。当你调用 <code>loss.backward()</code> 时，它会自动沿着这个计算图做反向传播，把每个参数的梯度算好，存在 <code>param.grad</code> 属性里。
+</p>
+
+<pre><code><span class="cm"># PyTorch 自动微分的工作方式</span>
+w = torch.tensor([<span class="num">3.0</span>], requires_grad=<span class="num">True</span>)  <span class="cm"># 告诉 PyTorch：这个张量需要梯度</span>
+x = torch.tensor([<span class="num">2.0</span>])
+
+y = x * w                    <span class="cm"># PyTorch 自动记录：y = x * w</span>
+loss = (y - <span class="num">10.0</span>) ** <span class="num">2</span>      <span class="cm"># PyTorch 自动记录：loss = (y - 10)^2</span>
+
+loss.backward()              <span class="cm"># 自动做反向传播</span>
+<span class="bi">print</span>(w.grad)                <span class="cm"># 输出: tensor([-16.])</span>
+                             <span class="cm"># 因为 ∂L/∂w = 2(y-10) × x = 2(6-10) × 2 = -16</span></code></pre>
+
+<p>
+这就是为什么你在 PiDiNet 的 <code>forward()</code> 中只需要写正常的数学运算——PyTorch 会在幕后为你构建完整的计算图，并在 <code>backward()</code> 时自动遍历它。你唯一需要做的就是确保你的操作是可微的（像 <code>max(0,x)</code> 在 x=0 处不可微，但 PyTorch 约定俗成地取次梯度，所以 ReLU 也能正常工作）。
+</p>
+
+<h4>完整的训练循环：把所有部分串起来</h4>
+
+<p>
+现在让我们重新审视训练代码，这次你能理解每一行的含义了：
+</p>
+
+<pre><code><span class="cm"># 1. 创建模型和优化器</span>
+model = MyNetwork()
+optimizer = torch.optim.Adam(model.parameters(), lr=<span class="num">0.001</span>)
+loss_fn = nn.BCELoss()
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="bi">range</span>(<span class="num">100</span>):
+    <span class="kw">for</span> image, label <span class="kw">in</span> dataset:
+
+        <span class="cm"># 2. 前向传播：输入图片 → 模型计算 → 预测结果</span>
+        prediction = model(image)
+
+        <span class="cm"># 3. 计算损失：预测 vs 正确答案 → 一个数字表示"错得有多离谱"</span>
+        loss = loss_fn(prediction, label)
+
+        <span class="cm"># 4. 反向传播：从损失出发，沿计算图反向扫描，</span>
+        <span class="cm">#    算出每个权重对应的梯度（"该权重对损失的影响有多大"）</span>
+        loss.backward()
+
+        <span class="cm"># 5. 梯度下降：每个权重沿梯度反方向更新一小步</span>
+        <span class="cm">#    w_new = w_old - lr × gradient</span>
+        optimizer.step()
+
+        <span class="cm"># 6. 清零梯度：PyTorch 默认会累加梯度（用于某些特殊场景），</span>
+        <span class="cm">#    大多数情况下我们需要每次更新后清零</span>
+        optimizer.zero_grad()</code></pre>
+
+<p>
+这个循环每执行一次，模型的所有权重就被微调一次。经过成千上万次迭代，权重逐渐收敛到一组"好"的值——模型就学会了做边缘检测。PiDiNet 的作者在 BSDS500 数据集上训练了数万次迭代，最终得到了你在 <code>table5_pidinet-tiny.pth</code> 中看到的权重文件。
+</p>
+
+<div class="insight">
+<p>
+<strong>理解这三件事，你就理解了深度学习的核心引擎：</strong>损失函数告诉你"目标在哪"，反向传播告诉你"方向在哪"，梯度下降告诉你"走多远"。无论模型多复杂——从最简单的 MNIST 分类器到 PiDiNet 到 GPT——训练的本质都是这三步的不断循环。区别只在于 forward 中的操作（卷积？Transformer？）和 loss 的设计（交叉熵？MSE？对比损失？）。
+</p>
+</div>
+
+</section>
+
+
+<!-- ========== Chapter 2 ========== -->
+<section id="ch2">
+<h2><span class="num">2</span>卷积神经网络 —— 让机器"看"图片</h2>
+
+<h3>2.1 为什么不能直接把图片喂给普通神经网络</h3>
+
+<p>
+一张 512x512 的彩色图片有 512 x 512 x 3 = 786,432 个数字（每个像素的 RGB 值）。如果用普通的全连接网络，第一层每个神经元都要和这 78 万个输入建立连接，参数量立刻爆炸。而且这种方式完全忽略了图片最重要的特征——<strong>空间结构</strong>。一个像素和它旁边的像素之间的关系，比它和远处某个像素的关系重要得多。
+</p>
+
+<div class="feynman">
+<p>
+想象你在看一幅画。你不会一个像素一个像素地看，而是会关注<strong>局部区域</strong>：这里有一条线，那里有一块色块，这些局部特征组合起来构成了整体的图像。卷积神经网络模仿的正是这种"局部感知"的方式——它用一个小窗口（称为<strong>卷积核</strong>）在图片上滑动，每次只看一小块区域。
+</p>
+</div>
+
+<h3>2.2 卷积操作：一个小窗口在图片上滑动</h3>
+
+<p>
+卷积的核心思想：取一个小的权重矩阵（比如 3x3），把它在输入图片上逐个像素滑动，每到一个位置，就把窗口覆盖的区域和权重逐元素相乘再求和，得到输出上一个点的值。
+</p>
+
+<div class="ascii-art">
+输入图片 (简化为 5x5)         卷积核 (3x3)           输出 (3x3)
+┌─────────────────────┐      ┌─────────┐
+│ 1  2  3  0  1       │      │ 1  0 -1 │         ┌──────────┐
+│ 0  1  2  3  0       │  ──> │ 1  0 -1 │  ──>    │ 3  3  -2 │
+│ 3  2  1  0  2       │      │ 1  0 -1 │         │ 5  0  -3 │
+│ 0  1  3  2  1       │      └─────────┘         │ 2  2  -1 │
+│ 2  0  1  3  0       │     在图片上滑动          └──────────┘
+└─────────────────────┘    每个位置做点积       每个值 = 对应区域
+                           得到一个输出值       与卷积核的点积结果</div>
+
+<p>
+上面的卷积核 <code>[1,0,-1; 1,0,-1; 1,0,-1]</code> 实际上就是一个<strong>竖直边缘检测器</strong>——它对左右两侧亮度差异大的地方响应强烈。传统图像处理中的 Sobel、Prewitt 算子就是手工设计的卷积核。而 CNN 的<strong>卷积核权重是学习出来的</strong>——网络自己决定什么样的"图案"值得关注。
+</p>
+
+<h3>2.3 几个必须理解的概念</h3>
+
+<h4>通道 (Channel)</h4>
+
+<p>
+输入图片有 3 个通道（R、G、B）。卷积核也是 3 通道的，一次操作把 3 个通道都处理了，输出 1 个通道。如果有 64 个卷积核，就输出 64 个通道。每个通道相当于网络学到的一个"观察角度"——有的通道专门看颜色变化，有的看纹理，有的看形状。
+</p>
+
+<h4>步长 (Stride) 与填充 (Padding)</h4>
+
+<p>
+<strong>步长</strong>控制卷积核每次滑动几个像素。stride=1 就是逐个滑动，stride=2 就是跳着走——输出尺寸会减半，相当于"下采样"。
+</p>
+
+<p>
+<strong>填充</strong>是在输入边缘补零，使得输出尺寸和输入相同。一个 3x3 卷积核、stride=1 的情况下，padding=1 可以保持尺寸不变。
+</p>
+
+<h4>感受野 (Receptive Field)</h4>
+
+<div class="feynman">
+<p>
+感受野就是网络中某个神经元"能看到"的原始图片上的区域大小。第一层 3x3 卷积的感受野就是 3x3。但如果叠两层 3x3 卷积，第二层的一个神经元实际上看到了第一层的 3x3 个神经元，而第一层每个神经元又看到了原图的 3x3 区域——所以第二层的感受野变成了 5x5。层数越深，感受野越大，神经元能看到越"宏观"的信息。PiDiNet 中使用的空洞卷积就是为了在不增加参数的情况下扩大感受野。
+</p>
+</div>
+
+<h4>空洞卷积 (Dilated / Atrous Convolution)</h4>
+
+<p>
+普通 3x3 卷积核的 9 个权重是紧密排列的。空洞卷积则在权重之间"插入空隙"，用 dilation rate 来控制。dilation=2 时，3x3 卷积核的实际覆盖范围变成了 5x5（但权重仍然只有 9 个）。这让网络用同样的参数量获得更大的感受野。
+</p>
+
+<div class="ascii-art">
+普通 3x3 卷积 (dilation=1)      空洞卷积 (dilation=2)      空洞卷积 (dilation=3)
+  ●  ●  ●                         ●     ●     ●              ●        ●        ●
+  ●  ●  ●                               ●                          ●
+  ●  ●  ●                         ●     ●     ●              ●        ●        ●
+
+  感受野: 3x3                     感受野: 5x5                感受野: 7x7
+  参数量: 9                       参数量: 9                  参数量: 9</div>
+
+<p>
+PiDiNet 的 CDCM 模块用了 dilation=5,7,9,11 的空洞卷积，让同一个模块能同时在小尺度（dilation=5）和大尺度（dilation=11）上感知边缘。
+</p>
+
+<h4>分组卷积 (Grouped Convolution) 与深度可分离卷积</h4>
+
+<p>
+普通卷积中，每个输出通道都和所有输入通道相连。<strong>分组卷积</strong>把通道分成几组，每组内部独立做卷积。当分组数等于输入通道数时，就是<strong>深度可分离卷积 (Depthwise Convolution)</strong>——每个通道独立处理，大幅减少参数量。
+</p>
+
+<p>
+PiDiNet 的 <code>PDCBlock</code> 中使用了 <code>groups=inplane</code>，这正是深度可分离卷积。代码中的第一层卷积是 depthwise 的，然后用一个 1x1 卷积（pointwise）来混合通道信息：
+</p>
+
+<pre><code><span class="cm"># pidinet.py PDCBlock 第 85-87 行</span>
+<span class="cm"># 第一层：depthwise 3x3，每个通道独立做空间卷积</span>
+self.conv1 = Conv2d(pdc, inplane, inplane, kernel_size=<span class="num">3</span>, padding=<span class="num">1</span>, groups=inplane, bias=<span class="num">False</span>)
+<span class="cm"># 第二层：pointwise 1x1，混合通道信息</span>
+self.conv2 = nn.Conv2d(inplane, ouplane, kernel_size=<span class="num">1</span>, padding=<span class="num">0</span>, bias=<span class="num">False</span>)</code></pre>
+
+<p>
+这个 depthwise + pointwise 的组合（也叫 Inverted Bottleneck）是 MobileNet 等轻量级网络的经典手法。PiDiNet 用它来保持模型的小体量——边缘检测不需要太深的语义理解，轻量就够了。
+</p>
+
+</section>
+
+
+<!-- ========== Chapter 3 ========== -->
+<section id="ch3">
+<h2><span class="num">3</span>PiDiNet 的架构 —— 逐层拆解</h2>
+
+<p>
+现在你有了足够的基础知识，让我们自底向上地构建 PiDiNet。
+</p>
+
+<h3>3.1 主干网络：四阶段特征提取器</h3>
+
+<p>
+PiDiNet 的主干是一个四阶段的卷积网络，每个阶段由若干个 <code>PDCBlock</code> 组成。每个阶段结束后，特征图的空间尺寸减半、通道数翻倍——这和 VGG 的经典设计思路一致：
+</p>
+
+<div class="ascii-art">
+输入 (1, 3, 512, 512)
+  │
+  ▼
+init_block: 3→20 ch, 3x3 Conv          ── (1, 20, 512, 512)
+  │
+  ▼
+Stage 1: 3x PDCBlock                    ── (1, 20, 512, 512)  ← x1
+  │
+  ▼
+Stage 2: PDCBlock(stride=2) + 3x Block  ── (1, 40, 256, 256)  ← x2
+  │
+  ▼
+Stage 3: PDCBlock(stride=2) + 3x Block  ── (1, 80, 128, 128)  ← x3
+  │
+  ▼
+Stage 4: PDCBlock(stride=2) + 3x Block  ── (1, 80, 64, 64)    ← x4
+</div>
+
+<div class="feynman">
+<p>
+你可以把这四个阶段想象成 progressively 从一张照片中"提炼信息"的过程。Stage 1 看到的是最底层的像素级细节——颜色跳变、纹理；Stage 2 开始看到稍大一些的结构——短线段、角点；Stage 3 看到更大的轮廓片段；Stage 4 看到的是物体级别的边界。边缘检测需要所有这些尺度的信息——细节边缘和语义边缘都很重要。
+</p>
+</div>
+
+<h3>3.2 PDCBlock：一个残差块</h3>
+
+<p>
+<code>PDCBlock</code> 是 PiDiNet 的基本构建单元。它采用了<strong>残差连接 (Residual Connection)</strong> 的设计：
+</p>
+
+<pre><code><span class="cm"># pidinet.py 第 89-98 行</span>
+<span class="kw">def</span> <span class="fn">forward</span>(self, x):
+    <span class="kw">if</span> self.stride > <span class="num">1</span>:
+        x = self.pool(x)          <span class="cm"># 下采样</span>
+    y = self.conv1(x)             <span class="cm"># depthwise PDC 卷积</span>
+    y = self.relu2(y)             <span class="cm"># 非线性激活</span>
+    y = self.conv2(y)             <span class="cm"># pointwise 1x1 卷积</span>
+    <span class="kw">if</span> self.stride > <span class="num">1</span>:
+        x = self.shortcut(x)      <span class="cm"># 调整 shortcut 的通道数</span>
+    y = y + x                     <span class="cm"># 残差连接：输出 = 变换 + 输入</span>
+    <span class="kw">return</span> y</code></pre>
+
+<div class="feynman">
+<p>
+残差连接的直觉：假设你要学一个函数 H(x)。直接学 H(x) 有时候很难，但如果改学 F(x) = H(x) - x（即"输入经过变换后，和原来差了多少"），再把输出写成 F(x) + x，反而更容易训练。这是因为如果"变换"其实不需要（H(x) 约等于 x），网络只要把 F(x) 学成 0 就行，而学 0 比学恒等映射容易。在深层网络中，残差连接还帮助梯度在反向传播时不消失——梯度可以通过 shortcut 直接传回前面的层。
+</p>
+</div>
+
+<p>
+当 stride=2 时，输入的空间尺寸需要减半。代码中用了两步：先用 <code>MaxPool2d(2,2)</code> 下采样特征图，再用 1x1 卷积（<code>shortcut</code>）调整通道数，使其和主分支的输出维度匹配，然后才能相加。
+</p>
+
+<h3>3.3 PiDiNet Tiny 的具体参数</h3>
+
+<p>
+项目中使用的是 PiDiNet Tiny 版本。从 <code>pidinet_tiny()</code> 工厂函数可以看到：<code>inplane=20</code>，<code>dil=8</code>（启用空洞卷积），<code>sa=True</code>（启用空间注意力）。
+</p>
+
+<table>
+<tr><th>模型</th><th>初始通道数</th><th>参数量</th><th>定位</th></tr>
+<tr><td>PiDiNet Tiny</td><td>20</td><td>~0.7M</td><td>极速推理、嵌入式部署</td></tr>
+<tr><td>PiDiNet Small</td><td>30</td><td>~1.5M</td><td>精度与速度的平衡</td></tr>
+<tr><td>PiDiNet</td><td>60</td><td>~6M</td><td>最高精度</td></tr>
+</table>
+
+<p>
+这三个版本共享完全相同的网络结构，只是"宽度"（通道数）不同。这是工程上非常实用的设计——同一个架构，用缩放系数就能在不同算力约束下灵活调整。
+</p>
+
+</section>
+
+
+<!-- ========== Chapter 4 ========== -->
+<section id="ch4">
+<h2><span class="num">4</span>像素差分卷积 —— PiDiNet 的灵魂</h2>
+
+<p>
+现在来到 PiDiNet 最核心的创新。名字里的 "PiDi" 就是 "Pixel Difference" 的缩写。
+</p>
+
+<h3>4.1 从传统边缘检测说起</h3>
+
+<div class="feynman">
+<p>
+在你的照片编辑器里，"查找边缘"滤镜是怎么工作的？最古老的方法是：取一个像素，看它和周围像素的亮度差多大。如果差异很大——说明这里有一条边缘。Sobel 算子就是用一个 3x3 的固定权重矩阵来做这件事。但这个矩阵是人工设计的，只能捕获固定方向的边缘。
+</p>
+<p>
+PiDiNet 的发明者想：<strong>为什么不把这个"差分"的思想融入可学习的卷积核中？</strong>让网络自己学怎么做差分最好。于是他们设计了三种差分卷积。
+</p>
+</div>
+
+<h3>4.2 三种差分卷积的直觉理解</h3>
+
+<h4>中央差分卷积 (Central Difference Convolution, CD)</h4>
+
+<p>
+这是最直观的一种。它的核心想法是：标准卷积提取的是"这个区域的整体响应"，而我想要的是"这个区域的变化量"。变化量 = 整体响应 - 不变的部分。
+</p>
+
+<pre><code><span class="cm"># ops.py 第 53-62 行</span>
+<span class="cm"># 把 3x3 权重在空间维度上求和 → 等效为 1x1 权重</span>
+<span class="cm"># 这个 1x1 权重代表的是"不考虑空间结构"时的响应</span>
+weights_c = weights.sum(dim=[<span class="num">2</span>, <span class="num">3</span>], keepdim=<span class="num">True</span>)
+
+<span class="cm"># 用 1x1 权重做卷积 → 得到"中心响应"（不含空间信息的"直流分量"）</span>
+yc = F.conv2d(x, weights_c, stride=stride, padding=<span class="num">0</span>, groups=groups)
+
+<span class="cm"># 用原始 3x3 权重做正常卷积 → 得到"完整响应"</span>
+y = F.conv2d(x, weights, bias, stride=stride, padding=padding, ...)
+
+<span class="cm"># 差分：完整响应 - 直流分量 = 纯空间变化 = 边缘信号</span>
+<span class="kw">return</span> y - yc</code></pre>
+
+<div class="feynman">
+<p>
+打个比方：你站在一间屋子里，想判断地面是否平坦。"完整响应"就像你感受到的全部光线（包括房间本身的亮度），"中心响应"就像你闭上一只眼睛只看平均亮度。两者之差就是"地面的起伏"——去掉了环境亮度的干扰，只剩下结构信息。
+</p>
+</div>
+
+<h4>角差分卷积 (Angular Difference Convolution, AD)</h4>
+
+<p>
+这种卷积关注的是<strong>方向性的变化</strong>。它的做法很巧妙：把 3x3 卷积核的 9 个权重展平，然后让每个权重减去它顺时针方向的邻居：
+</p>
+
+<pre><code><span class="cm"># ops.py 第 70-74 行</span>
+<span class="cm"># 原始 3x3 权重展平后的索引排列：</span>
+<span class="cm">#   [0] [1] [2]</span>
+<span class="cm">#   [3] [4] [5]</span>
+<span class="cm">#   [6] [7] [8]</span>
+<span class="cm">#</span>
+<span class="cm"># 顺时针旋转后的索引：</span>
+<span class="cm">#   [3] [0] [1]</span>
+<span class="cm">#   [6] [4] [2]</span>
+<span class="cm">#   [7] [8] [5]</span>
+<span class="cm">#</span>
+<span class="cm"># 做差分：原始 - 旋转后</span>
+weights_conv = (weights - weights[:, :, [<span class="num">3</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">6</span>,<span class="num">4</span>,<span class="num">2</span>,<span class="num">7</span>,<span class="num">8</span>,<span class="num">5</span>]]).view(shape)
+y = F.conv2d(x, weights_conv, bias, ...)</code></pre>
+
+<div class="feynman">
+<p>
+想象你站在一个圆形广场的中心，面向北。你测量了北、东北、东、东南...各个方向的温度。然后你计算：北边的温度减去东北边的温度、东北减去东、东减去东南...如果某两个相邻方向的温差特别大，说明那个方向有一条"温度锋面"。角差分卷积做的就是这件事——它让卷积核对方向性的梯度变化敏感，特别适合检测斜向的边缘。
+</p>
+</div>
+
+<h4>径向差分卷积 (Radial Difference Convolution, RD)</h4>
+
+<p>
+这种卷积检测的是<strong>从中心向外扩散方向的变化</strong>，本质上是一个可学习的拉普拉斯算子。它的实现最为精妙：把一个 3x3 的权重"展开"到一个 5x5 的缓冲区中，外圈放正值，内圈放负值：
+</p>
+
+<pre><code><span class="cm"># ops.py 第 77-93 行</span>
+<span class="cm"># 创建一个 5x5 的全零缓冲区</span>
+buffer = torch.zeros(shape[<span class="num">0</span>], shape[<span class="num">1</span>], <span class="num">5</span> * <span class="num">5</span>)
+
+<span class="cm"># 5x5 缓冲区的索引布局：</span>
+<span class="cm">#  [ 0] [ 1] [ 2] [ 3] [ 4]</span>
+<span class="cm">#  [ 5] [ 6] [ 7] [ 8] [ 9]</span>
+<span class="cm">#  [10] [11] [12] [13] [14]</span>
+<span class="cm">#  [15] [16] [17] [18] [19]</span>
+<span class="cm">#  [20] [21] [22] [23] [24]</span>
+<span class="cm">#</span>
+<span class="cm"># 外圈 8 个角点位置：[0,2,4,10,14,20,22,24]</span>
+<span class="cm"># 内圈 8 个相邻位置：[6,7,8,11,13,16,17,18]</span>
+<span class="cm"># 中心位置 [12] = 0</span>
+
+<span class="cm"># 原始 3x3 权重（去掉中心后的 8 个值）放到外圈</span>
+buffer[:, :, [<span class="num">0</span>,<span class="num">2</span>,<span class="num">4</span>,<span class="num">10</span>,<span class="num">14</span>,<span class="num">20</span>,<span class="num">22</span>,<span class="num">24</span>]] = weights[:, :, <span class="num">1</span>:]
+<span class="cm"># 取反后放到内圈</span>
+buffer[:, :, [<span class="num">6</span>,<span class="num">7</span>,<span class="num">8</span>,<span class="num">11</span>,<span class="num">13</span>,<span class="num">16</span>,<span class="num">17</span>,<span class="num">18</span>]] = -weights[:, :, <span class="num">1</span>:]
+<span class="cm"># 中心 = 0</span>
+buffer[:, :, <span class="num">12</span>] = <span class="num">0</span>
+
+<span class="cm"># 用这个 5x5 核做卷积</span>
+y = F.conv2d(x, buffer.view(shape[<span class="num">0</span>], shape[<span class="num">1</span>], <span class="num">5</span>, <span class="num">5</span>), ...)</code></pre>
+
+<div class="feynman">
+<p>
+拉普拉斯算子是图像处理中最经典的边缘检测算子之一，它的核心思想是"二阶导数"——如果某个点是局部极值（亮度在这里达到峰值或谷底），那它的二阶导数会很大。RD 卷积把这个思想变成了可学习的版本：外圈的权重和对应的内圈权重符号相反，本质上就是在算"外圈像素 - 内圈像素"的差分，这正是径向方向上的二阶差分。
+</p>
+</div>
+
+<h3>4.3 三种卷积的协同</h3>
+
+<p>
+在默认的 <code>carv4</code> 配置中，每个 stage 的四层分别使用 cd、ad、rd、cv 四种卷积。这不是随意安排的：
+</p>
+
+<table>
+<tr><th>层</th><th>卷积类型</th><th>擅长的边缘类型</th></tr>
+<tr><td>第 1 层</td><td>CD (中央差分)</td><td>通用强度变化——水平/垂直边缘</td></tr>
+<tr><td>第 2 层</td><td>AD (角差分)</td><td>方向性变化——斜向边缘</td></tr>
+<tr><td>第 3 层</td><td>RD (径向差分)</td><td>斑点/角点——二阶结构</td></tr>
+<tr><td>第 4 层</td><td>CV (标准卷积)</td><td>通用特征提取——综合信息</td></tr>
+</table>
+
+<p>
+三种差分卷积各管一种边缘模式，标准卷积负责兜底。这种"专家混合"的思路让网络在每一层都能高效地捕获不同类型的边缘信息，而不是让一个万能卷积做所有事情。
+</p>
+
+<div class="insight">
+<p>
+<strong>关键启示：</strong>领域知识可以指导网络结构设计。PiDiNet 的作者没有盲目堆叠标准卷积，而是从传统边缘检测的数学原理出发，设计了专门的卷积算子。这种"把先验知识注入网络"的思路在很多领域都有效——比如物理信息神经网络 (PINN) 把物理方程嵌入损失函数，图神经网络 (GNN) 把图结构嵌入消息传递机制。
+</p>
+</div>
+
+</section>
+
+
+<!-- ========== Chapter 5 ========== -->
+<section id="ch5">
+<h2><span class="num">5</span>多尺度融合与深度监督</h2>
+
+<h3>5.1 问题：不同尺度的特征图怎么合并</h3>
+
+<p>
+经过四个 stage 后，我们得到了四组特征图 x1~x4，它们的空间尺寸分别是 512、256、128、64。问题是：怎么把它们合并成一张最终的边缘图？
+</p>
+
+<p>
+PiDiNet 的做法分三步：
+</p>
+
+<p>
+<strong>第一步：增强。</strong>每个 stage 的输出先经过 CDCM（多尺度空洞卷积）和 CSAM（空间注意力），提取更丰富的多尺度特征并加权重要区域。
+</p>
+
+<p>
+<strong>第二步：降维。</strong>用 MapReduce（1x1 卷积）把多通道的特征图压缩成单通道的"边缘图"。
+</p>
+
+<p>
+<strong>第三步：上采样 + 融合。</strong>用双线性插值把所有边缘图放大到原始输入尺寸，然后拼接起来，用一个 1x1 分类器融合为最终输出。
+</p>
+
+<pre><code><span class="cm"># pidinet.py forward() 第 261-275 行</span>
+e1 = self.conv_reduces[<span class="num">0</span>](x_fuses[<span class="num">0</span>])    <span class="cm"># Stage 1: (1,20,512,512) → (1,1,512,512)</span>
+e1 = F.interpolate(e1, (H, W), mode=<span class="str">"bilinear"</span>)  <span class="cm"># 已经是 512，不需要变</span>
+
+e2 = self.conv_reduces[<span class="num">1</span>](x_fuses[<span class="num">1</span>])    <span class="cm"># Stage 2: (1,40,256,256) → (1,1,256,256)</span>
+e2 = F.interpolate(e2, (H, W), ...)       <span class="cm"># 上采样到 512x512</span>
+
+e3 = self.conv_reduces[<span class="num">2</span>](x_fuses[<span class="num">2</span>])    <span class="cm"># Stage 3: → 上采样到 512</span>
+e4 = self.conv_reduces[<span class="num">3</span>](x_fuses[<span class="num">3</span>])    <span class="cm"># Stage 4: → 上采样到 512</span>
+
+<span class="cm"># 拼接 4 张边缘图 → (1,4,512,512) → 1x1 卷积 → (1,1,512,512)</span>
+output = self.classifier(torch.cat([e1,e2,e3,e4], dim=<span class="num">1</span>))</code></pre>
+
+<h3>5.2 深度监督 (Deep Supervision)</h3>
+
+<div class="feynman">
+<p>
+想象你在教一个孩子画画。如果你只在他画完最终作品后才给反馈，他可能很难知道自己到底哪一步出了问题——是轮廓画歪了？还是阴影涂错了？但如果你在每一步都给他反馈，他学得就快多了。
+</p>
+<p>
+深度监督做的是同样的事情。PiDiNet 不仅对最终融合后的输出计算损失，还对每个 stage 的中间输出（e1~e4）分别计算损失。这样，梯度信号可以直接传到网络的每一层，而不需要经过长长的回传路径逐渐衰减。训练时，模型返回所有 5 个输出（e1,e2,e3,e4 加上融合后的 output）；推理时，你只需要用最终的 output。
+</p>
+</div>
+
+<pre><code><span class="cm"># pidinet.py 第 273-281 行</span>
+outputs = [e1, e2, e3, e4]          <span class="cm"># 4 个中间输出</span>
+output = self.classifier(torch.cat(outputs, dim=<span class="num">1</span>))  <span class="cm"># 融合输出</span>
+outputs.append(output)              <span class="cm"># 5 个输出全部返回</span>
+outputs = [torch.sigmoid(r) <span class="kw">for</span> r <span class="kw">in</span> outputs]  <span class="cm"># 全部过 sigmoid 映射到 [0,1]</span>
+<span class="kw">return</span> outputs</code></pre>
+
+<p>
+注意最后一行：所有输出都经过了 <code>sigmoid</code>，把数值映射到 [0,1] 区间。这是因为边缘检测的输出是一张概率图——每个像素是边缘的概率，0 表示"肯定不是边缘"，1 表示"肯定是边缘"。
+</p>
+
+<h3>5.3 分类器的权重初始化</h3>
+
+<pre><code><span class="cm"># pidinet.py 第 204-206 行</span>
+self.classifier = nn.Conv2d(<span class="num">4</span>, <span class="num">1</span>, kernel_size=<span class="num">1</span>)  <span class="cm"># 4通道 → 1通道</span>
+nn.init.constant_(self.classifier.weight, <span class="num">0.25</span>)     <span class="cm"># 初始权重全是 0.25</span>
+nn.init.constant_(self.classifier.bias, <span class="num">0</span>)</code></pre>
+
+<p>
+权重全部初始化为 0.25 意味着初始时，分类器对四个 stage 的边缘图做<strong>简单平均</strong>（0.25+0.25+0.25+0.25 = 1.0）。这是一个合理的起点——在训练开始前，"四个尺度同等重要"是最无偏的假设，让训练过程去调整各尺度的权重。
+</p>
+
+</section>
+
+
+<!-- ========== Chapter 6 ========== -->
+<section id="ch6">
+<h2><span class="num">6</span>你能从 PiDiNet 中获得的启示</h2>
+
+<h3>启示一：用领域知识指导架构设计，而不是盲目堆参数</h3>
+
+<div class="insight">
+<p>
+PiDiNet 的核心竞争力不在于它有多少参数，而在于它把传统图像处理中"差分 = 边缘检测"的知识编码进了卷积算子。结果是：0.7M 参数的 Tiny 版本就能达到很好的边缘检测效果，比用标准卷积堆出来的同等精度模型小得多。
+</p>
+<p>
+这个思路可以推广到任何领域：做音频处理？考虑把频谱分析的先验融入网络。做时间序列？把周期性、趋势性编码进注意力机制。<strong>最好的模型架构往往来自对问题本身的深刻理解</strong>，而不是在通用的 Transformer/ResNet 上调参。
+</p>
+</div>
+
+<h3>启示二：轻量级设计的艺术——少即是多</h3>
+
+<p>
+PiDiNet Tiny 只有 20 个初始通道，全程使用 depthwise separable convolution，不用 BatchNorm，结构极其简洁。但它通过精心设计的卷积类型组合、多尺度融合、注意力机制，弥补了"宽度"上的不足。
+</p>
+
+<p>
+这提醒我们：<strong>模型压缩不等于性能下降</strong>。关键是找到任务真正需要的信息，用最经济的方式提取它。边缘检测本身就是一个相对"简单"的任务（输出是单通道概率图），不需要 ImageNet 分类那种庞大的模型。
+</p>
+
+<h3>启示三：可转换性 (Convertibility) 要提前考虑</h3>
+
+<p>
+PiDiNet 专门设计了 <code>PDCBlock_converted</code> 类，把自定义的像素差分卷积转换为等价的标准卷积（cd/ad → 3x3，rd → 5x5）。这意味着训练时用自定义算子获得最佳效果，部署时转换为标准算子以兼容各种推理引擎。
+</p>
+
+<div class="insight">
+<p>
+这是一个非常重要的工程意识：<strong>训练和部署可以使用不同的模型表示</strong>。训练时用灵活但可能低效的自定义操作；部署前转换为标准操作的等价形式。这种"训练态"和"推理态"分离的思路在工业界非常常见——比如知识蒸馏（大模型训练，小模型推理）、结构化剪枝等。
+</p>
+</div>
+
+<h3>启示四：工厂函数模式——同一架构，多种规模</h3>
+
+<pre><code><span class="cm"># pidinet.py 第 284-297 行</span>
+<span class="kw">def</span> <span class="fn">pidinet_tiny</span>(args):
+    <span class="kw">return</span> PiDiNet(<span class="num">20</span>, pdcs, dil=<span class="num">8</span>, sa=args.sa)
+
+<span class="kw">def</span> <span class="fn">pidinet_small</span>(args):
+    <span class="kw">return</span> PiDiNet(<span class="num">30</span>, pdcs, dil=<span class="num">12</span>, sa=args.sa)
+
+<span class="kw">def</span> <span class="fn">pidinet</span>(args):
+    <span class="kw">return</span> PiDiNet(<span class="num">60</span>, pdcs, dil=<span class="num">24</span>, sa=args.sa)</code></pre>
+
+<p>
+三个工厂函数共享同一个 <code>PiDiNet</code> 类，只是调整 <code>inplane</code>（宽度）和 <code>dil</code>（空洞卷积通道数）。这种设计让你可以通过一个超参数就控制模型大小，非常适合做 NAS (Neural Architecture Search) 或针对不同硬件做模型适配。
+</p>
+
+<h3>启示五：配置驱动的网络拓扑</h3>
+
+<p>
+<code>config.py</code> 中用字典定义网络拓扑，而不是在代码中硬编码。这意味着你可以不修改网络类的代码就尝试不同的卷积组合——比如把所有层都换成 cd (<code>c16</code>)、或者混合使用 (<code>carv4</code>)。这种"数据驱动的结构定义"让实验迭代变得很快。
+</p>
+
+</section>
+
+
+<!-- ========== Chapter 7 ========== -->
+<section id="ch7">
+<h2><span class="num">7</span>用 PyTorch 构建同样的模型：完整知识图谱</h2>
+
+<p>
+如果你想从零用 PyTorch 实现一个类似 PiDiNet 的项目，以下是你需要掌握的知识点，按重要程度排列。
+</p>
+
+<!-- K1 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">1</span>nn.Module 与自定义层 <span class="tag tag-basic">基础</span></div>
+<p>
+PyTorch 中所有模型的基类。你需要理解：<code>__init__</code> 中定义层（子模块），<code>forward()</code> 中定义前向传播逻辑。PyTorch 的自动微分会自动根据 <code>forward()</code> 中的操作构建反向传播的计算图。
+</p>
+<p>
+PiDiNet 中有多处自定义层的例子。比如 <code>Conv2d</code>（ops.py）自定义了一个卷积层，它的 <code>forward()</code> 调用了传入的 <code>pdc</code> 函数而非标准的 <code>F.conv2d</code>。关键点是：<strong>只要你的 forward 中使用的操作是可微的（支持 autograd），PyTorch 就能自动处理反向传播</strong>。
+</p>
+<pre><code><span class="cm"># 自定义层的核心模式</span>
+<span class="kw">class</span> <span class="cls">MyCustomLayer</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_ch, out_ch):
+        <span class="bi">super</span>().__init__()
+        self.weight = nn.Parameter(torch.randn(out_ch, in_ch, <span class="num">3</span>, <span class="num">3</span>))  <span class="cm"># 可学习参数</span>
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="cm"># 任何可微操作都行：标准卷积、自定义数学运算、张量重组...</span>
+        <span class="kw">return</span> some_differentiable_computation(x, self.weight)</code></pre>
+</div>
+
+<!-- K2 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">2</span>权重初始化 <span class="tag tag-basic">基础</span></div>
+<p>
+好的初始化对训练收敛至关重要。PiDiNet 中使用了多种初始化策略：
+</p>
+<pre><code><span class="cm"># Kaiming 初始化 —— 适配 ReLU 激活函数</span>
+nn.init.kaiming_uniform_(self.weight, a=math.sqrt(<span class="num">5</span>))
+
+<span class="cm"># 常数初始化 —— 用于偏置和特定层</span>
+nn.init.constant_(self.conv.bias, <span class="num">0</span>)
+nn.init.constant_(self.classifier.weight, <span class="num">0.25</span>)</code></pre>
+<p>
+Kaiming 初始化让每层的输出方差和输入方差大致相同，防止信号在深层网络中逐层放大或缩小（即"梯度爆炸/消失"问题）。当激活函数是 ReLU 时，Kaiming 初始化是最常用的选择。
+</p>
+</div>
+
+<!-- K3 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">3</span>nn.Parameter 与 register_parameter <span class="tag tag-core">核心</span></div>
+<p>
+<code>nn.Parameter</code> 是 PyTorch 中标记"这个张量是可学习的"的方式。被 <code>nn.Parameter</code> 包裹的张量会自动注册到模块的参数列表中，<code>model.parameters()</code> 能遍历到它，优化器能更新它。
+</p>
+<pre><code><span class="cm"># ops.py Conv2d 第 27-31 行</span>
+self.weight = nn.Parameter(torch.Tensor(out_ch, in_ch // groups, k, k))
+<span class="kw">if</span> bias:
+    self.bias = nn.Parameter(torch.Tensor(out_ch))
+<span class="kw">else</span>:
+    self.register_parameter(<span class="str">'bias'</span>, <span class="num">None</span>)  <span class="cm"># 显式声明"无此参数"</span></code></pre>
+<p>
+<code>register_parameter('bias', None)</code> 的作用是在模块内部显式标记"这个模块没有 bias"。如果不做这一步，访问 <code>self.bias</code> 会抛 AttributeError；做了之后，它返回 None，代码可以用 <code>if self.bias is not None</code> 来安全判断。
+</p>
+</div>
+
+<!-- K4 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">4</span>函数工厂与闭包 <span class="tag tag-core">核心</span></div>
+<p>
+<code>createConvFunc</code>（ops.py）是一个函数工厂——它接收一个类型字符串，返回一个函数。这是 Python 闭包的经典用法：返回的内部函数"记住"了外部函数的上下文。
+</p>
+<pre><code><span class="cm"># ops.py 的模式</span>
+<span class="kw">def</span> <span class="fn">createConvFunc</span>(op_type):
+    <span class="kw">if</span> op_type == <span class="str">'cd'</span>:
+        <span class="kw">def</span> <span class="fn">func</span>(x, weights, bias=<span class="num">None</span>, ...):
+            <span class="cm"># 这个 func 被返回后，会被存储到 Conv2d.pdc 中</span>
+            weights_c = weights.sum(dim=[<span class="num">2</span>,<span class="num">3</span>], keepdim=<span class="num">True</span>)
+            yc = F.conv2d(x, weights_c, ...)
+            y = F.conv2d(x, weights, bias, ...)
+            <span class="kw">return</span> y - yc
+        <span class="kw">return</span> func
+    <span class="kw">elif</span> op_type == <span class="str">'ad'</span>:
+        <span class="kw">def</span> <span class="fn">func</span>(x, weights, bias=<span class="num">None</span>, ...):
+            ...
+        <span class="kw">return</span> func</code></pre>
+<p>
+这种设计让你可以用一个配置字符串（'cv', 'cd', 'ad', 'rd'）来决定每一层的行为，而不需要在 forward 中写 <code>if/elif</code> 判断——每个 <code>PDCBlock</code> 在创建时就已经持有了正确的卷积函数。
+</p>
+</div>
+
+<!-- K5 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">5</span>nn.ModuleList 与动态子模块管理 <span class="tag tag-core">核心</span></div>
+<p>
+当你需要在运行时动态创建多个子模块时（比如循环创建 4 个 CSAM），不能用 Python 列表存储——普通的 list 不会被 PyTorch 识别为子模块，<code>model.parameters()</code> 不会包含它们的参数。必须用 <code>nn.ModuleList</code>：
+</p>
+<pre><code><span class="cm"># pidinet.py 第 182-189 行</span>
+self.conv_reduces = nn.ModuleList()    <span class="cm"># ✓ 参数会被正确注册</span>
+self.attentions = nn.ModuleList()
+self.dilations = nn.ModuleList()
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">4</span>):
+    self.dilations.append(CDCM(self.fuseplanes[i], self.dil))
+    self.attentions.append(CSAM(self.dil))
+    self.conv_reduces.append(MapReduce(self.dil))</code></pre>
+<p>
+如果用 <code>self.conv_reduces = []</code>，PyTorch 不会追踪列表中的模块，导致这些层的权重不参与训练，也不会被 <code>model.state_dict()</code> 保存——这是一个非常容易踩的坑。
+</p>
+</div>
+
+<!-- K6 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">6</span>张量操作与形状变换 <span class="tag tag-basic">基础</span></div>
+<p>
+PiDiNet 中大量使用了张量变形操作，理解它们是读懂代码的基础：
+</p>
+<pre><code><span class="cm"># view() —— 重新解释张量形状（不复制数据）</span>
+weights = weights.view(shape[<span class="num">0</span>], shape[<span class="num">1</span>], -<span class="num">1</span>)
+<span class="cm"># (64, 20, 3, 3) → (64, 20, 9)，把 3x3 展平为 9 个元素</span>
+
+<span class="cm"># sum(dim=[2,3], keepdim=True) —— 在指定维度上求和</span>
+weights_c = weights.sum(dim=[<span class="num">2</span>, <span class="num">3</span>], keepdim=<span class="num">True</span>)
+<span class="cm"># (64, 20, 3, 3) → (64, 20, 1, 1)，在空间维度上求和</span>
+
+<span class="cm"># torch.cat(tensors, dim=1) —— 沿通道维度拼接</span>
+output = torch.cat([e1, e2, e3, e4], dim=<span class="num">1</span>)
+<span class="cm"># 4 个 (1,1,H,W) → (1,4,H,W)</span>
+
+<span class="cm"># F.interpolate —— 空间尺寸上采样/下采样</span>
+e1 = F.interpolate(e1, (H, W), mode=<span class="str">"bilinear"</span>, align_corners=<span class="num">False</span>)
+<span class="cm"># 将特征图放大到原始输入尺寸</span></code></pre>
+</div>
+
+<!-- K7 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">7</span>激活函数：ReLU 与 Sigmoid <span class="tag tag-basic">基础</span></div>
+<p>
+PiDiNet 用了两种激活函数，各有其用：
+</p>
+<p>
+<strong>ReLU (Rectified Linear Unit)</strong>：<code>f(x) = max(0, x)</code>。用于中间层，作用是引入非线性并加速训练。负值被"截断"为 0，让网络自动学会"忽略"不重要的信号。PiDiNet 中的 PDCBlock 和 CSAM 都使用了 ReLU。
+</p>
+<p>
+<strong>Sigmoid</strong>：<code>f(x) = 1/(1+e^(-x))</code>。将输出映射到 (0,1) 区间。PiDiNet 在最终输出层使用 sigmoid，因为边缘检测的输出需要是概率值。
+</p>
+</div>
+
+<!-- K8 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">8</span>MaxPool2d 与下采样策略 <span class="tag tag-basic">基础</span></div>
+<p>
+<code>nn.MaxPool2d(kernel_size=2, stride=2)</code> 在 2x2 的窗口中取最大值，步长为 2——输出尺寸变为输入的一半。PiDiNet 在 stride=2 的 PDCBlock 中使用 MaxPool 来做空间下采样。
+</p>
+<p>
+下采样的替代方案包括平均池化（AvgPool）和步长卷积（stride conv）。MaxPool 保留了最强的响应信号，适合边缘检测这种"关注最显著特征"的任务。
+</p>
+</div>
+
+<!-- K9 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">9</span>Depthwise Separable Convolution <span class="tag tag-adv">进阶</span></div>
+<p>
+PiDiNet 的 PDCBlock 使用了 <code>groups=inplane</code>，这就是 depthwise convolution。理解它需要对比标准卷积：
+</p>
+<table>
+<tr><th></th><th>标准 3x3 卷积 (64→64)</th><th>Depthwise 3x3 (64→64)</th><th>Pointwise 1x1 (64→128)</th></tr>
+<tr><td>参数量</td><td>64 x 64 x 3 x 3 = 36,864</td><td>64 x 1 x 3 x 3 = 576</td><td>64 x 128 x 1 x 1 = 8,192</td></tr>
+<tr><td>作用</td><td>同时做空间+通道混合</td><td>只做空间混合</td><td>只做通道混合</td></tr>
+</table>
+<p>
+分离后总参数量 = 576 + 8192 = 8,768，是标准卷积 36,864 的约 1/4。这就是轻量级模型的核心技巧。
+</p>
+</div>
+
+<!-- K10 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">10</span>注意力机制 <span class="tag tag-adv">进阶</span></div>
+<p>
+CSAM 模块是一种<strong>空间注意力</strong>机制。广义上的注意力机制是让网络学会"关注什么"。CSAM 的实现非常轻量：
+</p>
+<pre><code><span class="cm"># 1. 多通道 → 4 通道（降维，减少计算量）</span>
+y = self.conv1(x)       <span class="cm"># (B, C, H, W) → (B, 4, H, W)</span>
+<span class="cm"># 2. 4 通道 → 1 通道（生成空间注意力图）</span>
+y = self.conv2(y)       <span class="cm"># (B, 4, H, W) → (B, 1, H, W)</span>
+<span class="cm"># 3. Sigmoid 归一化到 [0,1]</span>
+y = self.sigmoid(y)     <span class="cm"># 每个位置一个"重要性分数"</span>
+<span class="cm"># 4. 用注意力图加权原特征</span>
+<span class="kw">return</span> x * y            <span class="cm"># 广播：(B,C,H,W) * (B,1,H,W) → (B,C,H,W)</span></code></pre>
+<p>
+这里用了一个 PyTorch 的广播机制 (broadcasting)：形状为 (B,1,H,W) 的注意力图会自动复制到所有 C 个通道上。如果你想深入学习注意力机制，可以从 CBAM（Convolutional Block Attention Module）和 SE-Net（Squeeze-and-Excitation）入手，它们是这类轻量注意力的经典代表。
+</p>
+</div>
+
+<!-- K11 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">11</span>损失函数与多输出训练 <span class="tag tag-adv">进阶</span></div>
+<p>
+PiDiNet 的 <code>forward()</code> 返回 5 个输出。在训练时，需要对每个输出分别计算损失然后加权求和。典型的边缘检测损失函数包括加权交叉熵损失（因为边缘像素远少于非边缘像素，需要给边缘更大的权重）和 Dice Loss。
+</p>
+<pre><code><span class="cm"># 训练时多输出损失的模式</span>
+outputs = model(image)  <span class="cm"># [e1, e2, e3, e4, fused_output]</span>
+total_loss = <span class="num">0</span>
+<span class="kw">for</span> o <span class="kw">in</span> outputs:
+    total_loss += loss_fn(o, label)  <span class="cm"># 每个输出都算损失</span>
+total_loss.backward()               <span class="cm"># 梯度自动累加</span></code></pre>
+<p>
+这种深度监督的损失设计让梯度信号能直接传到每个 stage，显著加速了深层网络的收敛。
+</p>
+</div>
+
+<!-- K12 -->
+<div class="knowledge-card">
+<div class="kc-title"><span class="kc-num">12</span>模型保存与加载 <span class="tag tag-core">核心</span></div>
+<p>
+<code>state_dict()</code> 返回模型所有可学习参数的有序字典。<code>load_state_dict()</code> 加载权重。这是训练与推理之间的桥梁：
+</p>
+<pre><code><span class="cm"># 保存</span>
+torch.save(model.state_dict(), <span class="str">"model.pth"</span>)
+
+<span class="cm"># 加载</span>
+model = MyModel()
+model.load_state_dict(torch.load(<span class="str">"model.pth"</span>, map_location=<span class="str">"cpu"</span>))
+model.eval()  <span class="cm"># 切换到推理模式！</span></code></pre>
+<p>
+PiDiNet 项目中 <code>PiDiNetLoader.load()</code> 做了两件额外的事：处理 <code>module.</code> 前缀（DataParallel 训练产物）和处理嵌套的 checkpoint 字典。这两步在实际项目中几乎总是需要的。
+</p>
+</div>
+
+<h3>学习路径建议</h3>
+
+<p>
+如果你想系统地掌握以上知识，推荐按这个顺序学习：
+</p>
+
+<p>
+<strong>第一阶段：基础。</strong>理解张量操作、自动微分、<code>nn.Module</code> 的基本用法。能写出一个简单的前馈网络做 MNIST 分类。
+</p>
+
+<p>
+<strong>第二阶段：卷积。</strong>理解卷积操作的数学含义、通道、步长、填充、感受野。能写出一个简单的 CNN 做 CIFAR-10 分类。
+</p>
+
+<p>
+<strong>第三阶段：经典架构。</strong>学习 ResNet（残差连接）、MobileNet（depthwise separable）、VGG（多阶段下采样）。理解它们的设计动机和 trade-off。
+</p>
+
+<p>
+<strong>第四阶段：高级话题。</strong>注意力机制、多尺度融合、空洞卷积、知识蒸馏。阅读 PiDiNet 论文并尝试复现。
+</p>
+
+<p>
+<strong>第五阶段：部署。</strong>学习 ONNX 导出、模型量化、TFLite 推理——也就是本项目 <code>convert_pidinet_to_tflite.py</code> 所覆盖的内容。
+</p>
+
+
+<!-- ===== 例题 ===== -->
+<div class="exercise-section">
+<h3>例题：手把手带你算一遍</h3>
+
+<div class="example">
+<div class="ex-title">例题 1：卷积输出尺寸计算 <span class="difficulty diff-easy">基础</span></div>
+<p>
+一个输入特征图尺寸为 32x32，使用 3x3 卷积核，stride=1，padding=1。求输出特征图的尺寸。
+</p>
+<details open>
+<summary>解题过程</summary>
+<div class="answer-body">
+<p>
+卷积输出尺寸的通用公式：
+</p>
+<p style="text-align:center; padding:10px; background:var(--surface2); border-radius:6px;">
+  output = (input - kernel_size + 2 &times; padding) / stride + 1
+</p>
+<p>
+代入数值：output = (32 - 3 + 2&times;1) / 1 + 1 = 31 + 1 = <strong>32</strong>。
+</p>
+<p>
+输出尺寸等于输入尺寸——这正是 <code>padding=1</code> 配合 3x3 卷积核和 stride=1 的经典用法，称为 "same padding"。PiDiNet 中大量的 3x3 卷积都用这种方式保持空间尺寸不变，只在需要下采样时才使用 stride=2 或 MaxPool。
+</p>
+</div>
+</details>
+</div>
+
+<div class="example">
+<div class="ex-title">例题 2：参数量计算 —— 标准卷积 vs 深度可分离卷积 <span class="difficulty diff-easy">基础</span></div>
+<p>
+一个卷积层，输入 64 通道，输出 128 通道，卷积核 3x3。分别计算标准卷积和深度可分离卷积（depthwise + pointwise）的参数量（假设都不用 bias）。
+</p>
+<details open>
+<summary>解题过程</summary>
+<div class="answer-body">
+<p><strong>标准卷积：</strong></p>
+<p>
+参数量 = out_channels &times; in_channels &times; kernel_h &times; kernel_w = 128 &times; 64 &times; 3 &times; 3 = <strong>73,728</strong>
+</p>
+<p><strong>深度可分离卷积：</strong></p>
+<p>
+Depthwise 部分：每个输入通道独立做 3x3 卷积，参数量 = 64 &times; 1 &times; 3 &times; 3 = 576<br>
+Pointwise 部分：1x1 卷积做通道混合，参数量 = 128 &times; 64 &times; 1 &times; 1 = 8,192<br>
+总计 = 576 + 8,192 = <strong>8,768</strong>
+</p>
+<p>
+深度可分离卷积的参数量仅为标准卷积的 8,768 / 73,728 &approx; <strong>11.9%</strong>，大约省了 88% 的参数。PiDiNet 的 PDCBlock 正是用 <code>groups=inplane</code> 实现了 depthwise 卷积，然后用 1x1 卷积做通道混合，所以整个模型的参数量才能压到 0.7M。
+</p>
+</div>
+</details>
+</div>
+
+<div class="example">
+<div class="ex-title">例题 3：感受野计算 <span class="difficulty diff-mid">中等</span></div>
+<p>
+一个网络连续使用了三层 3x3 卷积（stride=1, padding=1）。请问第三层的一个神经元在原始输入上的感受野是多大？如果其中一层换成 dilation=2 的空洞卷积呢？
+</p>
+<details open>
+<summary>解题过程</summary>
+<div class="answer-body">
+<p><strong>三层普通 3x3 卷积：</strong></p>
+<p>
+第 1 层：感受野 = 3<br>
+第 2 层：每个神经元看到第 1 层的 3 个神经元，第 1 层每个又看到原图的 3 个像素。但相邻神经元的感受野有重叠，所以第 2 层感受野 = 3 + (3-1) = 5<br>
+第 3 层：同理 = 5 + (3-1) = <strong>7</strong>
+</p>
+<p>
+通用公式：每增加一层 kernel_size=k 的卷积，感受野增加 (k-1)。
+</p>
+<p><strong>如果第 2 层换成 dilation=2 的 3x3 空洞卷积：</strong></p>
+<p>
+dilation=2 的 3x3 卷积的"有效核大小" = (k-1) &times; dilation + 1 = 2 &times; 2 + 1 = 5。<br>
+第 1 层：感受野 = 3<br>
+第 2 层（空洞卷积）：感受野 = 3 + (5-1) = 7<br>
+第 3 层：感受野 = 7 + (3-1) = <strong>9</strong>
+</p>
+<p>
+同样三层，用一层空洞卷积就把感受野从 7 扩大到了 9，而参数量没有任何增加。这就是 PiDiNet 的 CDCM 模块用 dilation=5,7,9,11 的原因——用极少的参数覆盖很大的感受野范围。
+</p>
+</div>
+</details>
+</div>
+
+<div class="example">
+<div class="ex-title">例题 4：中央差分卷积的数值验证 <span class="difficulty diff-mid">中等</span></div>
+<p>
+假设一个 3x3 卷积核的权重全部为 1（即 <code>w = ones(3,3)</code>），输入为一个 3x3 的区域：<code>[[1,2,3],[4,5,6],[7,8,9]]</code>。请手动计算中央差分卷积 (CD) 的输出值。
+</p>
+<details open>
+<summary>解题过程</summary>
+<div class="answer-body">
+<p><strong>第一步：标准 3x3 卷积 y</strong></p>
+<p>
+权重全为 1 时，卷积就是对窗口内所有值求和：y = 1+2+3+4+5+6+7+8+9 = <strong>45</strong>
+</p>
+<p><strong>第二步：中心响应 yc</strong></p>
+<p>
+weights_c = weights.sum(dim=[2,3]) = 1&times;9 = 9（等效为 1x1 卷积，权重为 9）<br>
+yc = 中心像素值 &times; 9 = 5 &times; 9 = <strong>45</strong>
+</p>
+<p><strong>第三步：差分输出</strong></p>
+<p>
+CD output = y - yc = 45 - 45 = <strong>0</strong>
+</p>
+<p>
+这个结果是合理的：权重全为 1 的卷积核本质上就是一个"求和器"，不含任何边缘检测能力。CD 卷积正确地输出 0——说明当权重没有学到任何空间差异模式时，差分响应为零。只有当权重在空间上不均匀分布时（比如 Sobel 那样的梯度模式），CD 才会产生非零的边缘响应。
+</p>
+</div>
+</details>
+</div>
+
+<div class="example">
+<div class="ex-title">例题 5：反向传播的链式法则 <span class="difficulty diff-mid">中等</span></div>
+<p>
+一个极简的计算图：<code>x = 3</code>，<code>w1 = 2</code>，<code>w2 = 4</code>，<code>z = x * w1</code>，<code>y = z + w2</code>，<code>L = (y - 10)^2</code>。请用链式法则计算 <code>&part;L/&part;w1</code> 和 <code>&part;L/&part;w2</code>。
+</p>
+<details open>
+<summary>解题过程</summary>
+<div class="answer-body">
+<p><strong>前向传播：</strong></p>
+<p>
+z = 3 &times; 2 = 6<br>
+y = 6 + 4 = 10<br>
+L = (10 - 10)&sup2; = 0
+</p>
+<p><strong>反向传播（从 L 往回推）：</strong></p>
+<p>
+&part;L/&part;y = 2(y - 10) = 2 &times; 0 = <strong>0</strong>
+</p>
+<p>
+因为 &part;L/&part;y = 0，后续所有梯度都是 0。这很合理——模型已经完美预测了（y=10 正好等于目标值），所以不需要调整任何权重。
+</p>
+<p>
+但如果目标值改为 15：<br>
+L = (10 - 15)&sup2; = 25<br>
+&part;L/&part;y = 2(10 - 15) = -10<br>
+&part;L/&part;w2 = &part;L/&part;y &times; &part;y/&part;w2 = -10 &times; 1 = <strong>-10</strong><br>
+&part;L/&part;z = &part;L/&part;y &times; &part;y/&part;z = -10 &times; 1 = -10<br>
+&part;L/&part;w1 = &part;L/&part;z &times; &part;z/&part;w1 = -10 &times; x = -10 &times; 3 = <strong>-30</strong>
+</p>
+<p>
+梯度为负，说明增大 w1 和 w2 可以减小损失。更新时 w_new = w_old - lr &times; gradient，因为 gradient 为负，所以 w 实际上会增大——和我们的直觉一致（y=10 太小了，需要增大）。
+</p>
+</div>
+</details>
+</div>
+</div>
+
+
+<!-- ===== 练习题 ===== -->
+<div class="exercise-section">
+<h3>练习题：检验你的理解</h3>
+
+<div class="exercise">
+<div class="ex-title">练习 1：Stride 与输出尺寸 <span class="difficulty diff-easy">基础</span></div>
+<p>
+PiDiNet 的 Stage 2 使用 <code>stride=2</code> 的 PDCBlock 做下采样。如果 Stage 1 的输出是 (1, 20, 512, 512)，Stage 2 的第一个 PDCBlock 中先做 MaxPool2d(kernel_size=2, stride=2)，再做 3x3 depthwise 卷积（padding=1）和 1x1 pointwise 卷积。请问：</p>
+<p>(a) MaxPool 后特征图的尺寸是多少？</p>
+<p>(b) depthwise 卷积后特征图的尺寸是多少？</p>
+<p>(c) pointwise 卷积后特征图的通道数变成了多少？</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+(a) MaxPool(2,2) 将空间尺寸减半：512 / 2 = <strong>256</strong>，所以是 (1, 20, 256, 256)。
+</p>
+<p>
+(b) 3x3 depthwise 卷积，padding=1，stride=1（注意：stride=2 的作用已经被 MaxPool 承担了，卷积本身是 stride=1）。输出尺寸 = (256 - 3 + 2&times;1) / 1 + 1 = 256。仍然是 <strong>(1, 20, 256, 256)</strong>。
+</p>
+<p>
+(c) Pointwise 1x1 卷积将通道从 inplane 映射到 ouplane。Stage 2 的 ouplane = inplane &times; 2 = 20 &times; 2 = <strong>40</strong>。所以最终是 (1, 40, 256, 256)。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 2：PiDiNet Tiny 的通道数变化 <span class="difficulty diff-easy">基础</span></div>
+<p>
+PiDiNet Tiny 的 <code>inplane=20</code>。请列出四个 Stage 结束后的特征图通道数分别是多少？
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+初始通道数 = 20。每个 Stage 结束后通道数翻倍（通过 pointwise 1x1 卷积）：
+</p>
+<p>
+Stage 1 输出：<strong>20</strong> 通道（Stage 1 不做通道扩展）<br>
+Stage 2 输出：<strong>40</strong> 通道（20 &times; 2）<br>
+Stage 3 输出：<strong>80</strong> 通道（40 &times; 2）<br>
+Stage 4 输出：<strong>80</strong> 通道（80 &times; 1，最后一个 Stage 不再翻倍）
+</p>
+<p>
+代码中 Stage 4 的 <code>self.inplane</code> 没有被再次乘以 2，所以 Stage 3 和 Stage 4 共享 80 通道。这也可以从 <code>self.fuseplanes</code> 列表验证：<code>[20, 40, 80, 80]</code>。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 3：角差分卷积的权重变换 <span class="difficulty diff-hard">进阶</span></div>
+<p>
+假设一个 3x3 卷积核的权重如下（展平后）：<code>[1, 2, 3, 4, 5, 6, 7, 8, 9]</code>。根据角差分卷积 (AD) 的变换规则 <code>weights - weights[:, :, [3,0,1,6,4,2,7,8,5]]</code>，请计算变换后的权重。
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+首先理解索引映射。原始索引 [0,1,2,3,4,5,6,7,8]，顺时针旋转后的索引 [3,0,1,6,4,2,7,8,5]。这意味着：
+</p>
+<pre><code>原始权重:    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+旋转后权重:  [4, 1, 2, 7, 5, 3, 8, 9, 6]
+                        ↑  ↑  ↑
+                     索引 0→3, 1→0, 2→1...
+
+逐位做差:
+  位置 0: 1 - 4 = -3
+  位置 1: 2 - 1 =  1
+  位置 2: 3 - 2 =  1
+  位置 3: 4 - 7 = -3
+  位置 4: 5 - 5 =  0    (中心不变)
+  位置 5: 6 - 3 =  3
+  位置 6: 7 - 8 = -1
+  位置 7: 8 - 9 = -1
+  位置 8: 9 - 6 =  3</code></pre>
+<p>
+变换后的权重为 <strong>[-3, 1, 1, -3, 0, 3, -1, -1, 3]</strong>，还原为 3x3 矩阵：
+</p>
+<pre><code>  -3   1   1
+  -3   0   3
+  -1  -1   3</code></pre>
+<p>
+观察这个矩阵：左侧和上方为负、右侧和下方为正，这正是某种方向性梯度算子。AD 卷积让网络可以学习到类似的方向敏感算子。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 4：nn.ModuleList vs 普通 list <span class="difficulty diff-mid">中等</span></div>
+<p>
+下面两段代码中，哪一段是正确的？为什么另一段有问题？
+</p>
+<pre><code><span class="cm"># 代码 A</span>
+<span class="kw">class</span> <span class="cls">MyNet</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="bi">super</span>().__init__()
+        self.layers = [nn.Conv2d(<span class="num">3</span>,<span class="num">64</span>,<span class="num">3</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="bi">range</span>(<span class="num">4</span>)]
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">for</span> layer <span class="kw">in</span> self.layers:
+            x = layer(x)
+        <span class="kw">return</span> x
+
+<span class="cm"># 代码 B</span>
+<span class="kw">class</span> <span class="cls">MyNet</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="bi">super</span>().__init__()
+        self.layers = nn.ModuleList([nn.Conv2d(<span class="num">3</span>,<span class="num">64</span>,<span class="num">3</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="bi">range</span>(<span class="num">4</span>)])
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">for</span> layer <span class="kw">in</span> self.layers:
+            x = layer(x)
+        <span class="kw">return</span> x</code></pre>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p><strong>代码 B 是正确的。</strong></p>
+<p>
+代码 A 使用了普通 Python list 来存储 nn.Conv2d 层。虽然 <code>forward()</code> 中循环调用没有问题（前向传播能正常运行），但存在两个严重问题：
+</p>
+<p>
+(1) <code>model.parameters()</code> <strong>不会包含</strong> 这些 Conv2d 层的权重——因为它们没有被 PyTorch 注册为子模块。结果就是优化器不会更新这些权重，<strong>模型不会学习</strong>。
+</p>
+<p>
+(2) <code>model.state_dict()</code> <strong>不会保存</strong> 这些层的权重——你保存的模型文件会丢失所有训练好的参数。
+</p>
+<p>
+<code>nn.ModuleList</code> 是 PyTorch 专门提供的容器，它会让其中存储的 Module 正确注册为父模块的子模块。PiDiNet 中的 <code>self.conv_reduces</code>、<code>self.attentions</code>、<code>self.dilations</code> 都使用了 <code>nn.ModuleList</code>。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 5：空洞卷积的有效核大小 <span class="difficulty diff-easy">基础</span></div>
+<p>
+PiDiNet 的 CDCM 模块使用 dilation=5, 7, 9, 11 的空洞卷积。请计算这四种 dilation 下 3x3 卷积核的"有效核大小"（即实际覆盖的像素范围），以及它们各自对应的感受野半径。
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+有效核大小公式：<code>effective_size = (kernel_size - 1) &times; dilation + 1</code>
+</p>
+<table>
+<tr><th>Dilation</th><th>有效核大小</th><th>覆盖半径 (从中心算)</th></tr>
+<tr><td>5</td><td>(3-1)&times;5 + 1 = <strong>11</strong></td><td>5 像素</td></tr>
+<tr><td>7</td><td>(3-1)&times;7 + 1 = <strong>15</strong></td><td>7 像素</td></tr>
+<tr><td>9</td><td>(3-1)&times;9 + 1 = <strong>19</strong></td><td>9 像素</td></tr>
+<tr><td>11</td><td>(3-1)&times;11 + 1 = <strong>23</strong></td><td>11 像素</td></tr>
+</table>
+<p>
+这意味着 CDCM 模块中的一个神经元可以同时"看到"从 11x11 到 23x23 的四种尺度的区域。四个分支的输出相加后，等效于一个能同时感知多尺度信息的超级卷积核。这就是 PiDiNet 在不增加参数量的前提下实现多尺度边缘检测的关键。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 6：CSAM 注意力模块的参数量 <span class="difficulty diff-mid">中等</span></div>
+<p>
+CSAM (Compact Spatial Attention Module) 接收一个 <code>(1, C, H, W)</code> 的特征图。它的结构是：ReLU → 1x1 Conv(C → 4) → 3x3 Conv(4 → 1, 无 bias) → Sigmoid → 与原特征逐元素相乘。请计算当 C=80 时 CSAM 的参数量。
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p><strong>1x1 Conv (80 → 4)，有 bias：</strong></p>
+<p>
+权重：4 &times; 80 &times; 1 &times; 1 = 320<br>
+偏置：4<br>
+小计 = 324
+</p>
+<p><strong>3x3 Conv (4 → 1)，无 bias：</strong></p>
+<p>
+权重：1 &times; 4 &times; 3 &times; 3 = 36<br>
+小计 = 36
+</p>
+<p><strong>总计 = 324 + 36 = 360 个参数</strong></p>
+<p>
+注意这个数值与输入的空间尺寸 (H, W) 完全无关——CSAM 的参数量只取决于通道数。这也是 1x1 卷积的优势：它能以极低的参数量实现通道降维。360 个参数对于一个注意力模块来说是非常轻量的。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 7：残差连接的维度匹配 <span class="difficulty diff-mid">中等</span></div>
+<p>
+在 PDCBlock 中，当 <code>stride=2</code> 时，输入先经过 MaxPool2d(2,2) 下采样，主分支经过 depthwise + pointwise 卷积。残差连接要求 <code>y = y + x</code>，即两个张量形状必须一致。请解释代码中是如何保证维度匹配的。
+</p>
+<pre><code><span class="kw">def</span> <span class="fn">forward</span>(self, x):
+    <span class="kw">if</span> self.stride > <span class="num">1</span>:
+        x = self.pool(x)
+    y = self.conv1(x)
+    y = self.relu2(y)
+    y = self.conv2(y)
+    <span class="kw">if</span> self.stride > <span class="num">1</span>:
+        x = self.shortcut(x)
+    y = y + x
+    <span class="kw">return</span> y</code></pre>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+假设输入 x 形状为 (1, 20, 512, 512)，stride=2。跟踪各变量：
+</p>
+<p>
+<strong>主分支 (y)：</strong><br>
+x 经过 MaxPool → (1, 20, 256, 256)<br>
+conv1 (depthwise 3x3, padding=1) → (1, 20, 256, 256)<br>
+ReLU → (1, 20, 256, 256)<br>
+conv2 (pointwise 1x1, 20→40) → y = <strong>(1, 40, 256, 256)</strong>
+</p>
+<p>
+<strong>Shortcut 分支 (x)：</strong><br>
+x 经过 MaxPool → (1, 20, 256, 256)<br>
+x 经过 shortcut (1x1 Conv, 20→40) → x = <strong>(1, 40, 256, 256)</strong>
+</p>
+<p>
+关键点在于 <code>self.shortcut</code> 这个 1x1 卷积——它不改变空间尺寸，但将通道数从 inplane (20) 映射到 ouplane (40)，使得 shortcut 分支的 x 和主分支的 y 在通道维度上匹配。如果没有这个 shortcut，(1, 20, 256, 256) 和 (1, 40, 256, 256) 无法相加，PyTorch 会直接报错。
+</p>
+<p>
+这也解释了为什么 stride=1 的 PDCBlock 不需要 shortcut——此时 inplane == ouplane，输入输出通道数相同，可以直接相加。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 8：损失函数与类别不平衡 <span class="difficulty diff-hard">进阶</span></div>
+<p>
+一张 512x512 的边缘检测结果图中，边缘像素有 13,107 个（5%），非边缘像素有 249,037 个（95%）。如果使用不加权重的二元交叉熵损失，模型对所有像素都预测 0（不是边缘），损失是多少？（假设 log(1) = 0, log(0.95) &approx; -0.0513）
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+当模型对所有像素预测 p=0（不是边缘）时：
+</p>
+<p>
+对于非边缘像素（y=0, p=0）：loss = -[0&times;log(0) + 1&times;log(1)] = -log(1) = 0<br>
+（这里 log(0) 虽然在数学上无定义，但在 BCE 中 0&times;log(0) 约定为 0）
+</p>
+<p>
+对于边缘像素（y=1, p=0）：loss = -[1&times;log(0) + 0&times;log(1)] = -log(0) → &infin;<br>
+实际上 PyTorch 会 clamp p 值避免 log(0)，假设 clamp 到 &epsilon;=1e-7，则 loss &approx; 16.1。
+</p>
+<p>
+平均损失 = (249,037 &times; 0 + 13,107 &times; 16.1) / 262,144 &approx; <strong>0.805</strong>
+</p>
+<p>
+看起来损失不大对吧？这就是问题所在——95% 的像素贡献了 0 损失，5% 的边缘像素贡献的高损失被平均后变得很小。模型"发现"只要全部预测 0 就能得到较低的损失值，所以它不会努力学习边缘。
+</p>
+<p>
+<strong>加权交叉熵的解决方案：</strong>给边缘像素更大的权重（比如正类权重设为 249,037/13,107 &approx; 19），这样边缘像素的损失被放大 19 倍，模型就无法通过"全部预测 0"来偷懒了。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 9：多输出模型的推理 <span class="difficulty diff-easy">基础</span></div>
+<p>
+PiDiNet 的 <code>forward()</code> 返回一个包含 5 个张量的列表。当你在部署时只需要最终的融合输出，你应该取列表的哪个元素？如果你想做深度监督的训练，损失函数应该怎么设计？
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p>
+<strong>推理时：</strong>取 <code>outputs[-1]</code>（即列表的最后一个元素，索引 4），这是四个 stage 的边缘图经过 classifier 融合后的最终输出。
+</p>
+<p>
+<strong>训练时的损失设计：</strong>
+</p>
+<pre><code>outputs = model(image)  <span class="cm"># [e1, e2, e3, e4, fused]</span>
+total_loss = <span class="num">0</span>
+<span class="kw">for</span> i, out <span class="kw">in</span> <span class="bi">enumerate</span>(outputs):
+    <span class="cm"># 每个输出都计算损失</span>
+    loss_i = weighted_bce_loss(out, label)
+    <span class="cm"># 可以给不同 stage 不同的权重</span>
+    <span class="cm"># 例如：融合输出 (i=4) 给更大权重</span>
+    weight = <span class="num">1.0</span> <span class="kw">if</span> i < <span class="num">4</span> <span class="kw">else</span> <span class="num">1.2</span>
+    total_loss += weight * loss_i
+total_loss.backward()</code></pre>
+<p>
+每个中间输出的损失都为对应 stage 提供直接的梯度信号，加速训练收敛。融合输出的权重稍大是因为它才是最终要用的结果。
+</p>
+</div>
+</details>
+</div>
+
+<div class="exercise">
+<div class="ex-title">练习 10：径向差分卷积的 buffer 布局 <span class="difficulty diff-hard">进阶</span></div>
+<p>
+RD 卷积将 3x3 权重展开到 5x5 buffer 中。已知原始 3x3 权重展平后为 <code>[w0, w1, w2, w3, w4, w5, w6, w7, w8]</code>。根据代码中的索引映射：<br>
+外圈位置 <code>[0, 2, 4, 10, 14, 20, 22, 24]</code> 放 <code>weights[1:]</code><br>
+内圈位置 <code>[6, 7, 8, 11, 13, 16, 17, 18]</code> 放 <code>-weights[1:]</code><br>
+中心位置 <code>[12]</code> = 0
+</p>
+<p>
+请画出这个 5x5 buffer 的完整布局（用 w_i 表示），并解释为什么这种布局等效于一个可学习的拉普拉斯算子。
+</p>
+<details>
+<summary>点击查看答案</summary>
+<div class="answer-body">
+<p><strong>5x5 Buffer 布局：</strong></p>
+<p>
+原始 3x3 权重展平：[w0, w1, w2, w3, w4, w5, w6, w7, w8]，其中 w4 是中心。
+</p>
+<p>
+<code>weights[1:]</code> = [w1, w2, w3, w4, w5, w6, w7, w8]（去掉 w0 后的 8 个值）
+</p>
+<pre><code>5x5 Buffer（行优先索引 0~24）：
+
+  [ 0] [ 1] [ 2] [ 3] [ 4]        w1   0   w2   0   w3
+  [ 5] [ 6] [ 7] [ 8] [ 9]         0 -w1 -w2 -w3    0
+  [10] [11] [12] [13] [14]   =    w4 -w5   0 -w6   w5
+  [15] [16] [17] [18] [19]         0 -w7  w8  w6    0
+  [20] [21] [22] [23] [24]        w6   0   w7   0   w8</code></pre>
+<p>
+注意：外圈四个角 [0,4,20,24] 和内圈 [6,8,16,18] 形成对应关系——每个外圈值都有一个符号相反的内圈"邻居"。
+</p>
+<p><strong>为什么这是可学习的拉普拉斯算子：</strong></p>
+<p>
+经典拉普拉斯算子的 5x5 形式是外圈为负、内圈为正（或反过来），中心为 0。RD 卷积的结构完全对应：外圈的权重与内圈的对应权重符号相反（<code>+w_i</code> 在外，<code>-w_i</code> 在内），中心为 0。
+</p>
+<p>
+当这个核与图像卷积时，对于每个位置，它计算的是"外圈像素的加权和 - 内圈像素的加权和"。在平坦区域，内外圈像素值相似，差分为 0；在边缘或角点处，内外圈像素值差异大，差分响应强。这正是拉普拉斯算子检测二阶导数（"弯曲度"）的原理，只不过 RD 卷积让这个算子变成了<strong>可学习的</strong>——网络自己调整 8 个权重值，找到最适合当前任务的"拉普拉斯变体"。
+</p>
+</div>
+</details>
+</div>
+
+</div>
+
+</section>
+
+<div class="footnote">
+  <p>
+    本文档基于 PiDiNet 项目源码（<code>pidinet/models/</code>）编写，采用费曼学习法组织内容。PiDiNet 论文：Zhuo Su, Wenzhe Liu, "Pixel Difference Networks for Efficient Edge Detection", ICCV 2021.
+  </p>
+</div>
+
+</div>
+</body>
+</html>
